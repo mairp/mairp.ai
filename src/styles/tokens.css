@@ -1,0 +1,114 @@
+/* Design tokens: the only place colours, type and spacing are defined. Dark
+   first; light follows prefers-color-scheme, and the toggle (data-theme on
+   <html>) overrides both ways. Accent system: Signal Teal (#00B3A4) with a
+   cyan gradient partner (#22D3EE) — vendor-neutral, telemetry-on-dark, AA in
+   both themes. See DECISIONS.md for why NVIDIA green and the template pink
+   were rejected. */
+
+:root {
+  /* type */
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: 1.375rem;
+  --font-display: 'Poppins', var(--font-sans);
+  --step-3: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --step-4: clamp(1.75rem, 1.1rem + 2.6vw, 3rem);
+  --step-5: clamp(2.4rem, 1.2rem + 5.2vw, 5rem);
+  --leading: 1.6;
+
+  /* spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 6.5rem;
+  --gutter: 16px;
+  --max: 72rem;
+  --radius: 8px;
+
+  /* colour: dark */
+  --bg: #0f1512;
+  --surface: #161d1a;
+  --surface-2: #1d2622;
+  --border: #2c3a35;
+  --fg: #d2ddd8;
+  --fg-strong: #ffffff;
+  --muted: #93a5a0;
+  --accent: #00b3a4;
+  --accent-2: #22d3ee;
+  --accent-ink: #04211d;
+  --ok: #4ade80;
+  --warn: #f5b342;
+  --err: #ff6b6b;
+  --info: #8b9cff;
+  --cyan: #22d3ee;
+  --focus: #22d3ee;
+
+  /* canvas: card fill, the dot grid, and the accent used as light */
+  --card: #121917;
+  --dot: rgb(220 255 250 / 0.09);
+  --orb-core: #ffffff;
+  --orb-edge: #00b3a4;
+  --ring: rgb(180 235 228 / 0.3);
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --bg: #fafaf7;
+    --surface: #ffffff;
+    --surface-2: #eef2f0;
+    --border: #d6ddd9;
+    --fg: #242b28;
+    --fg-strong: #000000;
+    --muted: #52605b;
+    --accent: #0a7d70;
+    --accent-2: #0e7490;
+    --accent-ink: #ffffff;
+    --ok: #0e6a2f;
+    --warn: #774700;
+    --err: #c42b2b;
+    --info: #3043c2;
+    --cyan: #0b7a86;
+    --focus: #0a7d70;
+    --card: #ffffff;
+    --dot: rgb(0 60 50 / 0.13);
+    --orb-core: #d8fbf5;
+    --orb-edge: #0fb5a6;
+    --ring: rgb(10 125 112 / 0.3);
+    color-scheme: light;
+  }
+}
+
+:root[data-theme='light'] {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-2: #eef2f0;
+  --border: #d6ddd9;
+  --fg: #242b28;
+  --fg-strong: #000000;
+  --muted: #52605b;
+  --accent: #0a7d70;
+  --accent-2: #0e7490;
+  --accent-ink: #ffffff;
+  --ok: #0e6a2f;
+  --warn: #774700;
+  --err: #c42b2b;
+  --info: #3043c2;
+  --cyan: #0b7a86;
+  --focus: #0a7d70;
+  --card: #ffffff;
+  --dot: rgb(0 60 50 / 0.13);
+  --orb-core: #d8fbf5;
+  --orb-edge: #0fb5a6;
+  --ring: rgb(10 125 112 / 0.3);
+  color-scheme: light;
+}

@@ -1,0 +1,42 @@
+# Engagement models — how the work is packaged. Synced with the synthesis; edit here.
+- id: eng-architecture-strategy-advisory
+  name: Architecture & Strategy Advisory
+  order: 1
+  duration: 2–3 weeks
+  deliverable: Opportunity/decision memo — where agentic NetOps, local inference or automation pays back, sequenced, with a build-or-buy recommendation and risk notes.
+  prerequisites: Executive sponsor; a current-state summary (docs or interviews); a defined business problem.
+
+- id: eng-automation-inference-readiness-assessment
+  name: Automation / Inference Readiness Assessment
+  order: 2
+  duration: 3–4 weeks
+  deliverable: Technical assessment report with dated, evidence-backed findings, severity-ranked gaps, and a two-quarter remediation roadmap.
+  prerequisites: Read-only access to configs/state or benchmark outputs; a technical point of contact.
+
+- id: eng-fabric-convergence-proof-of-value
+  name: Fabric Convergence Proof-of-Value
+  order: 3
+  duration: 4–8 weeks
+  deliverable: A containerlab replica of your fabric with the intent-to-CR pipeline, gNMI closed loop, and an on-device verification report — video-recorded for internal sell-through.
+  prerequisites: Sandbox or lab capacity; vendor or hardware access; one named business metric.
+
+- id: eng-implementation-delivery
+  name: Implementation & Delivery
+  order: 4
+  duration: 3–6 months
+  deliverable: Shipped automation or platform, runbooks, verified-on-device evidence, and a knowledge-transfer handover to your team.
+  prerequisites: Completed assessment or PoC; delivery sponsor; change-management window; access and credentials governance agreed.
+
+- id: eng-agent-fleet-platform-build
+  name: Agent-Fleet Platform Build
+  order: 5
+  duration: 6–12 weeks
+  deliverable: Working multi-agent reference (orchestration, memory, routing, observability) with dashboards, cost telemetry, and operating guidance.
+  prerequisites: Selected model-serving path (local, hosted or both); GPU or cloud budget; a use-case backlog from the business.
+
+- id: eng-fractional-architect-enablement
+  name: Fractional Architect & Enablement
+  order: 6
+  duration: 1–2 weeks per cohort / 3–12 month retainers
+  deliverable: Tailored EN/ES/PT curriculum and labs, plus a trained internal team; or a retained architecture allocation.
+  prerequisites: A cohort of engineers with baseline networking skills; a lab environment or licensed course materials.

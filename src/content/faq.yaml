@@ -1,0 +1,40 @@
+# FAQ — buyer-voiced questions, answered with evidence links. `code` and [text](https://…) allowed.
+- id: faq-1
+  order: 1
+  q: Do you actually build, or only advise?
+  a: Both, but the bias is building. The reference evidence is shipped and runnable — working multi-agent intent-to-fabric code with verified convergence on a live containerlab fabric ([agentic-netops](https://github.com/mairp/agentic-netops)), deployed observability stacks, published research. Advisory engagements exist, but every recommendation is anchored to something built and demonstrable.
+
+- id: faq-2
+  order: 2
+  q: Can you work with our vendor X?
+  a: Yes — multivendor is the core of the practice, not an add-on. Public work spans Cisco IOS-XR/NX-OS, Nokia SR Linux and SR OS, and SONiC, with hands-on labs for Nokia ANYsec/MACsec security and streaming telemetry ([sros-anysec-lab](https://github.com/mairp/sros-anysec-lab)). Certifications across Cisco, Nokia, Kubernetes and NVIDIA back that range; Juniper and Red Hat estates are equally in scope.
+
+- id: faq-3
+  order: 3
+  q: How do you handle confidentiality?
+  a: Your environments, topology and business context stay yours. Public repo names and anonymized capability categories are the only evidence ever referenced — no client names, architectures, screenshots or details are published or cited. Confidentiality terms are set in the engagement contract before work starts.
+
+- id: faq-4
+  order: 4
+  q: What does an engagement look like?
+  a: A short scoping conversation, then a bounded discovery phase mapping your fabric, tooling and constraints; then delivery with defined constructs and a verification bar — every change proven on the device before it is reported done; then handover with runbooks, code, and optionally training for your team.
+
+- id: faq-5
+  order: 5
+  q: Local models vs. cloud — what fits us?
+  a: It depends on your data sensitivity, latency and cost profile — and it is measurable, not philosophical. Structured benchmarks of local 30B-class models against hosted frontier models on real ops tasks ([agentic-ops-bench](https://github.com/mairp/agentic-ops-bench)) mean the decision is made on your workloads with real numbers, plus routing and policy so both can coexist.
+
+- id: faq-6
+  order: 6
+  q: How do you price?
+  a: Fixed-scope phases with a defined deliverable and verification bar per phase, priced up front; ongoing advisory or platform work on retainer. You always know what a phase costs and what "done" means before it starts — and "done" is on-device verified, not a status report.
+
+- id: faq-7
+  order: 7
+  q: Who controls the automation if agents are in the loop?
+  a: The same way the public reference build does — agents propose, controllers reconcile, telemetry verifies, and drift is repaired automatically, with guarded control planes so agent actions are bounded and auditable. Nothing is reported deployed until verified on the device; that rule is the product ([agentic-netops](https://github.com/mairp/agentic-netops)).
+
+- id: faq-8
+  order: 8
+  q: Can you train our team, not just deliver?
+  a: Yes. Training and enablement are a standing line of the practice, grounded in university mentoring that produced two peer-reviewed publications and in authored course material. Handover includes working sessions so your engineers can operate and extend what is built.

@@ -1,0 +1,24 @@
+---
+// A service card for the home-page band: one-line outcome, duration, vendors.
+import type { CollectionEntry } from 'astro:content';
+interface Props { entry: CollectionEntry<'services'> }
+const { entry } = Astro.props;
+const s = entry.data;
+---
+<a class="card svc reveal" href={`/services/${entry.id}/`}>
+  <h3>{s.name}</h3>
+  <p>{s.oneLine}</p>
+  <p class="meta mono">
+    <span class="st">{s.status === 'available' ? '●' : '○'}</span> {s.duration}
+    {s.vendors.length > 0 && <span class="vs"> · {s.vendors.slice(0, 3).join(' · ')}</span>}
+  </p>
+</a>
+
+<style>
+  .svc { display: flex; flex-direction: column; text-decoration: none; }
+  .svc h3 { color: var(--fg-strong); }
+  .svc p { margin: 0 0 var(--space-3); flex: 1; }
+  .meta { font-size: 0.75rem; margin: 0; color: var(--muted); }
+  .st { color: var(--ok); }
+  .vs { color: var(--muted); }
+</style>

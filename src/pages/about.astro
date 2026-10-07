@@ -1,0 +1,104 @@
+---
+// About: the person behind the practice — trajectory, certifications,
+// publications, languages, and the consultant profile (PDF).
+import Base from '../layouts/Base.astro';
+import CopyButton from '../components/CopyButton.astro';
+import { SITE, CERTS, VENDORS } from '../lib/site';
+
+const trajectory = [
+  { yr: '2024 — present', ttl: 'Network, Automation and Observability Architect', org: 'Core42 · Abu Dhabi, UAE · DCI and cloud networking, sovereign AI programs' },
+  { yr: '2019 — 2024', ttl: 'IP/MPLS Network Architect', org: 'Nokia · Amadora, Portugal — DTaaS (Digital Twin as a Service), Secure ZTP, smart-grid & railway critical infrastructure' },
+  { yr: '2018 — 2019', ttl: 'Network Consulting Engineer', org: 'Layer2 Consulting (Cisco) · Honduras' },
+  { yr: '2016 — 2018', ttl: 'Network & Security Specialist', org: 'Citi (contract) · San Salvador' },
+  { yr: '2014 — 2016', ttl: 'Telecommunications Engineer', org: 'Tigo (contract) · San Salvador' },
+  { yr: '2009', ttl: 'B.Sc. Electrical Engineering', org: 'Universidad Centroamericana (UCA) · San Salvador' },
+];
+
+const skills = {
+  Networks: 'IP/MPLS, SR, BGP/EVPN, VXLAN, Cisco IOS-XR and NX-OS, Nokia SR Linux and SR OS, SONiC, containerlab',
+  Platforms: 'Kubernetes, Cilium/eBPF, Go operators, Python, gNMI, Prometheus, OpenTelemetry, Grafana',
+  Agents: 'LangGraph, AGNTCY (A2A, SLIM), MCP, LiteLLM, Claude Code',
+};
+---
+<Base title="About" description="Marlon Paz — the consultant behind the practice: trajectory, certifications, publications, languages. Independent network-automation and AI-infrastructure consulting from Abu Dhabi.">
+  <div class="wrap page">
+    <p class="eyebrow mono">// about</p>
+    <h1>The consultant, not the CV.</h1>
+    <p class="lede">I solve the gap between what network and platform teams intend and what their fabric actually
+      runs. For a decade across telecom, banking and critical-infrastructure networking — and now in Gulf AI
+      data-center programs — I have built the automation that closes that gap: multivendor fabrics driven by
+      declarative intent, multi-agent systems that turn plain language into verified change, and closed loops that
+      repair drift instead of just reporting it. My operating rule is simple: nothing is reported done until it is
+      proven on the device.</p>
+    <p class="ctas">
+      <a class="btn btn-primary" href={SITE.cv}>Consultant profile — PDF <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      <CopyButton text={SITE.email} label="Copy address" />
+    </p>
+
+    <div class="bracket">
+      <p class="bracket-title mono">trajectory</p>
+      <div class="tl">
+        {trajectory.map((t, i) => (
+          <div class={`job ${i === 0 ? 'now' : ''}`}>
+            <div class="yr mono">{t.yr}</div>
+            <div class="ttl">{t.ttl}</div>
+            <div class="org muted">{t.org}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="bracket">
+      <p class="bracket-title mono">certifications &amp; fluency</p>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2 class="mono">certifications</h2>
+          <ul>{CERTS.map((c) => <li>{c}</li>)}</ul>
+          <p class="muted">Verified on <a href={SITE.credly}>Credly</a>.</p>
+        </div>
+        <div class="card">
+          <h2 class="mono">vendor fluency</h2>
+          <ul>{VENDORS.map((v) => <li>{v}</li>)}</ul>
+          <p class="muted">Deliberately vendor-independent — multivendor is the offer.</p>
+        </div>
+      </div>
+      <div class="card skills">
+        <h2 class="mono">working stack</h2>
+        {Object.entries(skills).map(([k, v]) => <p><b>{k}:</b> {v}</p>)}
+      </div>
+    </div>
+
+    <div class="bracket">
+      <p class="bracket-title mono">publications — co-authored, peer-reviewed</p>
+      <p><a href="https://ieeexplore.ieee.org/document/11080420/" target="_blank" rel="noopener noreferrer"><b>Decentralized &amp; Dynamic Zero-Touch Provisioning of Leaf-Spine EVPN Data Centers</b> (IEEE)</a></p>
+      <p class="muted">Autonomous agents on each router provision the leaf-spine EVPN underlay and overlay with no manual intervention — inferring router roles from link-state topology and self-healing on link/router failures.</p>
+      <p><a href="https://link.springer.com/article/10.1186/s13677-025-00814-0" target="_blank" rel="noopener noreferrer"><b>Kubernetes-Aware Load Balancing for Leaf-Spine EVPN Data Centers</b> (Springer, Journal of Cloud Computing)</a></p>
+      <p class="muted">Distributed agents at leaf routers feed live Kubernetes pod data into the fabric, dynamically tuning ECMP weights via EVPN/BGP extended communities so routing aligns with pod placement.</p>
+      <p class="muted">Co-authored as mentor to the master's students who carried out the research.</p>
+    </div>
+
+    <div class="bracket">
+      <p class="bracket-title mono">languages &amp; base</p>
+      <p>Based in {SITE.location}. Working languages: English, Español, Português — covering GCC, Iberia and LATAM engagements natively.</p>
+      <p class="muted">Currently practicing at Core42; the independent practice is separate and makes no claim of company endorsement.</p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-3); }
+  h1 { font-size: var(--step-4); }
+  .ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; margin: var(--space-4) 0 var(--space-6); }
+  .tl { display: grid; gap: var(--space-4); max-width: 46rem; }
+  .job { border-left: 2px solid var(--border); padding-left: var(--space-4); position: relative; }
+  .job.now { border-left-color: var(--accent); }
+  .job::before { content: ''; position: absolute; left: -5px; top: 0.45rem; width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+  .job.now::before { background: var(--accent); box-shadow: 0 0 12px 2px color-mix(in srgb, var(--accent) 60%, transparent); }
+  .job .yr { color: var(--accent); font-size: 0.75rem; }
+  .job .ttl { color: var(--fg-strong); font-weight: 600; }
+  .job .org { font-size: var(--step--1); }
+  .grid { margin-top: var(--space-4); }
+  .skills { margin-top: var(--space-4); }
+  .skills h2, .card h2 { font-size: var(--step--1); color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; }
+</style>

@@ -1,0 +1,99 @@
+---
+// One page per service, from its Markdown file. The front matter is the offer;
+// the body is the depth.
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const services = await getCollection('services');
+  return services.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const s = entry.data;
+const all = await getCollection('services');
+const related = all.filter((r) => s.related.includes(r.id));
+---
+<Base title={s.name} description={s.oneLine}>
+  <div class="wrap page">
+    <p class="eyebrow mono">// service{s.status === 'requires-scoping' && ' · ' + s.status}</p>
+    <h1>{s.name}</h1>
+    <p class="lede">{s.oneLine}</p>
+    <div class="grid grid-2 facts">
+      <div class="card card-top">
+        <h2 class="mono">shape</h2>
+        <p class="mono dur">{s.duration}</p>
+        {s.statusNote && <p class="muted">{s.statusNote}</p>}
+        {s.vendors.length > 0 && <p class="muted mono">{s.vendors.join(' · ')}</p>}
+      </div>
+      <div class="card card-top">
+        <h2 class="mono">outcome</h2>
+        <p>{s.summary}</p>
+      </div>
+    </div>
+
+    <div class="bracket">
+      <p class="bracket-title mono">what you get</p>
+      <ul class="deliverables">
+        {s.deliverables.map((d) => <li>{d}</li>)}
+      </ul>
+    </div>
+
+    <div class="bracket">
+      <p class="bracket-title mono">evidence — public, checkable</p>
+      <ul class="evidence">
+        {s.evidence.map((e) => <li>{e}</li>)}
+      </ul>
+      {s.links.length > 0 && (
+        <p class="ctas">
+          {s.links.map((l) => <a class="btn" href={l.href} target="_blank" rel="noopener noreferrer">{l.label} <span class="arrow" aria-hidden="true">→</span></a>)}
+        </p>
+      )}
+    </div>
+
+    {entry.body && (
+      <div class="prose">
+        <Content />
+      </div>
+    )}
+
+    {related.length > 0 && (
+      <div class="bracket">
+        <p class="bracket-title mono">pairs with</p>
+        <div class="grid grid-2">
+          {related.map((r) => (
+            <a class="card svc" href={`/services/${r.id}/`}>
+              <h3>{r.data.name}</h3>
+              <p>{r.data.oneLine}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="cta card">
+      <h2>Scope this on your fabric.</h2>
+      <p class="ctas">
+        <a class="btn btn-primary" href={`mailto:${SITE.email}?subject=${encodeURIComponent('Scoping: ' + s.name)}`}>Email Marlon <span class="arrow" aria-hidden="true">→</span></a>
+        <button class="btn" type="button" data-twin-open>Ask the lab twin</button>
+      </p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-3); }
+  h1 { font-size: var(--step-4); max-width: 26ch; }
+  .facts { margin: var(--space-6) 0; }
+  .facts h2 { font-size: var(--step--1); color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; }
+  .dur { color: var(--fg-strong); }
+  .deliverables, .evidence { max-width: 46rem; }
+  .evidence li { font-family: var(--font-mono); font-size: var(--step--1); margin-bottom: var(--space-2); }
+  .prose { max-width: 46rem; margin-top: var(--space-6); }
+  .cta { margin-top: var(--space-7); }
+  .cta .ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; margin: 0; }
+  .svc h3 { color: var(--fg-strong); }
+  .svc p { margin: 0; }
+  .ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-4); }
+</style>

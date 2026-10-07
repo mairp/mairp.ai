@@ -1,0 +1,345 @@
+---
+// The home page: the buyer's journey — hero, proof, services, method, twin,
+// work, trajectory, background, contact, FAQ. Content comes from the
+// collections; every number carries its source.
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import ProofCard from '../components/ProofCard.astro';
+import FAQ from '../components/FAQ.astro';
+import CopyButton from '../components/CopyButton.astro';
+import { SITE, VENDORS, CERTS, METHOD } from '../lib/site';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const proof = (await getCollection('proof')).sort((a, b) => a.data.order - b.data.order);
+const engagements = (await getCollection('engagements')).sort((a, b) => a.data.order - b.data.order);
+const repos = (await getCollection('repos')).sort((a, b) => a.data.order - b.data.order);
+
+const categories: { id: string; label: string }[] = [
+  { id: 'network', label: 'Network & fabric' },
+  { id: 'agents', label: 'Agents & platforms' },
+  { id: 'inference', label: 'Local inference' },
+  { id: 'method', label: 'Method & delivery' },
+  { id: 'applied', label: 'Applied agents' },
+];
+
+const trajectory = [
+  { yr: '2024 — now', ttl: 'Network, Automation & Observability Architect', org: 'Core42 · Abu Dhabi', derisk: 'Sovereign inference, cloud networking, DCI' },
+  { yr: '2019 — 2024', ttl: 'IP/MPLS Network Architect', org: 'Nokia · Portugal', derisk: 'Critical-infrastructure assessment — smart-grid, railway, DTaaS, Secure ZTP' },
+  { yr: '2018 — 2019', ttl: 'Network Consulting Engineer', org: 'Cisco (blue badge) · Honduras', derisk: 'Cisco-estate consulting discipline' },
+  { yr: '2016 — 2018', ttl: 'Network & Security Specialist', org: 'Citi · San Salvador', derisk: 'Financial-services change rigor' },
+  { yr: '2014 — 2016', ttl: 'Telecommunications Engineer', org: 'Tigo · San Salvador', derisk: 'Carrier operations ground truth' },
+];
+
+const papers = [
+  {
+    name: 'Decentralized & Dynamic Zero-Touch Provisioning of Leaf-Spine EVPN Data Centers',
+    venue: 'IEEE',
+    href: 'https://ieeexplore.ieee.org/document/11080420/',
+    note: 'Autonomous agents on each router provision the leaf-spine EVPN underlay and overlay with no manual intervention — inferring router roles from link-state topology and self-healing on failures.',
+  },
+  {
+    name: 'Kubernetes-Aware Load Balancing for Leaf-Spine EVPN Data Centers',
+    venue: 'Springer · Journal of Cloud Computing',
+    href: 'https://link.springer.com/article/10.1186/s13677-025-00814-0',
+    note: 'Distributed agents at leaf routers feed live Kubernetes pod data into the fabric, dynamically tuning ECMP weights via EVPN/BGP extended communities so routing aligns with pod placement.',
+  },
+];
+---
+<Base>
+  {/* ── Hero ─────────────────────────────────────────────────────────── */}
+  <header class="hero dots" id="top">
+    <div class="hero-glow" aria-hidden="true"><div class="orb"></div><div class="ring"></div></div>
+    <div class="wrap">
+      <p class="eyebrow mono reveal">// {SITE.practice} — Abu Dhabi · EN/ES/PT</p>
+      <h1 class="reveal">Networks that<br /><span class="accent">verify themselves.</span></h1>
+      <p class="lede reveal">{SITE.caption} Plain-language intent in — verified-on-device fabric changes out.
+        Independent consulting by Marlon Paz across network automation, agentic NetOps and sovereign AI.
+      </p>
+      <p class="meta mono reveal">CCIE · CKA · Cisco DevNet Professional · Nokia DCFP · NVIDIA AI Infrastructure &amp; Operations</p>
+      <p class="ctas reveal">
+        <a class="btn btn-primary" href="#services">Explore services <span class="arrow" aria-hidden="true">→</span></a>
+        <button class="btn" type="button" data-twin-open>Ask the lab twin</button>
+        <a class="btn" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </p>
+    </div>
+  </header>
+
+  {/* ── Proof ────────────────────────────────────────────────────────── */}
+  <Section id="proof" eyebrow="01 // proof" title="It ships, and it verifies." tone="raised"
+    intro="Every claim on this site links to public evidence — a repo, a paper or a demo. The receipts are the homepage.">
+    <div class="grid grid-2">
+      {proof.map((p) => <ProofCard entry={p} />)}
+    </div>
+    <p class="allproof muted reveal">More receipts: <a href="https://github.com/mairp?tab=repositories">all public repos</a> · <a href="/#open-source">the open-source ledger below</a>.</p>
+  </Section>
+
+  {/* ── Services ─────────────────────────────────────────────────────── */}
+  <Section id="services" eyebrow="02 // services" title="What the practice builds."
+    intro="Six service lines, one thesis: automation you can audit. Each carries its outcome, duration and the public evidence behind it.">
+    <div class="grid grid-3">
+      {services.map((s) => <ServiceCard entry={s} />)}
+    </div>
+    <div class="bracket">
+      <p class="bracket-title mono">engagement shapes</p>
+      <div class="grid grid-3 engs">
+        {engagements.map((e) => (
+          <div class="card eng reveal">
+            <h3 class="mono">{e.data.name}</h3>
+            <p class="dur mono">{e.data.duration}</p>
+            <p>{e.data.deliverable}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Section>
+
+  {/* ── Method ───────────────────────────────────────────────────────── */}
+  <Section id="method" eyebrow="03 // method" title={`${METHOD}: intent in, evidence out.`} tone="raised"
+    intro="The method is the same loop the reference system runs — and it is how engagements are governed: nothing advances without evidence.">
+    <div class="loop" role="list" aria-label="The verified-fabric loop">
+      <div class="stg card reveal" role="listitem">
+        <div class="k mono">01 · Intent</div>
+        <div class="t">Plain language + constraints</div>
+        <div class="d">"stretch this mac-vrf across both leaves" — captured, scoped, verified against policy</div>
+      </div>
+      <div class="stg card reveal" role="listitem">
+        <div class="k mono">02 · Agents &amp; controllers</div>
+        <div class="t">Plan, reconcile, dry-run</div>
+        <div class="d">Agents map intent to declarative resources; Kubernetes controllers apply them deterministically with rollback</div>
+      </div>
+      <div class="stg card reveal" role="listitem">
+        <div class="k mono">03 · Verified on device</div>
+        <div class="t">gNMI proves it — or it didn't happen</div>
+        <div class="d">Per-node verification gates; drift re-verified on a schedule and repaired automatically</div>
+      </div>
+    </div>
+    <p class="loop-back mono reveal">↺ gNMI → Prometheus → Grafana · converged services re-verified every 5 min — drift is repaired, and said so</p>
+    <p class="muted reveal">The same loop runs the inference practice: prompt → routed model → verified cost and latency, per workload, on dated numbers.</p>
+  </Section>
+
+  {/* ── Twin ─────────────────────────────────────────────────────────── */}
+  <Section id="twin" eyebrow="04 // zero-friction" title="Ask the lab twin.">
+    <div class="grid grid-2 twin-grid">
+      <div class="reveal">
+        <p class="lede">A Turnstile-gated digital twin of Marlon's public work — it answers how intent-to-fabric verification, gNMI closed loops or local GPU serving actually work, and points back to the repo or paper it came from.</p>
+        <p class="muted">It is itself a served inference app with telemetry: a live demo of the grounding, routing and observability the practice sells. Not a live person; may be imperfect.</p>
+        <p><button class="btn btn-primary" type="button" data-twin-open>Open the twin chat <span class="arrow" aria-hidden="true">→</span></button></p>
+      </div>
+      <div class="card card-top reveal">
+        <h3 class="mono">try asking</h3>
+        <ul class="try mono">
+          <li>"What stops the agents from reporting success before it's real?"</li>
+          <li>"How do you benchmark local models against frontier APIs?"</li>
+          <li>"What does quantum-safe ANYsec change in my fabric?"</li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  {/* ── Work & publications ──────────────────────────────────────────── */}
+  <Section id="work" eyebrow="05 // depth" title="Work & publications." tone="raised"
+    intro="Curated depth on demand — the demo, the peer-reviewed papers, the security labs, the delivery method.">
+      <details class="work reveal" open>
+        <summary><span class="q">The intent-tier demo — 6½ minutes, end to end</span></summary>
+        <div class="inner">
+          <video controls preload="none" playsinline poster="/assets/agentic-netops-demo-thumb.jpg" aria-label="agentic-netops intent-tier demo">
+            <source src="/assets/agentic-netops-demo.mp4" type="video/mp4" />
+          </video>
+          <p class="muted">VLAN, ip-vrf and a stretched mac-vrf provisioned from plain language, then proven with kubectl and on the SONiC leaves. Nokia SR Linux variant: <a href="https://github.com/mairp/agentic-netops-srl">agentic-netops-srl</a>.</p>
+        </div>
+      </details>
+      <details class="work reveal">
+        <summary><span class="q">Peer-reviewed publications — IEEE &amp; Springer</span></summary>
+        <div class="inner">
+          {papers.map((p) => (
+            <p class="paper">
+              <a href={p.href} target="_blank" rel="noopener noreferrer"><b>{p.name}</b> <span class="badge"><span class="src">{p.venue}</span></span></a><br />
+              <span class="muted">{p.note}</span>
+            </p>
+          ))}
+          <p class="muted">Co-authored as mentor to the master's students who carried out the research.</p>
+        </div>
+      </details>
+      <details class="work reveal">
+        <summary><span class="q">Quantum-safe fabric labs — Nokia SR OS FP5</span></summary>
+        <div class="inner">
+          <p class="muted">Working containerlab labs: <a href="https://github.com/mairp/sros-anysec-lab">ANYsec</a> · <a href="https://github.com/mairp/sros-anysec-macsec-lab">ANYsec + MACsec</a> · <a href="https://github.com/mairp/srl-sros-telemetry-lab">streaming telemetry (SR Linux + SR OS)</a> — the same labs the Critical-Network Assessment runs on.</p>
+        </div>
+      </details>
+      <details class="work reveal">
+        <summary><span class="q">Spec-driven delivery — specstride.ai</span></summary>
+        <div class="inner">
+          <p class="muted">The delivery methodology is public and self-improving: <a href="https://specstride.ai">specstride.ai</a> drives coding agents phase by phase behind an LLM-critic gate and learns from its own telemetry. <a href="https://github.com/mairp/mixture-of-loops">mixture-of-loops</a> compiles Spec Kit features into provenance-bound, unattended pipelines.</p>
+        </div>
+      </details>
+  </Section>
+
+  {/* ── Open source ──────────────────────────────────────────────────── */}
+  <Section id="open-source" eyebrow="06 // ledger" title="The open-source ledger."
+    intro="The practice's public work, auto-synced daily from GitHub and grouped by service line — the standing evidence behind every offer.">
+    {categories.map((c) => {
+      const items = repos.filter((r) => r.data.category === c.id);
+      return items.length > 0 && (
+        <div class="cat reveal">
+          <h3 class="mono cat-title">{c.label}</h3>
+          <div class="grid grid-3">
+            {items.map((r) => (
+              <a class="card repo reveal" href={r.data.url} target="_blank" rel="noopener noreferrer">
+                <h4 class="mono">{r.data.name}</h4>
+                <p>{r.data.description}</p>
+                <p class="rf mono">
+                  {r.data.lang && <span><span class="lang" data-lang={r.data.lang}></span>{r.data.lang}</span>}
+                  {typeof r.data.stars === 'number' && r.data.stars > 0 && <span><b>★</b> {r.data.stars}</span>}
+                  {r.data.forks === 'fork' && <span><b>⑂</b> fork</span>}
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+      );
+    })}
+    <p class="muted reveal">Synced daily by an unattended pipeline — identical GitHub state, byte-identical output. <a href="https://github.com/mairp?tab=repositories">All repos ↗</a></p>
+  </Section>
+
+  {/* ── Trajectory ───────────────────────────────────────────────────── */}
+  <Section id="trajectory" eyebrow="07 // lineage" title="Where the fabric experience comes from." tone="raised"
+    intro="Trust via lineage, not biography — each stop de-risks a service line.">
+    <div class="rail reveal" role="list">
+      {trajectory.map((t) => (
+        <div class="stop card" role="listitem">
+          <div class="yr mono">{t.yr}</div>
+          <div class="ttl">{t.ttl}</div>
+          <div class="org muted">{t.org}</div>
+          <div class="derisk mono">→ {t.derisk}</div>
+        </div>
+      ))}
+    </div>
+    <p class="muted reveal">Full story and the consultant profile (PDF): <a href="/about/">about</a>.</p>
+  </Section>
+
+  {/* ── Background ───────────────────────────────────────────────────── */}
+  <Section id="background" eyebrow="08 // depth" title="Certified across the stack.">
+    <div class="grid grid-2">
+      <div class="card reveal">
+        <h3 class="mono">certifications</h3>
+        <ul class="certs">
+          {CERTS.map((c) => <li>{c}</li>)}
+        </ul>
+        <p class="muted">Verified on <a href={SITE.credly}>Credly</a>.</p>
+      </div>
+      <div class="card reveal">
+        <h3 class="mono">vendor fluency</h3>
+        <ul class="certs">
+          {VENDORS.map((v) => <li>{v}</li>)}
+        </ul>
+        <p class="muted">Multivendor is the offer, not an add-on — deliberately vendor-independent.</p>
+      </div>
+    </div>
+  </Section>
+
+  {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+  <Section id="faq" eyebrow="09 // questions" title="Asked, answered." tone="raised">
+    <FAQ />
+  </Section>
+
+  {/* ── Contact ──────────────────────────────────────────────────────── */}
+  <Section id="contact" eyebrow="10 // talk" title="One email starts it.">
+    <div class="grid grid-2 contact">
+      <div class="reveal">
+        <p class="lede">Scope a Fabric Convergence Proof-of-Value, an assessment, or a fractional engagement — or just ask a hard question.</p>
+        <p class="ctas">
+          <a class="btn btn-primary" href={`mailto:${SITE.email}?subject=${encodeURIComponent('Scoping question — mairp.ai')}`}>Email Marlon <span class="arrow" aria-hidden="true">→</span></a>
+          <CopyButton text={SITE.email} label="Copy address" />
+        </p>
+        <p class="muted">Response within two working days. {SITE.location} · working languages EN / ES / PT.</p>
+      </div>
+      <div class="card card-top reveal no-print">
+        <h3 class="mono">the ladder</h3>
+        <ol class="ladder mono">
+          <li>Ask the twin — zero friction</li>
+          <li>Watch the 6½-min demo</li>
+          <li>Read the repos and papers</li>
+          <li>Print this page as a one-page brief (Ctrl/Cmd-P)</li>
+          <li>Send the scoping email</li>
+        </ol>
+      </div>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  /* hero */
+  .hero { position: relative; overflow: clip; padding: var(--space-9) 0 var(--space-8); }
+  .hero-glow { position: absolute; inset: auto 0 -30%; height: 70%; pointer-events: none; }
+  .orb {
+    position: absolute; left: 50%; bottom: 0; translate: -50% 45%;
+    width: min(64rem, 120vw); aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle, var(--orb-core) 0%, color-mix(in srgb, var(--orb-edge) 55%, transparent) 18%, transparent 60%);
+    filter: blur(2px); opacity: 0.55;
+  }
+  .ring {
+    position: absolute; left: 50%; bottom: 0; translate: -50% 32%;
+    width: min(40rem, 90vw); aspect-ratio: 1; border-radius: 50%;
+    border: 1px solid var(--ring);
+  }
+  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-3); }
+  .hero h1 { font-size: clamp(2.1rem, 1rem + 6vw, 4.4rem); max-width: 20ch; position: relative; overflow-wrap: break-word; }
+  .hero h1 .accent { color: var(--accent); }
+  .hero .lede { position: relative; margin-top: var(--space-4); }
+  .meta { font-size: 0.75rem; color: var(--muted); position: relative; margin-top: var(--space-3); }
+  .ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; position: relative; margin-top: var(--space-5); margin-bottom: 0; }
+  .allproof { margin-top: var(--space-4); }
+
+  /* method loop */
+  .loop { display: grid; gap: var(--space-4); }
+  @media (min-width: 768px) { .loop { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .stg { display: flex; flex-direction: column; gap: var(--space-1); }
+  .stg .k { color: var(--accent); font-size: 0.75rem; }
+  .stg .t { color: var(--fg-strong); font-weight: 600; }
+  .stg .d { color: var(--muted); font-size: var(--step--1); flex: 1; }
+  .loop-back { margin-top: var(--space-4); color: var(--fg-strong); border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: var(--radius); padding: var(--space-3) var(--space-4); }
+
+  /* twin band */
+  .twin-grid { align-items: start; }
+  .try { margin: 0; padding-left: 1.1rem; color: var(--muted); display: grid; gap: var(--space-2); font-size: var(--step--1); }
+
+  /* work accordions */
+  .work { border-top: 1px solid var(--border); max-width: 52rem; }
+  .work summary { cursor: pointer; list-style: none; padding: var(--space-4) 0; font-family: var(--font-display); font-weight: 500; font-size: var(--step-1); color: var(--fg-strong); display: flex; gap: var(--space-3); min-height: 44px; }
+  .work summary::-webkit-details-marker { display: none; }
+  .work summary::before { content: '+'; color: var(--accent); flex: none; width: 1ch; font-family: var(--font-mono); }
+  .work[open] summary::before { content: '−'; }
+  .work .inner { padding-bottom: var(--space-5); }
+  .work video { width: 100%; max-width: 40rem; border-radius: var(--radius); border: 1px solid var(--border); display: block; margin-bottom: var(--space-3); }
+  .paper { margin-bottom: var(--space-4); }
+
+  /* open-source grid */
+  .cat { margin-bottom: var(--space-6); }
+  .cat-title { color: var(--accent); font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase; }
+  .repo h4 { color: var(--fg-strong); font-size: var(--step-0); }
+  .repo p { margin: 0 0 var(--space-2); font-size: var(--step--1); flex: 1; }
+  .rf { display: flex; gap: var(--space-3); font-size: 0.75rem; color: var(--muted); margin: 0; align-items: center; }
+  .lang { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: var(--space-1); background: var(--border); }
+
+  /* trajectory rail */
+  .rail { display: grid; gap: var(--space-4); }
+  @media (min-width: 900px) { .rail { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+  .stop { display: flex; flex-direction: column; gap: var(--space-1); font-size: var(--step--1); }
+  .stop .yr { color: var(--accent); }
+  .stop .ttl { color: var(--fg-strong); font-weight: 600; }
+  .stop .derisk { color: var(--muted); margin-top: auto; }
+
+  /* certs */
+  .certs { margin: 0 0 var(--space-3); display: grid; gap: var(--space-1); }
+
+  /* engagements */
+  .engs .eng { font-size: var(--step--1); }
+  .eng .dur { color: var(--accent); margin: 0 0 var(--space-2); font-size: 0.75rem; }
+  .eng p { margin: 0; }
+
+  /* contact */
+  .contact { align-items: start; }
+  .ladder { margin: 0; padding-left: 1.2rem; color: var(--muted); display: grid; gap: var(--space-2); font-size: var(--step--1); }
+</style>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mairp.ai/sitemap-index.xml

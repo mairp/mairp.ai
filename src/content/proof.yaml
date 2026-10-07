@@ -1,0 +1,32 @@
+# Proof band — flagship evidence cards. Every badge is a dated, sourced number.
+- id: proof-agentic-netops
+  name: agentic-netops
+  order: 1
+  badge: 4/4 constructs converge · 0 unverified success reports
+  source: repo, 2026-10
+  url: https://github.com/mairp/agentic-netops
+  note: Intent in plain language; AGNTCY + LangGraph agents, Kubernetes controllers, a live SONiC EVPN/VXLAN fabric, gNMI closed loop. Nothing reported deployed until verified on the device.
+
+- id: proof-agent-observability-stack
+  name: agent-observability-stack
+  order: 2
+  badge: every LLM call traced · cost per agent, model, task
+  source: repo + video walkthrough
+  url: https://github.com/mairp/agent-observability-stack
+  note: Token/cost/trace telemetry for agent fleets — LiteLLM + OpenTelemetry into Prometheus, Loki, Tempo, Grafana and Arize Phoenix; GPU-aware, with budget alerts.
+
+- id: proof-agentic-ops-bench
+  name: agentic-ops-bench
+  order: 3
+  badge: 30B-class on 1× RTX 3090 vs hosted frontier
+  source: repo, dated runs
+  url: https://github.com/mairp/agentic-ops-bench
+  note: Model × harness benchmark on real operations tasks — AIOps, NetDevOps, HPC, inference, RAG, tool loops. The honest local-or-frontier answer, per workload.
+
+- id: proof-qmd-memory-stack
+  name: qmd-memory-stack
+  order: 4
+  badge: ~19× query speedup (Intel Arc iGPU, Vulkan)
+  source: repo README
+  url: https://github.com/mairp/qmd-memory-stack
+  note: Local, GPU-accelerated 3-tier RAG memory over GGUF embeddings plus a shared MCP gateway — agent memory that never leaves your hardware.

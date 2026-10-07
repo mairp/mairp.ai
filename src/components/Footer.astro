@@ -1,0 +1,44 @@
+---
+import { NAV, SITE } from '../lib/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <p class="mono brand">marlon·paz</p>
+        <p class="muted">{SITE.tagline} {SITE.caption}</p>
+        <p class="muted">Independent consulting — one architect, full stack: fabric to tokens.</p>
+        <p class="langs" aria-label="Working languages">
+          <span><b>EN</b> English</span><span><b>ES</b> Español</span><span><b>PT</b> Português</span>
+        </p>
+      </div>
+      <nav aria-label="Footer">
+        <ul role="list">
+          {NAV.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+          <li><a href={SITE.github}>GitHub</a></li>
+          <li><a href={SITE.linkedin}>LinkedIn</a></li>
+          <li><a href={SITE.credly}>Credly</a></li>
+          <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+          <li><a href={SITE.cv}>Consultant profile (PDF)</a></li>
+        </ul>
+      </nav>
+      <div class="legal">
+        <p>Every claim on this site links to public evidence — a repo, a paper or a demo. No invented testimonials, no client logos.</p>
+        <p class="muted">Confidential client work appears only as anonymized capability categories, never as names or details.</p>
+        <p class="muted">Privacy: no cookies, no trackers. Cookie-free, aggregate page counts by Cloudflare Web Analytics.</p>
+        <p class="muted">© {year} {SITE.copyright}. Site <a href="https://github.com/mairp/mairp.ai">open source</a> under MIT.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { border-top: 1px solid; border-image: linear-gradient(to right, var(--accent), var(--border) 45%, transparent) 1; padding: var(--space-7) 0 var(--space-6); font-size: var(--step--1); }
+  .cols { display: grid; gap: var(--space-5); }
+  @media (min-width: 768px) { .cols { grid-template-columns: 1.3fr 1fr 1.6fr; } }
+  .brand { color: var(--fg-strong); font-weight: 700; font-size: var(--step-0); margin-bottom: var(--space-2); }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-1); }
+  ul a { display: inline-block; padding: var(--space-1) 0; }
+  p { margin-bottom: var(--space-2); }
+</style>

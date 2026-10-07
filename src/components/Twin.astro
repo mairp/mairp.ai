@@ -1,0 +1,259 @@
+---
+// The digital twin chat — ask.mairp.ai, gated by Cloudflare Turnstile.
+// Reframed from "career Q&A" to a consulting asset: a technical Q&A twin
+// grounded in the public work (repos, papers, labs). See DECISIONS.md.
+// Markup only; behaviour is the bundled external script below (CSP-safe).
+---
+<button id="twin-launch" data-twin-open type="button" aria-label="Open the lab twin chat">
+  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+  Ask the lab twin
+</button>
+<div id="twin-panel" role="dialog" aria-label="Marlon's lab twin — technical Q&A" aria-modal="false">
+  <div class="twin-head">
+    <span class="dot" aria-hidden="true"></span>
+    <div>
+      <div class="twin-title">Marlon's lab twin</div>
+      <div class="twin-sub mono">TECHNICAL Q&amp;A · SHOWS ITS SOURCES</div>
+    </div>
+    <button class="twin-x" id="twin-close" type="button" aria-label="Close chat">&times;</button>
+  </div>
+  <div class="twin-log" id="twin-log" aria-live="polite"></div>
+  <div id="twin-turnstile" class="twin-ts"></div>
+  <p class="twin-esc">Want this in your environment? <a href="mailto:marlon.paz@ieee.org">marlon.paz@ieee.org</a></p>
+  <p class="twin-disc">AI agent grounded in Marlon's public work (repos, papers, labs). Not a live person; may be imperfect — verify anything important.</p>
+  <div class="twin-foot">
+    <textarea id="twin-input" rows="1" placeholder="Ask about intent-to-fabric, gNMI loops, local GPU serving…" maxlength="1000" aria-label="Your question"></textarea>
+    <button class="twin-send" id="twin-send" type="button">Send</button>
+  </div>
+</div>
+
+<style>
+  #twin-launch {
+    position: fixed; right: max(var(--gutter), 16px); bottom: 20px; z-index: 80;
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    background: var(--surface); color: var(--fg-strong);
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+    border-radius: 999px; padding: 0.6rem 1.1rem; cursor: pointer;
+    font-family: var(--font-sans); font-size: 0.9rem; font-weight: 500;
+    box-shadow: 0 10px 40px -12px color-mix(in srgb, var(--accent) 45%, transparent);
+    min-height: 44px;
+  }
+  #twin-launch:hover { background: var(--accent); color: var(--accent-ink); }
+  #twin-panel {
+    position: fixed; right: max(var(--gutter), 16px); bottom: 20px; z-index: 90;
+    width: min(420px, calc(100vw - 32px));
+    display: none; flex-direction: column;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.55);
+    max-height: min(600px, calc(100vh - 40px)); overflow: hidden;
+  }
+  #twin-panel.open { display: flex; }
+  .twin-head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); background: var(--surface-2); }
+  .twin-head .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 10px 1px var(--ok); flex: none; }
+  .twin-title { font-weight: 600; color: var(--fg-strong); line-height: 1.2; }
+  .twin-sub { font-size: 0.68rem; letter-spacing: 0.08em; color: var(--muted); }
+  .twin-x { margin-left: auto; background: none; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; min-width: 44px; min-height: 44px; }
+  .twin-x:hover { color: var(--fg-strong); }
+  .twin-log { overflow-y: auto; padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); min-height: 160px; }
+  .twin-log:empty::before { content: ' '; }
+  .twin-msg { font-size: 0.9rem; line-height: 1.5; max-width: 92%; }
+  .twin-msg.bot { align-self: flex-start; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px 10px 10px 2px; padding: var(--space-2) var(--space-3); color: var(--fg); overflow-wrap: anywhere; }
+  .twin-msg.user { align-self: flex-end; background: color-mix(in srgb, var(--accent) 18%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 10px 10px 2px 10px; padding: var(--space-2) var(--space-3); color: var(--fg-strong); }
+  .twin-msg.err { align-self: center; color: var(--warn); font-size: 0.8rem; }
+  .twin-msg a { overflow-wrap: anywhere; }
+  .twin-ts { padding: 0 var(--space-4); min-height: 0; }
+  .twin-ts:not(:empty) { padding-bottom: var(--space-2); min-height: 60px; }
+  .twin-esc { margin: 0; padding: var(--space-2) var(--space-4) 0; font-size: 0.75rem; color: var(--fg); }
+  .twin-esc a { color: var(--accent); }
+  .twin-disc { margin: 0; padding: var(--space-1) var(--space-4) var(--space-2); font-size: 0.7rem; color: var(--muted); }
+  .twin-foot { display: flex; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border); background: var(--surface-2); }
+  #twin-input {
+    flex: 1; resize: none; font-family: var(--font-sans); font-size: 0.9rem;
+    background: var(--bg); color: var(--fg); border: 1px solid var(--border);
+    border-radius: 8px; padding: var(--space-2); max-height: 90px;
+  }
+  #twin-input:focus-visible { outline: 2px solid var(--focus); outline-offset: 0; }
+  .twin-send {
+    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 8px;
+    padding: 0 var(--space-4); font-weight: 600; cursor: pointer; min-height: 44px;
+  }
+  .twin-send:disabled { opacity: 0.45; cursor: not-allowed; }
+  @media print { #twin-launch, #twin-panel { display: none !important; } }
+</style>
+
+<script>
+  // Ported from the previous site's widget: XSS-safe linkification, single-use
+  // Turnstile tokens, no-preflight POST (JSON body without custom headers).
+  declare global {
+    interface Window {
+      turnstile?: {
+        render: (sel: string, opts: Record<string, unknown>) => string;
+        reset: (id?: string) => void;
+      };
+    }
+  }
+  const ENDPOINT = 'https://ask.mairp.ai';
+  const TURNSTILE_SITEKEY = '0x4AAAAAADh3IF9CMBwpW3ha';
+  const MAX_TURNS = 12;
+
+  const launch = document.getElementById('twin-launch');
+  const panel = document.getElementById('twin-panel');
+  const log = document.getElementById('twin-log');
+  const input = document.getElementById('twin-input') as HTMLTextAreaElement | null;
+  const send = document.getElementById('twin-send') as HTMLButtonElement | null;
+  const history: { role: string; content: string }[] = [];
+  let tsId: string | null = null;
+  let tsToken: string | null = null;
+  let tsLoading = false;
+  let greeted = false;
+  let busy = false;
+
+  const sessionId = (() => {
+    try {
+      let v = sessionStorage.getItem('twin-session-id');
+      if (!v) { v = crypto.randomUUID(); sessionStorage.setItem('twin-session-id', v); }
+      return v;
+    } catch { return crypto.randomUUID(); }
+  })();
+
+  function addMsg(kind: string, text: string) {
+    const el = document.createElement('div');
+    el.className = `twin-msg ${kind}`;
+    // Linkify http(s) URLs. XSS-safe: model output never touches innerHTML;
+    // text goes in via text nodes and URLs become anchors with validated hrefs.
+    const re = /(https?:\/\/[^\s<]+[^\s<.,;:!?)\]}'"])/g;
+    let last = 0, m: RegExpExecArray | null;
+    while ((m = re.exec(text)) !== null) {
+      if (m.index > last) el.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const url = m[0];
+      let ok = false;
+      try { const u = new URL(url); ok = u.protocol === 'http:' || u.protocol === 'https:'; } catch {}
+      if (ok) {
+        const a = document.createElement('a');
+        a.href = url; a.textContent = url;
+        a.target = '_blank'; a.rel = 'noopener noreferrer';
+        el.appendChild(a);
+      } else el.appendChild(document.createTextNode(url));
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) el.appendChild(document.createTextNode(text.slice(last)));
+    log?.appendChild(el);
+    log!.scrollTop = log!.scrollHeight;
+    return el;
+  }
+
+  const updateSend = () => { if (send) send.disabled = busy || !tsToken; };
+
+  function loadTurnstile(): Promise<void> {
+    return new Promise((resolve) => {
+      if (window.turnstile) return resolve();
+      const wait = () => { if (window.turnstile) resolve(); else setTimeout(wait, 80); };
+      if (tsLoading) return wait();
+      tsLoading = true;
+      const s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      s.async = true; s.defer = true; s.onload = wait;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureTurnstile() {
+    await loadTurnstile();
+    if (tsId === null) {
+      // Interaction-only: invisible for normal users, shows a challenge only
+      // when Turnstile needs one.
+      tsId = window.turnstile!.render('#twin-turnstile', {
+        sitekey: TURNSTILE_SITEKEY,
+        size: 'flexible',
+        theme: document.documentElement.dataset.theme === 'light' ? 'light' : 'dark',
+        appearance: 'interaction-only',
+        callback: (tok: string) => { tsToken = tok; updateSend(); },
+        'expired-callback': () => { tsToken = null; updateSend(); },
+        'error-callback': () => { tsToken = null; updateSend(); },
+      });
+    }
+  }
+
+  function openPanel() {
+    panel?.classList.add('open');
+    if (launch) launch.style.display = 'none';
+    if (send) send.disabled = true;
+    ensureTurnstile().catch(() => {});
+    if (!greeted) {
+      greeted = true;
+      addMsg('bot', "Hi — I'm the lab twin of Marlon Paz, grounded in his public work. Ask me how intent-to-fabric verification, gNMI closed loops or local GPU serving actually work; I'll point back to the repo or paper.");
+    }
+    input?.focus();
+  }
+
+  function closePanel() {
+    panel?.classList.remove('open');
+    if (launch) launch.style.display = '';
+  }
+
+  async function submit() {
+    if (busy || !input) return;
+    const text = input.value.trim();
+    if (!text) return;
+    if (!tsToken) {
+      addMsg('err', 'One moment — finishing the human-check, then resend.');
+      ensureTurnstile().catch(() => {});
+      return;
+    }
+    addMsg('user', text);
+    history.push({ role: 'user', content: text });
+    while (history.length > MAX_TURNS) history.shift();
+    input.value = '';
+    input.style.height = 'auto';
+    const token = tsToken;
+    tsToken = null; // Turnstile tokens are single-use
+    busy = true; updateSend();
+    const typing = addMsg('bot twin-typing', '…');
+    let timedOut = false;
+    const ctrl = new AbortController();
+    const to = setTimeout(() => { timedOut = true; ctrl.abort(); }, 30000);
+    try {
+      // No JSON content-type / custom headers => a CORS "simple" request with
+      // no preflight OPTIONS. Body is JSON text; the Worker parses it anyway.
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify({ turnstileToken: token, sessionId, messages: history }),
+        signal: ctrl.signal,
+      });
+      clearTimeout(to);
+      const data = await res.json().catch(() => ({}) as { reply?: string });
+      typing.remove();
+      if (res.ok && data.reply) {
+        addMsg('bot', data.reply);
+        history.push({ role: 'assistant', content: String(data.reply).slice(0, 1000) });
+      } else if (res.status === 429) {
+        addMsg('err', "You're sending messages a little fast — give it a moment and try again.");
+      } else if (res.status === 403) {
+        addMsg('err', 'The human-check expired — please complete it again, then resend.');
+      } else {
+        addMsg('err', "Sorry, I couldn't answer that just now. Please try again.");
+      }
+    } catch {
+      clearTimeout(to);
+      typing.remove();
+      addMsg('err', timedOut ? 'That took too long to respond — please try again.' : 'Connection issue — please try again in a moment.');
+    } finally {
+      busy = false;
+      try { window.turnstile?.reset(tsId!); } catch {} // fresh token for the next message
+      updateSend();
+      input?.focus();
+    }
+  }
+
+  launch?.addEventListener('click', openPanel);
+  document.getElementById('twin-close')?.addEventListener('click', closePanel);
+  send?.addEventListener('click', submit);
+  input?.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } });
+  input?.addEventListener('input', () => { if (!input) return; input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 90)}px`; });
+  // Any element marked data-twin-open (e.g. the home-page band button) opens the twin.
+  for (const el of document.querySelectorAll<HTMLElement>('[data-twin-open]')) {
+    if (el !== launch) el.addEventListener('click', openPanel);
+  }
+</script>

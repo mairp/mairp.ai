@@ -1,0 +1,104 @@
+---
+// Every page: meta and social cards, JSON-LD, skip link, header, footer,
+// and the digital-twin chat widget.
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource/poppins/latin-500.css';
+import '@fontsource/poppins/latin-600.css';
+import display from '@fontsource/poppins/files/poppins-latin-500-normal.woff2?url';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Twin from '../components/Twin.astro';
+import { SITE } from '../lib/site';
+import { THEME_INIT } from '../lib/theme-init';
+
+interface Props { title?: string; description?: string; noindex?: boolean }
+const { title, description = SITE.description, noindex = false } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE.name}` : SITE.title;
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const og = new URL('/og.png', SITE.url).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': `${SITE.url}/#person`,
+      name: SITE.name,
+      url: SITE.url,
+      image: og,
+      jobTitle: 'Network, Automation and Observability Architect',
+      description: SITE.description,
+      email: `mailto:${SITE.email}`,
+      address: { '@type': 'PostalAddress', addressLocality: 'Abu Dhabi', addressCountry: 'AE' },
+      knowsLanguage: ['en', 'es', 'pt'],
+      sameAs: [SITE.github, SITE.linkedin, SITE.credly],
+      hasCredential: ['CCIE', 'CKA', 'Cisco DevNet Professional', 'CCNP Data Center', 'Nokia DCFP', 'NVIDIA AI Infrastructure and Operations', 'Isovalent Lab Champion'],
+    },
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${SITE.url}/#practice`,
+      name: `${SITE.name} — ${SITE.practice}`,
+      url: SITE.url,
+      description: SITE.description,
+      areaServed: ['AE', 'GCC', 'Iberia', 'LATAM', 'Global'],
+      provider: { '@id': `${SITE.url}/#person` },
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Consulting services',
+        itemListElement: [
+          'Agentic Network Operations — Intent-to-Fabric',
+          'Sovereign Inference & GPU Economics',
+          'Agent-Fleet Platform — Memory, Routing, Observability',
+          'Critical-Network Security & Telemetry Assessment',
+          'Applied Agent Delivery',
+          'Fractional Architecture & Team Enablement',
+        ].map((name) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name } })),
+      },
+    },
+  ],
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline set:html={THEME_INIT} />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0f1512" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href="/fonts/jetbrains-mono-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={display} as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${SITE.name} — ${SITE.practice}: ${SITE.tagline} ${SITE.caption}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={og} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <Twin />
+  </body>
+</html>
