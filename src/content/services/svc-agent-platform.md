@@ -1,6 +1,6 @@
 ---
 name: Agent-Fleet Platform — Memory, Routing, Observability
-order: 3
+order: 4
 status: available
 oneLine: A governed multi-agent platform with shared memory, model routing, and full token/cost/trace telemetry — so fleets are operable, not just demoed.
 summary: 'Teams deploying more than one agent inherit the three problems that kill them at scale: memory, routing, and knowing what anything costs. You get a shared MCP gateway and GPU-accelerated RAG memory tier, a programmable mixture-of-models routing layer, and complete token/cost/trace observability wired into Prometheus/Grafana-grade tooling with budget alerts. The result is a control plane your ops and finance teams can both live with.'
@@ -18,7 +18,7 @@ evidence:
   - Multi-agent fleet orchestration at scale, delivered (anonymized capability category)
   - Guarded, agent-operated control planes with GitOps DR (anonymized capability category)
 vendors: [NVIDIA, Intel, Red Hat, Grafana/OpenTelemetry ecosystem]
-related: [svc-local-inference, svc-agent-delivery]
+related: [svc-aiops-cloudops, svc-local-inference, svc-agent-delivery]
 links:
   - label: agent-observability-stack on GitHub
     href: https://github.com/mairp/agent-observability-stack

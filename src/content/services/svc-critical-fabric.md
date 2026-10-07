@@ -1,6 +1,6 @@
 ---
 name: Critical-Network Security & Telemetry Assessment
-order: 4
+order: 5
 status: available
 oneLine: Your utility, railway, ISP or data-center fabric gets a quantum-safe segmentation and streaming-telemetry readiness review — hands-on, not a checklist.
 summary: Operators of critical infrastructure in energy, rail and telecom face security requirements (ANYsec/MACsec-class protection, real-time visibility) that generic consultants treat theoretically. You get working lab-based validation on the actual router-OS class you run, an interactive telemetry baseline, and a prioritized roadmap. Where automation gaps surface, they feed directly into the Agentic NetOps service.

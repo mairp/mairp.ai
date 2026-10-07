@@ -1,6 +1,6 @@
 ---
 name: Applied Agent Delivery
-order: 5
+order: 6
 status: available
 oneLine: One named workflow — analysis, triage, content, assurance — delivered as a working agentic application with provenance-bound, unattended operation.
 summary: 'Instead of a generic "AI strategy", you pick one workflow that costs real hours and get it running end-to-end: an agent that performs the task, gated by spec-driven quality loops so it can operate unattended with an audit trail. Delivery follows a spec-driven methodology with diagnostics for stuck phases and self-tuning from run telemetry, and includes sensitive-input handling such as local-model triage where data cannot leave your environment.'

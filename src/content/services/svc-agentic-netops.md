@@ -16,7 +16,7 @@ evidence:
   - srl-sros-telemetry-lab — interactive streaming telemetry
   - IEEE paper — decentralized zero-touch provisioning of leaf-spine EVPN data centers
 vendors: [Cisco (SONiC, IOS-XR, NX-OS), Nokia (SR Linux, SR OS), Juniper, NVIDIA, Red Hat (Ansible/RHEL)]
-related: [svc-critical-fabric, svc-agent-platform]
+related: [svc-aiops-cloudops, svc-critical-fabric, svc-agent-platform]
 links:
   - label: agentic-netops on GitHub
     href: https://github.com/mairp/agentic-netops

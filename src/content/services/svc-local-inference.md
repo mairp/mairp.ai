@@ -1,6 +1,6 @@
 ---
 name: Sovereign Inference & GPU Economics
-order: 2
+order: 3
 status: available
 oneLine: Production-grade LLM serving on your own NVIDIA GPUs, with a dated, benchmarked answer to "local or frontier?" per workload.
 summary: You get a working on-prem serving stack (vLLM, llama.cpp, ik_llama) tuned for your hardware and data-residency constraints, not a slide deck. Every model choice is backed by a benchmark of local 30B-class models versus hosted frontier models on real operational tasks, plus token/cost telemetry so GPU spend is a managed number. This is the sovereign-AI layer for organizations that cannot ship data to a public API.
@@ -17,7 +17,7 @@ evidence:
   - gpu_rtx_3090 — eGPU operations
   - Sovereign inference routing and policy delivered for a Gulf AI holding (anonymized capability category)
 vendors: [NVIDIA, Red Hat (RHEL ecosystem), Intel (iGPU/NPU edge cases)]
-related: [svc-agent-platform, svc-agentic-netops]
+related: [svc-agent-platform, svc-aiops-cloudops, svc-agentic-netops]
 links:
   - label: club-3090 on GitHub
     href: https://github.com/mairp/club-3090

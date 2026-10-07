@@ -27,11 +27,11 @@
   deliverable: Shipped automation or platform, runbooks, verified-on-device evidence, and a knowledge-transfer handover to your team.
   prerequisites: Completed assessment or PoC; delivery sponsor; change-management window; access and credentials governance agreed.
 
-- id: eng-agent-fleet-platform-build
-  name: Agent-Fleet Platform Build
+- id: eng-aiops-agent-platform-build
+  name: AIOps & Agent-Platform Build
   order: 5
   duration: 6–12 weeks
-  deliverable: Working multi-agent reference (orchestration, memory, routing, observability) with dashboards, cost telemetry, and operating guidance.
+  deliverable: Working event-driven operations pipeline (alert → diagnosis → guarded remediation → verified resolution) on a multi-agent platform with observability, dashboards, cost telemetry, and operating guidance.
   prerequisites: Selected model-serving path (local, hosted or both); GPU or cloud budget; a use-case backlog from the business.
 
 - id: eng-fractional-architect-enablement

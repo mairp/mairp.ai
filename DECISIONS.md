@@ -163,6 +163,24 @@ sheer card count on the ledger band — trim `.reveal` and halos further there.
   old site within minutes; its repo is untouched and its grid was last synced
   2026-10-07.
 
+## Addendum (2026-10-07): the AIOps/CloudOps gap
+
+The owner flagged that the six-service architecture had no dedicated AIOps/CloudOps
+offering — even though the site description promised "agentic NetOps/CloudOps" and
+the evidence pack carries it (the research synthesis had folded CloudOps into the
+agent-platform line as a killed overlap). Added **"Agentic CloudOps & AIOps — Signal
+to Action"** as service 2 (order 2; the rest shifted down): event-driven operations —
+alert → agent diagnosis → guarded remediation → **verified resolution** — over
+Kubernetes-first platforms and bare-metal hypervisor estates, with GitOps DR and
+progressive autonomy (suggested actions → approval-gated → proven-safe auto-remediation).
+
+Evidence anchors: `agent-observability-stack` (telemetry backbone), `agentic-ops-bench`
+(AIOps task benchmark), `kind-cilium-hubble-cluster`, `agentic-netops` (operator
+discipline ported from fabric to platform), plus anonymized categories (guarded
+agent-operated control planes with GitOps DR; fleet orchestration at scale). The
+"Agent-Fleet Platform Build" engagement became "AIOps & Agent-Platform Build" with a
+matching deliverable. Seven services render 3+3+1 in the home grid — accepted.
+
 ## Open-source ledger sync
 
 `/root/portfolio-sync` (daily cron) now writes `src/content/repos.yaml` in this repo

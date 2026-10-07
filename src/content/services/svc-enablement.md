@@ -1,6 +1,6 @@
 ---
 name: Fractional Architecture & Team Enablement
-order: 6
+order: 7
 status: requires-scoping
 oneLine: Ongoing senior network/AI-infrastructure architecture judgment — plus your engineers trained on automation, Kubernetes and agent operations — without a full-time hire.
 summary: Organizations building network-automation or sovereign-AI capability typically lack the senior architect layer between strategy and hands-on keyboards. You get retained architectural oversight of your automation and inference programs, structured enablement for your team, and mentoring with a track record — university mentoring that produced two peer-reviewed publications. Trilingual delivery in English, Spanish and Portuguese for GCC, Iberia and LATAM teams.
