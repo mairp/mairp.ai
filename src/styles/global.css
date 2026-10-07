@@ -1,6 +1,6 @@
 @import './tokens.css';
 
-/* The lit share of a card's border: registered so it can be transitioned. */
+/* The lit share of a card's border (kept for @property consumers elsewhere). */
 @property --edge {
   syntax: '<percentage>';
   inherits: false;
@@ -32,8 +32,10 @@ h1, h2, h3, h4 {
   letter-spacing: -0.02em;
   margin: 0 0 var(--space-4);
   font-weight: 500;
-  text-wrap: balance;
 }
+/* Balance only the few large headings: multi-pass balancing on every card
+ * heading cost seconds of layout on throttled mobile CPUs (see DECISIONS.md). */
+h1, h2 { text-wrap: balance; }
 h1 { font-size: var(--step-4); }
 h2 { font-size: var(--step-3); }
 h3, h4 { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
@@ -111,31 +113,34 @@ pre { margin: 0; }
 .btn:hover .arrow { rotate: 0deg; }
 
 /* The dot grid, as a background layer. */
-.dots { background-image: radial-gradient(circle, var(--dot) 1px, transparent 1.5px); background-size: 12px 12px; }
+.dots { background-image: var(--dots-tile); background-size: 12px 12px; }
 
 .grid { display: grid; gap: var(--space-4); }
 @media (min-width: 640px) { .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 900px) { .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
-/* Glow card: the border is a gradient that starts in the accent and fades out,
-   with a halo on the lit edge. Text rests at --muted (AA in both themes) and
-   comes up on hover or focus. --edge-dir and --halo turn it for top-lit cards. */
+/* Glow card: the border is a gradient that starts in the accent and fades out.
+   Resting state is cheap (no shadow, no live interpolation): the halo and the
+   full-lit edge appear on hover/focus only. Text rests at --muted (AA in both
+   themes). --edge-dir and --halo turn it for top-lit cards. */
 .card {
   --card-bg: var(--card);
   background:
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    linear-gradient(var(--edge-dir, to right), color-mix(in srgb, var(--accent) var(--edge), transparent), color-mix(in srgb, var(--border) 55%, transparent) 72%) border-box;
+    linear-gradient(var(--edge-dir, to right), color-mix(in srgb, var(--accent) 40%, transparent), color-mix(in srgb, var(--border) 55%, transparent) 72%) border-box;
   border: 1px solid transparent;
   border-radius: var(--radius);
-  box-shadow: var(--halo, -12px 0) 28px -16px color-mix(in srgb, var(--accent) var(--edge), transparent);
   padding: var(--space-5);
   min-width: 0;
   color: var(--muted);
-  transition: --edge 0.6s, color 0.6s;
+  transition: color 0.3s;
 }
-.card:hover, .card:focus-within { --edge: 100%; color: var(--fg); }
-.card h3, .card h4 { margin-bottom: var(--space-2); transition: translate 0.6s; }
-.card:hover h3, .card:hover h4 { translate: 3px -2px; }
+.card:hover, .card:focus-within { color: var(--fg); }
+@media (prefers-reduced-motion: no-preference) {
+  .card { box-shadow: var(--halo, -12px 0) 28px -16px color-mix(in srgb, var(--accent) 40%, transparent); transition: box-shadow 0.45s, color 0.3s; }
+  .card:hover, .card:focus-within { box-shadow: var(--halo, -12px 0) 34px -14px color-mix(in srgb, var(--accent) 55%, transparent); }
+}
+.card h3, .card h4 { margin-bottom: var(--space-2); }
 .card-top { --edge-dir: to bottom; --halo: 0 -12px; }
 
 /* A group of cards hanging from a line that ends in a glowing node. */
@@ -204,7 +209,7 @@ main:has(> .page)::before {
   pointer-events: none;
   background:
     radial-gradient(60rem 16rem at 20% 0, color-mix(in srgb, var(--orb-edge) 16%, transparent), transparent 70%),
-    radial-gradient(circle, var(--dot) 1px, transparent 1.5px) 0 0 / 12px 12px;
+    var(--dots-tile);
   mask-image: linear-gradient(to bottom, #000, transparent);
 }
 

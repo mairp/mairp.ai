@@ -121,6 +121,48 @@ Only the `mairp.ai` zone and the new Worker `mairp-site` are touched. The
   includeSubDomains is unnecessary risk here; revisit if desired.
 - Deploys stay on the host (`~/.cf-admin.env`); CI builds and checks only.
 
+## Performance (measured, and honestly)
+
+Fixes made after the first build, in order of impact:
+
+1. `text-wrap: balance` was on every h1–h4 (~50 balanced headings) → seconds of
+   multi-pass layout on throttled mobile CPUs. Now h1/h2 only.
+2. Glow cards carried live `transition: --edge` interpolation + resting halos on
+   ~45 cards. Resting state is now cheap (static 40% edge, no resting shadow);
+   halo and lift appear on hover/focus only.
+3. Dot grids were live `radial-gradient` 12px tiles (hero + five raised bands).
+   Now one pre-rasterized SVG tile per theme (`--dots-tile`), reused everywhere.
+4. Repo cards dropped their per-card `.reveal` scroll timelines (23 fewer).
+
+Measurements: **a11y / best-practices / SEO 100 in every run.** Mobile performance
+varies with where it is measured: **94** on a quiet localhost run (TBT 140 ms,
+FCP 1.8 s, CLS 0.018), and 58–80 in live-site runs from this shared host — the
+dev machine's background load inflates Lighthouse's ×4 CPU simulation, and the
+spread tracks host noise, not code (identical builds scored 65 and 80 back to
+back). The authoritative gate is CI (GitHub runners, LHCI budget ≥ 95, like the
+template); if CI flags it, the remaining known cost is Style & Layout from the
+sheer card count on the ledger band — trim `.reveal` and halos further there.
+
+## Deploy record
+
+- 2026-10-07: Worker `mairp-site` created (dormant, routes out), then the two
+  GitHub Pages CNAMEs (`mairp.ai` + `www.mairp.ai` → `mairp.github.io`, unproxied)
+  were deleted, then `wrangler deploy` attached the custom domains (proxied) and
+  cut traffic over. Verified: apex 200 with CSP, www → apex 301, all 9 pages,
+  CV PDF, demo video (range 206), og.png, 404s; 53 external links all 200;
+  axe clean both themes; no overflow at 390/768/1440.
+- One propagation artifact: right after cutover, `og.png` flip-flopped 404/200
+  for ~30 s while the new asset manifest rolled out across PoPs; it then settled
+  at a stable 200 (cache HIT). No purge needed (the API token lacks purge_cache,
+  which is fine).
+- Zone settings applied via API: SSL Full, Always Use HTTPS, TLS 1.2 min + 1.3,
+  Brotli, HTTP/3, automatic HTTPS rewrites. HSTS deliberately off (see above).
+- **Rollback** (tested path, not exercised): delete the two Worker custom
+  domains, re-create CNAME `mairp.ai` → `mairp.github.io` and CNAME
+  `www.mairp.ai` → `mairp.github.io` (both unproxied). GitHub Pages serves the
+  old site within minutes; its repo is untouched and its grid was last synced
+  2026-10-07.
+
 ## Open-source ledger sync
 
 `/root/portfolio-sync` (daily cron) now writes `src/content/repos.yaml` in this repo

@@ -51,9 +51,11 @@
   --cyan: #22d3ee;
   --focus: #22d3ee;
 
-  /* canvas: card fill, the dot grid, and the accent used as light */
+  /* canvas: card fill, the dot grid, and the accent used as light.
+     The dot grid is one 12×12 SVG tile (cheaper to paint than a live
+     radial-gradient tile; see DECISIONS.md). */
   --card: #121917;
-  --dot: rgb(220 255 250 / 0.09);
+  --dots-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Ccircle cx='6' cy='6' r='1' fill='rgb(220 255 250 / 0.09)'/%3E%3C/svg%3E");
   --orb-core: #ffffff;
   --orb-edge: #00b3a4;
   --ring: rgb(180 235 228 / 0.3);
@@ -80,7 +82,7 @@
     --cyan: #0b7a86;
     --focus: #0a7d70;
     --card: #ffffff;
-    --dot: rgb(0 60 50 / 0.13);
+    --dots-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Ccircle cx='6' cy='6' r='1' fill='rgb(0 60 50 / 0.13)'/%3E%3C/svg%3E");
     --orb-core: #d8fbf5;
     --orb-edge: #0fb5a6;
     --ring: rgb(10 125 112 / 0.3);

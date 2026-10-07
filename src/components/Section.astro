@@ -21,7 +21,7 @@ const { id, eyebrow, title, intro, tone = 'plain' } = Astro.props;
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: radial-gradient(circle, var(--dot) 1px, transparent 1.5px) 0 0 / 12px 12px;
+    background: var(--dots-tile); background-size: 12px 12px;
     mask-image: linear-gradient(to bottom, transparent, #000 7rem, #000 calc(100% - 7rem), transparent);
   }
   .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-3); letter-spacing: 0.02em; }
