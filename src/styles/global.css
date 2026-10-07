@@ -282,12 +282,17 @@ th[scope="row"] { white-space: nowrap; }
   margin-right: var(--space-1);
 }
 
+/* Below-fold bands: skip rendering work until near-viewport. Older engines
+   ignore these and render eagerly (identical result, just slower). */
+.cv-auto { content-visibility: auto; contain-intrinsic-size: auto 640px; }
+
 /* Print-to-pitch: the page prints as a one-page consulting brief. */
 @media print {
   :root { --bg: #fff; --fg: #111; --fg-strong: #000; --muted: #444; --surface: #fff; --surface-2: #f2f2f2; --border: #ccc; --card: #fff; }
   body { font-size: 11px; }
   .site-header, .site-footer, .skip-link, .theme, #twin-launch, #twin-panel,
   .no-print, video, .meter, details > summary::before { display: none !important; }
+  .cv-auto { content-visibility: visible; contain-intrinsic-size: auto; }
   .section { padding: 0.6rem 0 !important; }
   .card { box-shadow: none; border: 1px solid #ccc; color: var(--fg); }
   details { page-break-inside: avoid; }

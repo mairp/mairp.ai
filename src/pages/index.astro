@@ -85,7 +85,7 @@ const papers = [
       <p class="bracket-title mono">engagement shapes</p>
       <div class="grid grid-3 engs">
         {engagements.map((e) => (
-          <div class="card eng reveal">
+          <div class="card eng reveal cv-auto">
             <h3 class="mono">{e.data.name}</h3>
             <p class="dur mono">{e.data.duration}</p>
             <p>{e.data.deliverable}</p>
@@ -99,17 +99,17 @@ const papers = [
   <Section id="method" eyebrow="03 // method" title={`${METHOD}: intent in, evidence out.`} tone="raised"
     intro="The method is the same loop the reference system runs — and it is how engagements are governed: nothing advances without evidence.">
     <div class="loop" role="list" aria-label="The verified-fabric loop">
-      <div class="stg card reveal" role="listitem">
+      <div class="stg card" role="listitem">
         <div class="k mono">01 · Intent</div>
         <div class="t">Plain language + constraints</div>
         <div class="d">"stretch this mac-vrf across both leaves" — captured, scoped, verified against policy</div>
       </div>
-      <div class="stg card reveal" role="listitem">
+      <div class="stg card" role="listitem">
         <div class="k mono">02 · Agents &amp; controllers</div>
         <div class="t">Plan, reconcile, dry-run</div>
         <div class="d">Agents map intent to declarative resources; Kubernetes controllers apply them deterministically with rollback</div>
       </div>
-      <div class="stg card reveal" role="listitem">
+      <div class="stg card" role="listitem">
         <div class="k mono">03 · Verified on device</div>
         <div class="t">gNMI proves it — or it didn't happen</div>
         <div class="d">Per-node verification gates; drift re-verified on a schedule and repaired automatically</div>
@@ -121,7 +121,7 @@ const papers = [
 
   {/* ── Twin ─────────────────────────────────────────────────────────── */}
   <Section id="twin" eyebrow="04 // zero-friction" title="Ask the lab twin.">
-    <div class="grid grid-2 twin-grid">
+    <div class="grid grid-2 twin-grid cv-auto">
       <div class="reveal">
         <p class="lede">A Turnstile-gated digital twin of Marlon's public work — it answers how intent-to-fabric verification, gNMI closed loops or local GPU serving actually work, and points back to the repo or paper it came from.</p>
         <p class="muted">It is itself a served inference app with telemetry: a live demo of the grounding, routing and observability the practice sells. Not a live person; may be imperfect.</p>
@@ -141,7 +141,7 @@ const papers = [
   {/* ── Work & publications ──────────────────────────────────────────── */}
   <Section id="work" eyebrow="05 // depth" title="Work & publications." tone="raised"
     intro="Curated depth on demand — the demo, the peer-reviewed papers, the security labs, the delivery method.">
-      <details class="work reveal" open>
+      <details class="work cv-auto" open>
         <summary><span class="q">The intent-tier demo — 6½ minutes, end to end</span></summary>
         <div class="inner">
           <video controls preload="none" playsinline poster="/assets/agentic-netops-demo-thumb.jpg" aria-label="agentic-netops intent-tier demo">
@@ -150,7 +150,7 @@ const papers = [
           <p class="muted">VLAN, ip-vrf and a stretched mac-vrf provisioned from plain language, then proven with kubectl and on the SONiC leaves. Nokia SR Linux variant: <a href="https://github.com/mairp/agentic-netops-srl">agentic-netops-srl</a>.</p>
         </div>
       </details>
-      <details class="work reveal">
+      <details class="work cv-auto">
         <summary><span class="q">Peer-reviewed publications — IEEE &amp; Springer</span></summary>
         <div class="inner">
           {papers.map((p) => (
@@ -162,13 +162,13 @@ const papers = [
           <p class="muted">Co-authored as mentor to the master's students who carried out the research.</p>
         </div>
       </details>
-      <details class="work reveal">
+      <details class="work cv-auto">
         <summary><span class="q">Quantum-safe fabric labs — Nokia SR OS FP5</span></summary>
         <div class="inner">
           <p class="muted">Working containerlab labs: <a href="https://github.com/mairp/sros-anysec-lab">ANYsec</a> · <a href="https://github.com/mairp/sros-anysec-macsec-lab">ANYsec + MACsec</a> · <a href="https://github.com/mairp/srl-sros-telemetry-lab">streaming telemetry (SR Linux + SR OS)</a> — the same labs the Critical-Network Assessment runs on.</p>
         </div>
       </details>
-      <details class="work reveal">
+      <details class="work cv-auto">
         <summary><span class="q">Spec-driven delivery — specstride.ai</span></summary>
         <div class="inner">
           <p class="muted">The delivery methodology is public and self-improving: <a href="https://specstride.ai">specstride.ai</a> drives coding agents phase by phase behind an LLM-critic gate and learns from its own telemetry. <a href="https://github.com/mairp/mixture-of-loops">mixture-of-loops</a> compiles Spec Kit features into provenance-bound, unattended pipelines.</p>
@@ -182,7 +182,7 @@ const papers = [
     {categories.map((c) => {
       const items = repos.filter((r) => r.data.category === c.id);
       return items.length > 0 && (
-        <div class="cat reveal">
+        <div class="cat cv-auto">
           <h3 class="mono cat-title">{c.label}</h3>
           <div class="grid grid-3">
             {items.map((r) => (
@@ -206,7 +206,7 @@ const papers = [
   {/* ── Trajectory ───────────────────────────────────────────────────── */}
   <Section id="trajectory" eyebrow="07 // lineage" title="Where the fabric experience comes from." tone="raised"
     intro="Trust via lineage, not biography — each stop de-risks a service line.">
-    <div class="rail reveal" role="list">
+    <div class="rail cv-auto" role="list">
       {trajectory.map((t) => (
         <div class="stop card" role="listitem">
           <div class="yr mono">{t.yr}</div>
