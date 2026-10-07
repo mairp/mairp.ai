@@ -29,7 +29,9 @@
   </div>
 </div>
 
-<style>
+<style is:global>
+  /* All widget styles global: the message bubbles are runtime-created DOM and
+     sit outside Astro's style scoping. */
   #twin-launch {
     position: fixed; right: max(var(--gutter), 16px); bottom: 20px; z-index: 80;
     display: inline-flex; align-items: center; gap: var(--space-2);
@@ -58,10 +60,20 @@
   .twin-x:hover { color: var(--fg-strong); }
   .twin-log { overflow-y: auto; padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); min-height: 160px; }
   .twin-log:empty::before { content: ' '; }
-  .twin-msg { font-size: 0.9rem; line-height: 1.5; max-width: 92%; }
-  .twin-msg.bot { align-self: flex-start; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px 10px 10px 2px; padding: var(--space-2) var(--space-3); color: var(--fg); overflow-wrap: anywhere; }
-  .twin-msg.user { align-self: flex-end; background: color-mix(in srgb, var(--accent) 18%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 10px 10px 2px 10px; padding: var(--space-2) var(--space-3); color: var(--fg-strong); }
-  .twin-msg.err { align-self: center; color: var(--warn); font-size: 0.8rem; }
+
+  /* Chat messages are created at runtime by the script below, outside Astro's
+     style scoping — these rules must stay global. The bubbles are deliberately
+     unmistakable: the visitor's words sit in a solid accent bubble on the right,
+     the twin's answers in a bordered surface bubble on the left, each with a
+     mono sender label. */
+  .twin-msg { font-size: 0.9rem; line-height: 1.5; max-width: 92%; border-radius: 12px; padding: var(--space-2) var(--space-3); overflow-wrap: anywhere; }
+  .twin-msg .who { display: block; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2px; }
+  .twin-msg.bot { align-self: flex-start; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px 12px 12px 2px; color: var(--fg); }
+  .twin-msg.bot .who { color: var(--accent); }
+  .twin-msg.user { align-self: flex-end; background: var(--accent); color: var(--accent-ink); border-radius: 12px 12px 2px 12px; }
+  .twin-msg.user .who { color: color-mix(in srgb, var(--accent-ink) 75%, transparent); }
+  .twin-msg.user a { color: var(--accent-ink); font-weight: 600; }
+  .twin-msg.err { align-self: center; color: var(--warn); font-size: 0.8rem; background: color-mix(in srgb, var(--warn) 10%, transparent); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); }
   .twin-msg a { overflow-wrap: anywhere; }
   .twin-ts { padding: 0 var(--space-4); min-height: 0; }
   .twin-ts:not(:empty) { padding-bottom: var(--space-2); min-height: 60px; }
@@ -121,6 +133,13 @@
   function addMsg(kind: string, text: string) {
     const el = document.createElement('div');
     el.className = `twin-msg ${kind}`;
+    // Sender label first: "you" vs "twin" is never ambiguous, in either theme.
+    if (kind === 'user' || kind === 'bot') {
+      const who = document.createElement('span');
+      who.className = 'who mono';
+      who.textContent = kind === 'user' ? 'you' : 'twin';
+      el.appendChild(who);
+    }
     // Linkify http(s) URLs. XSS-safe: model output never touches innerHTML;
     // text goes in via text nodes and URLs become anchors with validated hrefs.
     const re = /(https?:\/\/[^\s<]+[^\s<.,;:!?)\]}'"])/g;
