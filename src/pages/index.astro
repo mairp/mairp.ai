@@ -236,6 +236,13 @@ const papers = [
         </ul>
         <p class="muted">Multivendor is the offer, not an add-on — deliberately vendor-independent.</p>
       </div>
+      <div class="card reveal span-2">
+        <h3 class="mono">quantum-safe networking</h3>
+        <p>Nokia ANYsec — post-quantum-resistant, line-rate encryption for data-center fabrics — plus MACsec and Nokia NGE,
+          exercised in <a href="https://github.com/mairp/sros-anysec-lab" target="_blank" rel="noopener noreferrer">public labs</a> on Nokia SR OS FP5 and presented at MPLS SD &amp; AI Net World 2024
+          (<a href="https://www.youtube.com/watch?v=pAKnSQR694g" target="_blank" rel="noopener noreferrer">demo video</a>).
+          PQC keying, line-rate encryption inside EVPN/VXLAN, latency trade-offs, staged multi-vendor migration.</p>
+      </div>
     </div>
   </Section>
 
@@ -325,6 +332,7 @@ const papers = [
 
   /* trajectory rail */
   .rail { display: grid; gap: var(--space-4); }
+  .span-2 { grid-column: 1 / -1; }
   @media (min-width: 900px) { .rail { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
   .stop { display: flex; flex-direction: column; gap: var(--space-1); font-size: var(--step--1); }
   .stop .yr { color: var(--accent); }

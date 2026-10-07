@@ -38,3 +38,8 @@
   order: 8
   q: Can you train our team, not just deliver?
   a: Yes. Training and enablement are a standing line of the practice, grounded in university mentoring that produced two peer-reviewed publications and in authored course material. Handover includes working sessions so your engineers can operate and extend what is built.
+
+- id: faq-9
+  order: 9
+  q: Do you actually work on quantum?
+  a: 'Applied quantum-safe networking — hands-on, public and verifiable: Nokia ANYsec (post-quantum-resistant, line-rate encryption for data-center fabrics), MACsec and Nokia NGE, exercised in public containerlab labs on Nokia SR OS FP5 vSIMs ([sros-anysec-lab](https://github.com/mairp/sros-anysec-lab), [sros-anysec-macsec-lab](https://github.com/mairp/sros-anysec-macsec-lab), building on the [srl-labs originals](https://github.com/srl-labs/sros-anysec-macsec-lab)) and presented as a quantum-safe ANYsec demonstration at MPLS SD & AI Net World 2024 — [demo video](https://www.youtube.com/watch?v=pAKnSQR694g). In depth: how post-quantum cryptography and keying change network design and operations, line-rate encryption inside EVPN/VXLAN fabrics, performance/latency trade-offs, and staged multi-vendor migration. Quantum-computing research itself (qubits, algorithms, hardware) is not the practice — making your fabric resistant to it is.'
