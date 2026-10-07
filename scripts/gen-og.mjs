@@ -41,7 +41,7 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
     <text x="80" y="382" font-size="32" fill="${C.text}">AI you can run on your own GPUs.</text>
     <text x="80" y="452" font-size="26" fill="${C.muted}">multivendor automation · agentic netops · sovereign inference</text>
     <text x="80" y="526" font-size="26" xml:space="preserve"><tspan fill="${C.ok}">intent ✓    verified ✓    costed ✓</tspan><tspan fill="${C.accent}">    · on the device, or it didn't happen</tspan></text>
-    <text x="80" y="570" font-size="24" fill="${C.muted}">Cisco · Nokia · Juniper · NVIDIA · Red Hat · SONiC</text>
+    <text x="80" y="570" font-size="24" fill="${C.muted}">Cisco · Nokia · Juniper · loadbalancer.org · NVIDIA · Red Hat · SONiC</text>
     <text x="1120" y="580" font-size="26" fill="${C.text}" text-anchor="end">mairp.ai</text>
   </g>
 </svg>`;

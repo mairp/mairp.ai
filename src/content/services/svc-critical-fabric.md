@@ -16,7 +16,7 @@ evidence:
   - srl-sros-telemetry-lab — interactive streaming telemetry lab, Nokia SR Linux + SR OS
   - vrnetlab — contributed Nokia vr-sros ISA-MS card support
   - ISP subscriber assurance automation on carrier router OS (anonymized capability category)
-vendors: [Nokia (SR OS, SR Linux), Cisco (IOS-XR), Juniper]
+vendors: [Nokia (SR OS, SR Linux), Cisco (IOS-XR), Juniper, loadbalancer.org (ADC)]
 related: [svc-agentic-netops]
 links:
   - label: sros-anysec-lab on GitHub

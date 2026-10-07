@@ -163,6 +163,14 @@ sheer card count on the ledger band — trim `.reveal` and halos further there.
   old site within minutes; its repo is untouched and its grid was last synced
   2026-10-07.
 
+## Addendum (2026-10-07): vendor band updates
+
+Owner-flagged omissions, closed same day: **loadbalancer.org (application delivery)**
+added to the fluency band (site tokens + OG card) and to the two services where
+ADCs are in scope — Agentic NetOps (LB tier sits in the automated fabric path)
+and Critical-Network Security & Telemetry. Band stays text-only, CV-backed,
+no logo soup.
+
 ## Addendum (2026-10-07): the AIOps/CloudOps gap
 
 The owner flagged that the six-service architecture had no dedicated AIOps/CloudOps

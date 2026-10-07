@@ -31,6 +31,7 @@ export const VENDORS = [
   'Nokia (SR Linux, SR OS)',
   'Juniper',
   'SONiC',
+  'loadbalancer.org (application delivery)',
   'NVIDIA (GPU / AI infrastructure)',
   'Red Hat (Ansible, RHEL)',
 ] as const;

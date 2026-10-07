@@ -15,7 +15,7 @@ evidence:
   - agentic-netops-srl — the Nokia SR Linux variant
   - srl-sros-telemetry-lab — interactive streaming telemetry
   - IEEE paper — decentralized zero-touch provisioning of leaf-spine EVPN data centers
-vendors: [Cisco (SONiC, IOS-XR, NX-OS), Nokia (SR Linux, SR OS), Juniper, NVIDIA, Red Hat (Ansible/RHEL)]
+vendors: [Cisco (SONiC, IOS-XR, NX-OS), Nokia (SR Linux, SR OS), Juniper, loadbalancer.org (ADC), NVIDIA, Red Hat (Ansible/RHEL)]
 related: [svc-aiops-cloudops, svc-critical-fabric, svc-agent-platform]
 links:
   - label: agentic-netops on GitHub
