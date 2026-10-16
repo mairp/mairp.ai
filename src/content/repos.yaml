@@ -27,7 +27,7 @@
   description: "Spec-driven autonomous coding orchestrator: drives your agent through GitHub Spec Kit phases behind an LLM critic gate and diagnoses stuck phases. It also improves itself: it learns per-phase settings from its own run telemetry, tests each change against a baseline, and reverts any that make things worse."
   lang: "Python"
   langColor: "#3572A5"
-  stars: 3
+  stars: 4
   category: method
   pinned: true
   order: 2
