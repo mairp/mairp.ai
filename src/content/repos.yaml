@@ -95,9 +95,9 @@
   name: "video-to-deck"
   url: https://github.com/mairp/video-to-deck
   description: "Turn videos into Marp slide decks (PPTX/PDF/HTML). Local whisper + OCR + optional VLM captions build an evidence bundle; a fresh agent per video writes the deck. Structural content becomes Mermaid diagrams. Pluggable agent, CUDA-accelerated, CPU-portable."
-  lang: "Shell"
-  langColor: "#89e051"
-  stars: 1
+  lang: "Python"
+  langColor: "#3572A5"
+  stars: 2
   category: applied
   pinned: true
   order: 9
