@@ -173,6 +173,15 @@
   category: network
   pinned: true
   order: 16
+- id: "nb-robotic-ai-hk"
+  name: "nb-robotic-ai-hk"
+  url: https://github.com/mairp/nb-robotic-ai-hk
+  description: ""
+  lang: "Shell"
+  langColor: "#89e051"
+  category: applied
+  pinned: false
+  order: 17
 - id: "trustcircle"
   name: "trustcircle"
   url: https://github.com/mairp/trustcircle
@@ -182,7 +191,7 @@
   stars: 1
   category: applied
   pinned: false
-  order: 17
+  order: 18
 - id: "agent-skills"
   name: "agent-skills"
   url: https://github.com/mairp/agent-skills
@@ -191,7 +200,7 @@
   langColor: "#3572A5"
   category: applied
   pinned: false
-  order: 18
+  order: 19
 - id: "specstride.ai"
   name: "specstride.ai"
   url: https://github.com/mairp/specstride.ai
@@ -201,7 +210,7 @@
   stars: 1
   category: method
   pinned: false
-  order: 19
+  order: 20
 - id: "claude-plugins"
   name: "claude-plugins"
   url: https://github.com/mairp/claude-plugins
@@ -211,7 +220,7 @@
   stars: 1
   category: method
   pinned: false
-  order: 20
+  order: 21
 - id: "kanban"
   name: "kanban"
   url: https://github.com/mairp/kanban
@@ -221,7 +230,7 @@
   stars: 1
   category: applied
   pinned: false
-  order: 21
+  order: 22
 - id: "gpu_rtx_3090"
   name: "gpu_rtx_3090"
   url: https://github.com/mairp/gpu_rtx_3090
@@ -231,7 +240,7 @@
   stars: 1
   category: inference
   pinned: false
-  order: 22
+  order: 23
 - id: "certforge"
   name: "certforge"
   url: https://github.com/mairp/certforge
@@ -241,7 +250,7 @@
   stars: 1
   category: network
   pinned: false
-  order: 23
+  order: 24
 - id: "duby"
   name: "duby"
   url: https://github.com/mairp/duby
@@ -251,4 +260,4 @@
   stars: 1
   category: applied
   pinned: false
-  order: 24
+  order: 25
