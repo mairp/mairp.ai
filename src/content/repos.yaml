@@ -17,7 +17,7 @@
   description: "Agentic NetOps on Nokia SR Linux — declarative EVPN/VXLAN fabric control plane with a guarded multi-agent intent tier."
   lang: "Shell"
   langColor: "#89e051"
-  stars: 2
+  stars: 3
   category: network
   pinned: true
   order: 1
