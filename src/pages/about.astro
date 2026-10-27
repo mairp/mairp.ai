@@ -2,6 +2,7 @@
 // About: the person behind the practice — trajectory, certifications,
 // publications, languages, and the consultant profile (PDF).
 import Base from '../layouts/Base.astro';
+import CertBadges from '../components/CertBadges.astro';
 import CopyButton from '../components/CopyButton.astro';
 import { SITE, CERTS, VENDORS } from '../lib/site';
 
@@ -51,6 +52,7 @@ const skills = {
 
     <div class="bracket">
       <p class="bracket-title mono">certifications &amp; fluency</p>
+      <CertBadges />
       <div class="grid grid-2">
         <div class="card">
           <h2 class="mono">certifications</h2>
