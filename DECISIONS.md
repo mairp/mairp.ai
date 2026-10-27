@@ -39,7 +39,7 @@ accent, curated+grouped grid, Core42 as credential line only).
 | IEEE / Springer publications | Linked papers (ieeexplore.ieee.org/document/11080420, link.springer.com/article/10.1186/s13677-025-00814-0) |
 | Spec-driven delivery method | `specstride` + specstride.ai (live), `mixture-of-loops` |
 | "Sovereign inference routing and policy for a Gulf AI holding" | **Anonymized capability category only** — from private-repo evidence; no repo name, client, topology, or detail is ever shown. Same rule for: industrial agentic AI (oil & gas), ISP subscriber assurance on carrier router OS, guarded agent-operated control planes with GitOps DR, multi-agent fleet orchestration at scale, AI enablement/course-material authoring. |
-| CCIE · CKA · DevNet Professional · CCNP DC · Nokia DCFP · NVIDIA AI Infra & Ops · Isovalent Lab Champion | Credly-verified; shown as text with link, never the lead story |
+| CCIE · CKA · CCNP Automation · CCNP DC · NVIDIA Agentic AI Professional · NVIDIA AI Infra & Ops · Nokia DCFP · Isovalent Lab Champion | Verified on Credly / NVIDIA; since 2026-10-27 shown as a curated 12-badge wall (self-hosted images, each linking to its verify page) in Background and About, never the lead story. Isovalent limited to the 10/20-lab badges; Cisco to the most marketable |
 | Vendor fluency incl. Juniper, Red Hat | CV-backed career claim (Tigo/Citi estates, Ansible/RHEL ecosystem); vendors shown as a band, not logos |
 
 No testimonials, no "trusted by" logos, no invented case-study metrics — anywhere.

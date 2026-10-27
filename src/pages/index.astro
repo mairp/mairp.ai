@@ -7,6 +7,7 @@ import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import ProofCard from '../components/ProofCard.astro';
+import CertBadges from '../components/CertBadges.astro';
 import FAQ from '../components/FAQ.astro';
 import CopyButton from '../components/CopyButton.astro';
 import { SITE, VENDORS, CERTS, METHOD } from '../lib/site';
@@ -57,7 +58,7 @@ const papers = [
       <p class="lede reveal">{SITE.caption} Plain-language intent in — verified-on-device fabric changes out.
         Independent consulting by Marlon Paz across network automation, agentic NetOps and sovereign AI.
       </p>
-      <p class="meta mono reveal">CCIE · CKA · Cisco DevNet Professional · Nokia DCFP · NVIDIA AI Infrastructure &amp; Operations</p>
+      <p class="meta mono reveal">CCIE · CKA · CCNP Automation · NVIDIA Agentic AI Professional · NVIDIA AI Infrastructure &amp; Operations</p>
       <p class="ctas reveal">
         <a class="btn btn-primary" href="#services">Explore services <span class="arrow" aria-hidden="true">→</span></a>
         <button class="btn" type="button" data-twin-open>Ask the lab twin</button>
@@ -221,6 +222,7 @@ const papers = [
 
   {/* ── Background ───────────────────────────────────────────────────── */}
   <Section id="background" eyebrow="08 // depth" title="Certified across the stack.">
+    <CertBadges />
     <div class="grid grid-2">
       <div class="card reveal">
         <h3 class="mono">certifications</h3>
