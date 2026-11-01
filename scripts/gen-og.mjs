@@ -37,7 +37,7 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
     <text x="80" y="104" font-size="22" fill="${C.accent}">NETWORK &amp; AI SYSTEMS CONSULTING · ABU DHABI · EN/ES/PT</text>
     ${markSvg(78, 150, 96)}
     <text x="220" y="212" font-size="72" font-weight="700" fill="${C.fg}">Marlon Paz</text>
-    <text x="80" y="330" font-size="40" fill="${C.fg}">Networks that verify themselves.</text>
+    <text x="80" y="330" font-size="40" fill="${C.fg}">Infrastructure that verifies itself.</text>
     <text x="80" y="382" font-size="32" fill="${C.text}">AI you can run on your own GPUs.</text>
     <text x="80" y="452" font-size="26" fill="${C.muted}">multivendor automation · agentic netops · sovereign inference</text>
     <text x="80" y="526" font-size="26" xml:space="preserve"><tspan fill="${C.ok}">intent ✓    verified ✓    costed ✓</tspan><tspan fill="${C.accent}">    · on the device, or it didn't happen</tspan></text>

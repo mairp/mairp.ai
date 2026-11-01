@@ -3,10 +3,10 @@ export const SITE = {
   name: 'Marlon Paz',
   practice: 'Network & AI Systems Consulting',
   url: 'https://mairp.ai',
-  title: 'Marlon Paz — Networks that verify themselves',
+  title: 'Marlon Paz — Infrastructure that verifies itself',
   description:
     'Independent consulting by Marlon Paz: multivendor network automation, agentic NetOps/CloudOps (intent-to-fabric with verified-on-device change), and sovereign local inference on your own GPUs. Every claim on this site links to public evidence.',
-  tagline: 'Networks that verify themselves.',
+  tagline: 'Infrastructure that verifies itself.',
   caption: 'AI you can run on your own GPUs.',
   email: 'marlon.paz@ieee.org',
   cv: '/cv-MARLON-PAZ-CONSULTANT-PROFILE.pdf',
@@ -45,6 +45,8 @@ export const CERTS = [
   'NVIDIA AI Infrastructure and Operations',
   'Nokia DCFP',
   'Isovalent Lab Champion',
+  'CCNA Automation',
+  'CCNA',
 ] as const;
 
 /** The badge wall: each links to its public verification page (Credly or NVIDIA). */
