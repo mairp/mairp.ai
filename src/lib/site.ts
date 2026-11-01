@@ -63,6 +63,8 @@ export const BADGES = [
   { name: 'CCNP Enterprise', issuer: 'Cisco', year: 2015, img: 'cisco-ccnp-enterprise', url: 'https://www.credly.com/badges/d17d82a9-f9c3-42ee-9e60-c9c5fdf48f90' },
   { name: 'Specialist: Automation Core', issuer: 'Cisco', year: 2022, img: 'cisco-specialist-automation-core', url: 'https://www.credly.com/badges/4dce67a3-b29c-43a6-a42c-0ac1e35b4aed' },
   { name: 'Data Center Fabric Professional', issuer: 'Nokia', year: 2021, img: 'nokia-ncp-dcf', url: 'https://www.credly.com/badges/e253b0fa-0e58-457c-8980-17ebde694ffc' },
+  { name: 'CCNA Automation', issuer: 'Cisco', year: 2020, img: 'cisco-ccna-automation', url: 'https://www.credly.com/badges/2903c928-7a06-4b8e-9f3d-ea3b59ff6d4d' },
+  { name: 'CCNA', issuer: 'Cisco', year: 2013, img: 'cisco-ccna', url: 'https://www.credly.com/badges/13b7ecae-86ba-4866-850e-9f1c83154431' },
 ] as const;
 
 /** The methodology name (from the research synthesis): the practice's signature. */
