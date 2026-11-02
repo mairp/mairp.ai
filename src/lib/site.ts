@@ -65,6 +65,7 @@ export const BADGES = [
   { name: 'Data Center Fabric Professional', issuer: 'Nokia', year: 2021, img: 'nokia-ncp-dcf', url: 'https://www.credly.com/badges/e253b0fa-0e58-457c-8980-17ebde694ffc' },
   { name: 'CCNA Automation', issuer: 'Cisco', year: 2020, img: 'cisco-ccna-automation', url: 'https://www.credly.com/badges/2903c928-7a06-4b8e-9f3d-ea3b59ff6d4d' },
   { name: 'CCNA', issuer: 'Cisco', year: 2013, img: 'cisco-ccna', url: 'https://www.credly.com/badges/13b7ecae-86ba-4866-850e-9f1c83154431' },
+  { name: 'DevNet Class of 2020', issuer: 'Cisco', year: 2020, img: 'cisco-devnet-class-2020', url: 'https://www.credly.com/badges/645712e4-d2c6-449b-aa76-c63bfe85c782' },
 ] as const;
 
 /** The methodology name (from the research synthesis): the practice's signature. */
