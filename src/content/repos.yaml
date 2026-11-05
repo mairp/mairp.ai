@@ -173,34 +173,23 @@
   category: network
   pinned: true
   order: 16
-- id: "nb-robotic-ai-hk"
-  name: "nb-robotic-ai-hk"
-  url: https://github.com/mairp/nb-robotic-ai-hk
-  description: ""
-  lang: "Shell"
-  langColor: "#89e051"
+- id: "specstride-plugin"
+  name: "specstride-plugin"
+  url: https://github.com/mairp/specstride-plugin
+  description: "Development governance for coding agents: every phase reviewed, signed and committed. A Claude Code plugin for Spec Kit features."
+  lang: "TypeScript"
+  langColor: "#3178c6"
+  stars: 1
   category: applied
   pinned: false
   order: 17
-- id: "agent-skills"
-  name: "agent-skills"
-  url: https://github.com/mairp/agent-skills
-  description: "Agent skills I use every day: GPU and fleet ops, Proxmox ops/triage, local-model routing, fleet memory, spec reconciliation, spec-corpus curation."
-  lang: "Python"
-  langColor: "#3572A5"
+- id: "specstride-example"
+  name: "specstride-example"
+  url: https://github.com/mairp/specstride-example
+  description: "Try Specstride in five minutes: a tiny Spec Kit feature, implemented, tested, reviewed and committed phase by phase."
   category: applied
   pinned: false
   order: 18
-- id: "specstride.ai"
-  name: "specstride.ai"
-  url: https://github.com/mairp/specstride.ai
-  description: "Website for Specstride: spec-driven, gated, unattended coding. Built as a reusable template."
-  lang: "Astro"
-  langColor: "#8b949e"
-  stars: 1
-  category: method
-  pinned: false
-  order: 19
 - id: "claude-plugins"
   name: "claude-plugins"
   url: https://github.com/mairp/claude-plugins
@@ -210,7 +199,35 @@
   stars: 1
   category: method
   pinned: false
+  order: 19
+- id: "nb-robotic-ai-hk"
+  name: "nb-robotic-ai-hk"
+  url: https://github.com/mairp/nb-robotic-ai-hk
+  description: ""
+  lang: "Shell"
+  langColor: "#89e051"
+  category: applied
+  pinned: false
   order: 20
+- id: "agent-skills"
+  name: "agent-skills"
+  url: https://github.com/mairp/agent-skills
+  description: "Agent skills I use every day: GPU and fleet ops, Proxmox ops/triage, local-model routing, fleet memory, spec reconciliation, spec-corpus curation."
+  lang: "Python"
+  langColor: "#3572A5"
+  category: applied
+  pinned: false
+  order: 21
+- id: "specstride.ai"
+  name: "specstride.ai"
+  url: https://github.com/mairp/specstride.ai
+  description: "Website for Specstride: spec-driven, gated, unattended coding. Built as a reusable template."
+  lang: "Astro"
+  langColor: "#8b949e"
+  stars: 1
+  category: method
+  pinned: false
+  order: 22
 - id: "kanban"
   name: "kanban"
   url: https://github.com/mairp/kanban
@@ -220,7 +237,7 @@
   stars: 1
   category: applied
   pinned: false
-  order: 21
+  order: 23
 - id: "gpu_rtx_3090"
   name: "gpu_rtx_3090"
   url: https://github.com/mairp/gpu_rtx_3090
@@ -230,7 +247,7 @@
   stars: 1
   category: inference
   pinned: false
-  order: 22
+  order: 24
 - id: "certforge"
   name: "certforge"
   url: https://github.com/mairp/certforge
@@ -240,7 +257,7 @@
   stars: 1
   category: network
   pinned: false
-  order: 23
+  order: 25
 - id: "duby"
   name: "duby"
   url: https://github.com/mairp/duby
@@ -250,4 +267,4 @@
   stars: 1
   category: applied
   pinned: false
-  order: 24
+  order: 26
