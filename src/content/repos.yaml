@@ -173,6 +173,16 @@
   category: network
   pinned: true
   order: 16
+- id: "specstride.ai"
+  name: "specstride.ai"
+  url: https://github.com/mairp/specstride.ai
+  description: "Website for Specstride: development governance for coding agents, a Claude Code plugin. Built as a reusable template."
+  lang: "Astro"
+  langColor: "#8b949e"
+  stars: 1
+  category: method
+  pinned: false
+  order: 17
 - id: "specstride-plugin"
   name: "specstride-plugin"
   url: https://github.com/mairp/specstride-plugin
@@ -182,14 +192,14 @@
   stars: 1
   category: applied
   pinned: false
-  order: 17
+  order: 18
 - id: "specstride-example"
   name: "specstride-example"
   url: https://github.com/mairp/specstride-example
   description: "Try Specstride in five minutes: a tiny Spec Kit feature, implemented, tested, reviewed and committed phase by phase."
   category: applied
   pinned: false
-  order: 18
+  order: 19
 - id: "claude-plugins"
   name: "claude-plugins"
   url: https://github.com/mairp/claude-plugins
@@ -199,7 +209,7 @@
   stars: 1
   category: method
   pinned: false
-  order: 19
+  order: 20
 - id: "nb-robotic-ai-hk"
   name: "nb-robotic-ai-hk"
   url: https://github.com/mairp/nb-robotic-ai-hk
@@ -208,7 +218,7 @@
   langColor: "#89e051"
   category: applied
   pinned: false
-  order: 20
+  order: 21
 - id: "agent-skills"
   name: "agent-skills"
   url: https://github.com/mairp/agent-skills
@@ -216,16 +226,6 @@
   lang: "Python"
   langColor: "#3572A5"
   category: applied
-  pinned: false
-  order: 21
-- id: "specstride.ai"
-  name: "specstride.ai"
-  url: https://github.com/mairp/specstride.ai
-  description: "Website for Specstride: spec-driven, gated, unattended coding. Built as a reusable template."
-  lang: "Astro"
-  langColor: "#8b949e"
-  stars: 1
-  category: method
   pinned: false
   order: 22
 - id: "kanban"
