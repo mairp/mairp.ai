@@ -199,6 +199,7 @@
   description: "The dsh host of Specstride: skills, shim, doctor and eval driver over the pinned specstride-core."
   lang: "TypeScript"
   langColor: "#3178c6"
+  stars: 1
   category: method
   pinned: false
   order: 19
