@@ -1,5 +1,5 @@
 ---
-description: "Task list for feature 001-whole-site-3d"
+description: "Task list for feature 001-whole-site-3d (fine-grained: smallest viable scope per task)"
 ---
 
 # Tasks: Whole-Site 3D Experience
@@ -10,7 +10,7 @@ description: "Task list for feature 001-whole-site-3d"
 
 **Tests**: Not requested — validation uses the existing CI gates (`npm run build` incl. csp-hash, `astro check`, linkinator, LHCI ≥0.95) and the walkthroughs in quickstart.md.
 
-**Organization**: Tasks grouped by user story (US1 navigate-in-3D, US2 deep links, US3 fallbacks, US4 performance, US5 branding/neutrality) to enable independent implementation and testing.
+**Organization**: Tasks grouped by user story (US1 navigate-in-3D, US2 deep links, US3 fallbacks, US4 performance, US5 branding/neutrality). **Granularity**: every task touches one concern (ideally one file/one function group) so each is a small, reviewable, independently committable unit.
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -42,17 +42,45 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Implement the room payload builder `src/lib/room-payload.ts` with `buildRoomPayload()` producing the `RoomPayload` shape from contracts/room-payload.schema.md (mairp-owned sources only: content collections, src/lib/site.ts, repos.yaml — constitution P5/FR-015); include per-page service slices, proof, engagements, reposByCategory, faq, about (SITE/trajectory/papers/skills/certs/badges verbatim), contact, navigation from contracts/url-room-map.md, and method steps
-- [ ] T007 Add TypeScript types for RoomPayload and its entities (ServiceSummary, ProofBadge, RepoSummary, FaqItem, AboutData, Engagement) in `src/lib/room-payload.ts` matching contracts/room-payload.schema.md; JSON-safe only, evidence URLs passthrough
-- [ ] T008 Mount the island on every page and ship payload endpoints per FR-016: create the prerendered per-route JSON endpoint `src/pages/rooms/[route].json.ts` (getStaticPaths over contracts/url-room-map.md; one entry per 3D room; `/404` excluded), call `buildRoomPayload()` there and in page frontmatter only where needed for route data, and render `<RoomIsland client:only="react" />` from `src/components/RoomIsland.astro` in `src/pages/index.astro`, `src/pages/about.astro`, `src/pages/services/[id].astro` — NO serialized payload props in page HTML (csp-hash + SC-004 stay at baseline)
-- [ ] T009 Implement the pre-JS boot overlay in `src/layouts/Base.astro` following the demo pattern (inline styles only, `role="status"`, CSS var `--p` progress, rotating status lines themed to mairp copy, `prefers-reduced-motion` disables animations) plus a page-level removal timeout wired into the existing bundled theme-init module — NO new inline script (csp-hash must stay green, contracts/island-events.md)
-- [ ] T010 Implement `src/islands/room3d/boot/boot.ts` exposing `window.__roomBoot = { setProgress, hide }` (clamp ≥0.04; `.done` fade; remove node), a `SceneReady` gate that calls `hide()` only after 4 rendered frames (research R2/room-viewer-mechanics §boot), and progressive content surfacing (screens/payload slices report readiness so key content is readable before full load — FR-003/SC-009)
-- [ ] T011 Implement WebGL/environment detection and mount gating in `src/islands/room3d/Room3D.tsx`: webgl2 feature detect (null → island renders nothing, boot removed), requestIdleCallback post-LCP mount, `hardwareConcurrency <= 4` lite-mode flag, and `webglcontextlost` → reveal flat page (contracts/island-events.md; US3 foundation)
-- [ ] T012 Implement the theme bridge `src/islands/room3d/fx/ThemeBridge.ts`: read tokens (bg/surface/accent/accent2/fg/muted/border) from computed CSS vars into THREE.Color; MutationObserver on `data-theme` + `prefers-color-scheme` listener re-maps live (data-model.md ThemeBridge)
-- [ ] T013 Implement the persistent history router `src/islands/room3d/routing/useRoomRoute.ts`: parse initial room from `payload.route`, pushState/popstate with trailing slashes per contracts/url-room-map.md, client-side document.title/meta-description/canonical sync on in-app navigation, and room-transition state machine
-- [ ] T014 Set up the Canvas root in `src/islands/room3d/Room3D.tsx` per research R9: `<Canvas shadows PCFShadowMap gl={{toneMapping: AgXToneMapping}} dpr={[1,1.5]}>`, Suspense boundary, React.StrictMode-safe effect cleanups (no WebGL context leaks), pause `useFrame` when `document.hidden` or island inactive
+### Payload types & builder (contracts/room-payload.schema.md)
 
-**Checkpoint**: Foundation ready — every page ships flat content + payload, island mounts gated, boot/theme/routing infrastructure testable. User story work can begin.
+- [x] T006 [P] Define the core payload types `RoomKind`, `RoomPayload`, `RoomLink`, and `ContactInfo` in `src/lib/room-payload.ts` matching contracts/room-payload.schema.md (JSON-safe only)
+- [x] T007 [P] Define the entity types `ServiceSummary`, `ProofBadge`, `Engagement`, `RepoSummary`, `FaqItem`, `AboutData` in `src/lib/room-payload.ts` (fields per data-model.md; evidence URLs documented as immutable passthrough per FR-010)
+- [x] T008 [P] Implement `buildServiceSummaries()` in `src/lib/room-payload.ts`: map the services collection (all 7, order-preserved; own + related slice for service pages) including bodyExcerpt handling — no raw markdown bodies
+- [x] T009 [P] Implement `buildHomeSlices()` in `src/lib/room-payload.ts`: proof (badges + evidence URLs verbatim), engagements, reposByCategory (from generated repos.yaml, read-only), faq (sanitized inline-md output only), and method steps from the homepage content
+- [x] T010 [P] Implement `buildAboutData()` in `src/lib/room-payload.ts`: serialize SITE, trajectory, papers, skills, certs, badges, vendors from `src/lib/site.ts` verbatim into the AboutData shape
+- [x] T011 Implement `buildRoomPayload(route)` assembly in `src/lib/room-payload.ts`: compose title/description, contact, navigation (from contracts/url-room-map.md), and the slices above into one RoomPayload per route key
+- [x] T012 Create the prerendered endpoint `src/pages/rooms/[route].json.ts`: getStaticPaths over every 3D room in contracts/url-room-map.md (home + 7 services + about; `/404` EXCLUDED), each returning `buildRoomPayload()` output
+- [x] T013 Verify payload documents: run `npm run build`, confirm `/rooms/*.json` files exist in dist, each < 30 KB, each parses, and no payload data appears in any route's HTML (FR-016; SC-004 baseline)
+
+### Mounting & boot overlay (contracts/island-events.md)
+
+- [x] T014 Add the `#boot` overlay markup + inline styles to `src/layouts/Base.astro` (mairp-branded status lines, `role="status"`, CSS var `--p` progress, `prefers-reduced-motion` disables animations — demo pattern, mairp copy only)
+- [x] T015 Add the boot-removal fallback timeout to the existing bundled theme-init module (`src/lib/theme-init.ts`): ~3 s after DOMContentLoaded, remove `#boot` if the island never took ownership — NO new inline scripts (csp-hash stays green)
+- [x] T016 [P] Implement `src/islands/room3d/boot/boot.ts` window API: install `window.__roomBoot = { setProgress, hide }`; `setProgress` clamps ≥ 0.04 and writes CSS var `--p`; `hide()` fades via `.done` then removes the node
+- [x] T017 [P] Implement the `SceneReady` gate in `src/islands/room3d/boot/boot.ts`: count 4 rendered frames before allowing `hide()` (shader-compile stutter guard, research R2)
+- [x] T018 Implement boot ownership handoff in `src/islands/room3d/boot/boot.ts`: once the island installs `__roomBoot`, cancel the theme-init timeout (T015) so only one party owns `#boot`
+
+### Mount gating & environment detection (Room3D)
+
+- [x] T019 Implement the WebGL2 feature-detect helper in `src/islands/room3d/env.ts` (`document.createElement('canvas').getContext('webgl2')`) plus the lite-mode probe (`navigator.hardwareConcurrency <= 4`) and reduced-motion probe (`prefers-reduced-motion`)
+- [x] T020 Implement mount gating in `src/islands/room3d/Room3D.tsx`: requestIdleCallback post-LCP mount, webgl2 check before any Canvas creation (null → render nothing), persisted flat-site preference check consumed (gate extended in T071)
+- [x] T021 Set up the Canvas root in `src/islands/room3d/Room3D.tsx` per research R9: `<Canvas shadows PCFShadowMap gl={{ toneMapping: AgXToneMapping }} dpr={[1, 1.5]}>` inside Suspense, `frameloop` pausing when `document.hidden`
+- [x] T022 Audit StrictMode-safe cleanup in `src/islands/room3d/Room3D.tsx` and children: every effect disposes symmetrically (no WebGL context leaks on double-mount, research §5 pitfall 2)
+- [x] T023 [P] Add the `webglcontextlost` listener stub in `src/islands/room3d/Room3D.tsx` that flags a lost-context state (recovery UI itself is US3/T066)
+
+### Theme bridge
+
+- [x] T024 [P] Implement token reading in `src/islands/room3d/fx/ThemeBridge.ts`: read bg/surface/accent/accent2/fg/muted/border from computed CSS vars into THREE.Color
+- [x] T025 [P] Implement live re-mapping in `src/islands/room3d/fx/ThemeBridge.ts`: MutationObserver on `documentElement[data-theme]` + `prefers-color-scheme` media listener → re-read tokens → notify subscribers (island never toggles themes itself)
+
+### History router
+
+- [x] T026 [P] Implement initial-route parsing in `src/islands/room3d/routing/useRoomRoute.ts`: read the current pathname, normalize trailing slash, look up the room in the URL↔room map (contracts/url-room-map.md); unknown route → do not mount
+- [x] T027 Implement in-app navigation in `src/islands/room3d/routing/useRoomRoute.ts`: `navigate(route)` → `history.pushState` (trailing slash preserved) → room-transition state machine (currentRoom → transitioning → newRoom)
+- [x] T028 Implement popstate handling in `src/islands/room3d/routing/useRoomRoute.ts`: reverse map lookup, transition to the previous room without reload; the 3D world never re-boots (FR-006)
+
+**Checkpoint**: Foundation ready — every route ships flat content + a payload JSON, island mount is gated, boot/theme/routing infrastructure testable. User story work can begin.
 
 ---
 
@@ -62,23 +90,69 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 **Independent Test**: open `/` in a WebGL2 desktop browser → boot completes → navigate entry room → services → a specific service room and read its summary/deliverables/evidence; contact reachable with working copy-email + Twin trigger.
 
-### Implementation for User Story 1
+### Camera rig (research R8)
 
-- [ ] T015 [US1] Implement the shot-based camera rig `src/islands/room3d/rig/CameraRig.tsx` per research R8: SHOTS registry (position/target/smoothTime/label/shortLabel), drei CameraControls makeDefault with per-room azimuth+pan Box3 bounds, tweened `setLookAt` transitions, run-ref cancellation of stale transitions, portrait FOV fitting
-- [ ] T016 [US1] Build the original mairp-branded environment ("fabric room": racks, patch panels, cable runs, screen meshes) as a PROCEDURAL in-code scene (primitive-based geometry composed in `src/islands/room3d/rooms/environment.tsx` — no GLB required), using ONLY mairp palette/brand motifs and sized to the perf budget (research R7/R9; decision recorded per U1 remediation: an authored GLB in `public/assets/models/` with meshopt/webp compression remains an OPTIONAL later swap; no demo assets under either path)
-- [ ] T017 [US1] Conditional asset plumbing (only exercised if/when a GLB is adopted per T016's optional path): self-host meshopt/draco decoders under `public/`, wire loaders to local paths (no CDN, research R7/R11), and add immutable caching for `/assets/models/*` via the wrangler assets config or a new `_headers` file (neither exists yet — create whichever fits the current Cloudflare assets setup)
-- [ ] T018 [US1] Implement GLB scene preparation + static merging in `src/islands/room3d/rooms/prepareScene.ts` (port demo mergeStatic pattern): castShadow flags, emissive→MeshBasicMaterial conversion, rounded-corner screen-geometry swap with matching UVs, live-mesh exemption list, merge-by-material, one-shot shadow maps (`shadowMap.autoUpdate=false`)
-- [ ] T019 [P] [US1] Implement the CSS3D screen system `src/islands/room3d/screens/Css3dScreens.tsx`: second DOM-only CSS3DRenderer over the canvas, createPortal into detached divs, CSS_SCALE=1000, per-frame camera mirroring, dark-glass backing material, rounded corners (demo TVFeed pattern; research R5)
-- [ ] T020 [P] [US1] Implement screen content components in `src/islands/room3d/screens/content/` rendering ONLY payload data per provenance rule (contracts/room-payload.schema.md rule 6): ServiceScreen, ProofScreen (dated badges + evidence links), ServicesGridScreen, ReposScreen (5 categories), MethodScreen, FaqScreen, AboutScreen, ContactScreen (copy-email + Twin trigger), reusing site tokens/typography via CSS vars in `src/islands/room3d/screens/screens.css`
-- [ ] T021 [US1] Build the home room `src/islands/room3d/rooms/HomeRoom.tsx`: shot set (overview/proof/services/method/work/repos/trajectory/background/faq/contact), screen placements bound to payload slices, navigation hotspots to other rooms
-- [ ] T022 [US1] Build the service room template `src/islands/room3d/rooms/ServiceRoom.tsx`: fact cards, deliverables, evidence list, related-services screens from the page payload slice; status/statusNote handling for svc-enablement (requires-scoping)
-- [ ] T023 [US1] Build the about room `src/islands/room3d/rooms/AboutRoom.tsx`: bio, trajectory timeline, certs/badges wall, skills, publications screens from AboutData payload
-- [ ] T024 [US1] Implement in-world navigation interactions in `src/islands/room3d/rooms/hotspots.tsx`: clickable screens/hotspots (R3F pointer events), hover cursor/pointer states, room-transition triggers wired to useRoomRoute, shot controls UI (labels from SHOTS, mobile short labels)
-- [ ] T025 [US1] Implement contact interactivity parity inside screens per contracts/island-events.md: ContactScreen copy-email reuses the page CopyButton behavior with aria-live announcement; Twin trigger clicks the existing `[data-twin-open]` launcher (never reimplement the chat); evidence links are real `<a target="_blank">` in CSS3D DOM
-- [ ] T026 [US1] Add keyboard navigation per contracts/island-events.md (exact keys defined there): `J`/`K` or `←`/`→` cycle navigation targets, `Enter` opens focused screen, `Escape` closes, focus moves into open screen DOM and restores on close; canvas container `aria-hidden`
-- [ ] T027 [US1] Implement postprocessing pipeline `src/islands/room3d/fx/Effects.tsx` per research R9: EffectComposer multisampling 0 → N8AO halfRes/medium → in-composer AgX ToneMapping; skip N8AO in lite mode (T011 flag)
-- [ ] T028 [US1] Wire boot completion to scene readiness in `src/islands/room3d/Room3D.tsx`: fetch the route's payload JSON from `/rooms/<route>.json` (FR-016, same-origin, no props), useProgress → `__roomBoot.setProgress`, progressive screen rendering as slices arrive, SceneReady 4-frame gate → `hide()` (T010); failure at any phase → failed → fallback (US3 path)
-- [ ] T029 [US1] Validate US1 independently: dev-server walkthrough of quickstart.md §2 steps 1–7 (boot, navigate, service detail, back/forward, theme toggle, Twin, copy-email) and `npm run build && npm run check` green; **record boot-to-usable time on the reference machine (mid-range laptop per SC-009, target ≤ 10 s / hard ceiling ≤ 20 s from landing incl. boot) in `specs/001-whole-site-3d/notes.md`**
+- [ ] T029 [US1] Define the SHOTS registry types + per-room shot data structure in `src/islands/room3d/rig/shots.ts` (key, label, shortLabel for <600px, position, target, smoothTime, azimuth bounds, arrival effects)
+- [ ] T030 [US1] Implement the bounded CameraControls setup in `src/islands/room3d/rig/CameraRig.tsx`: drei CameraControls `makeDefault`, per-shot azimuth min/max and pan Box3 constraints from shots.ts
+- [ ] T031 [US1] Implement tweened shot transitions in `src/islands/room3d/rig/CameraRig.tsx`: damped `setLookAt` (smoothTime per shot), run-ref cancellation of stale transitions on rapid shot changes
+- [ ] T032 [US1] Implement portrait FOV fitting in `src/islands/room3d/rig/CameraRig.tsx`: widen FOV on narrow viewports so shot framing keeps key content visible (demo pattern)
+
+### Procedural environment (research R6/R7 — original mairp "fabric room", no GLB required)
+
+- [ ] T033 [P] [US1] Build the room shell (floor, walls, ceiling grid) in `src/islands/room3d/rooms/environment.tsx` using primitives + ThemeBridge token materials only
+- [ ] T034 [P] [US1] Build the rack props (network racks with rails + unit outlines) in `src/islands/room3d/rooms/environment.tsx` as reusable instanced/merged geometry
+- [ ] T035 [P] [US1] Build patch panels + cable-run props in `src/islands/room3d/rooms/environment.tsx` (accent-colored status LEDs using accent2 token)
+- [ ] T036 [US1] Define the screen-placement registry in `src/islands/room3d/rooms/screenPlacements.ts`: per room, screen id → world position/rotation/size/contentKey/interactive/lazy (data-model.md ScreenPlacement)
+- [ ] T037 [US1] Create the screen mesh geometry in `src/islands/room3d/rooms/environment.tsx`: rounded-corner planes per placement with dark-glass backing material
+- [ ] T038 [US1] Add the lighting rig in `src/islands/room3d/rooms/environment.tsx`: ambient + directional + screen-glow rect/point lights, colors from ThemeBridge tokens; light intensities re-derived for this scene (never demo constants)
+
+### Scene preparation & optimization (research R9)
+
+- [ ] T039 [US1] Implement shadow/emissive prep in `src/islands/room3d/rooms/prepareScene.ts`: castShadow/receiveShadow flags, emissive-only materials → MeshBasicMaterial
+- [ ] T040 [US1] Implement mergeStatic-style static geometry merging in `src/islands/room3d/rooms/prepareScene.ts`: merge by (material, shadow flags, attribute layout) with a live-mesh exemption list; replaced originals get empty geometry + negative-radius bounding sphere
+- [ ] T041 [US1] Enable one-shot shadow maps in `src/islands/room3d/rooms/prepareScene.ts`: `shadowMap.autoUpdate = false`, re-flag `needsUpdate` only when lights/scene change
+
+### CSS3D screen system (research R5)
+
+- [ ] T042 [P] [US1] Implement the DOM-only CSS3DRenderer layer in `src/islands/room3d/screens/Css3dScreens.tsx`: second renderer stacked over the canvas, CSS_SCALE=1000, per-frame camera mirroring (`view.copy(camera); view.position.multiplyScalar(CSS_SCALE)`)
+- [ ] T043 [P] [US1] Implement portal mounting in `src/islands/room3d/screens/Css3dScreens.tsx`: `createPortal` into detached divs sized 640 CSS px wide, one per ScreenPlacement, aligned to screen meshes
+- [ ] T044 [US1] Wire pointer-events policy in `src/islands/room3d/screens/Css3dScreens.tsx`: interactive screens accept pointer events (links/buttons); display-only screens `pointer-events: none`
+
+### Screen content components (payload-only copy; contracts rule 6)
+
+- [ ] T045 [P] [US1] Create `src/islands/room3d/screens/screens.css` with token-driven styles (CSS vars only — no hardcoded hex) for all screen surfaces
+- [ ] T046 [P] [US1] Implement `ServiceScreen` in `src/islands/room3d/screens/content/ServiceScreen.tsx`: name/oneLine/status/statusNote/duration, fact cards, deliverables, evidence list with real `<a target="_blank">` links
+- [ ] T047 [P] [US1] Implement `ServicesGridScreen` in `src/islands/room3d/screens/content/ServicesGridScreen.tsx`: all 7 services with one-liners, each clickable → navigate to its service room
+- [ ] T048 [P] [US1] Implement `ProofScreen` in `src/islands/room3d/screens/content/ProofScreen.tsx`: dated badges with source + evidence URLs verbatim (FR-010/SC-006)
+- [ ] T049 [P] [US1] Implement `ReposScreen` in `src/islands/room3d/screens/content/ReposScreen.tsx`: repos grouped by the 5 categories, name/url/description/lang/stars from RepoSummary
+- [ ] T050 [P] [US1] Implement `MethodScreen` in `src/islands/room3d/screens/content/MethodScreen.tsx`: "The Verified Fabric" name + loop steps from the payload
+- [ ] T051 [P] [US1] Implement `FaqScreen` in `src/islands/room3d/screens/content/FaqScreen.tsx`: 9 Q/A items rendering only sanitized inline-md (code spans + text links)
+- [ ] T052 [P] [US1] Implement `AboutScreen` in `src/islands/room3d/screens/content/AboutScreen.tsx`: bio lede, trajectory timeline, certs/badges, skills, publications from AboutData
+- [ ] T053 [US1] Implement `EngagementsScreen` in `src/islands/room3d/screens/content/EngagementsScreen.tsx`: 6 engagement shapes with deliverable + prerequisites
+- [ ] T054 [US1] Implement `ContactScreen` in `src/islands/room3d/screens/content/ContactScreen.tsx`: email display + copy affordance + Twin trigger + CV/link CTAs (interactivity wired in T056/T057)
+
+### Rooms
+
+- [ ] T055 [US1] Build the home room `src/islands/room3d/rooms/HomeRoom.tsx`: shot set (overview/proof/services/method/work/repos/trajectory/background/faq/contact) + screen placements bound to payload slices + hotspots
+- [ ] T056 [US1] Build the service room template `src/islands/room3d/rooms/ServiceRoom.tsx`: ServiceScreen + related-services screens from the page payload slice; requires-scoping status handling (svc-enablement)
+- [ ] T057 [US1] Build the about room `src/islands/room3d/rooms/AboutRoom.tsx`: AboutScreen placements + entry shot + navigation hotspots
+- [ ] T058 [US1] Implement the hotspot mesh component in `src/islands/room3d/rooms/hotspots.tsx`: clickable 3D affordances (R3F pointer events) triggering room navigation
+- [ ] T059 [US1] Implement hover/press feedback in `src/islands/room3d/rooms/hotspots.tsx`: pointer cursor, hover glow/emissive pop, press animation (demo mechanic, mairp styling)
+- [ ] T060 [US1] Implement the shot-controls UI in `src/islands/room3d/rooms/hotspots.tsx`: on-screen shot labels (short labels < 600 px) as accessible buttons driving CameraRig
+
+### Interactivity parity (contracts/island-events.md)
+
+- [ ] T061 [US1] Wire copy-email in `src/islands/room3d/screens/content/ContactScreen.tsx`: reuse the page CopyButton behavior (dispatch click on `button.copy[data-copy]` or its clipboard+aria-live pattern); announce via existing aria-live
+- [ ] T062 [US1] Wire the Twin trigger in `src/islands/room3d/screens/content/ContactScreen.tsx`: click the existing `[data-twin-open]` launcher — never reimplement the chat
+- [ ] T063 [US1] Implement keyboard navigation in `src/islands/room3d/screens/focus.ts`: `J`/`K` or `←`/`→` cycle navigation targets, `Enter` opens focused screen, `Escape` closes; canvas container `aria-hidden`
+- [ ] T064 [US1] Implement focus management in `src/islands/room3d/screens/focus.ts`: focus moves into open screen DOM on open, restored to the triggering hotspot on close
+
+### Postprocessing & boot wiring
+
+- [ ] T065 [US1] Implement the postprocessing pipeline `src/islands/room3d/fx/Effects.tsx`: EffectComposer multisampling 0 → N8AO (halfRes, medium) → in-composer AgX ToneMapping; skip N8AO when lite flag set
+- [ ] T066 [US1] Wire payload fetch at boot in `src/islands/room3d/Room3D.tsx`: fetch `/rooms/<routeKey>.json` (FR-016, same-origin), hold in React context for screens; fetch failure → boot failed state (US3 fallback)
+- [ ] T067 [US1] Wire boot progress in `src/islands/room3d/Room3D.tsx`: useProgress → `__roomBoot.setProgress`; progressive screen rendering as payload slices/assets arrive (FR-003); SceneReady 4-frame gate → `hide()`
+- [ ] T068 [US1] Validate US1 independently: dev-server walkthrough of quickstart.md §2 steps 1–7 (boot, navigate, service detail, back/forward, theme toggle, Twin, copy-email) and `npm run build && npm run check` green; **record boot-to-usable time on the reference machine (SC-009: ≤10 s target / ≤20 s ceiling) in `specs/001-whole-site-3d/notes.md`**
 
 **Checkpoint**: MVP — the practice is fully discoverable and navigable in 3D from the homepage.
 
@@ -92,11 +166,11 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 ### Implementation for User Story 2
 
-- [ ] T030 [US2] Boot-time deep-link resolution in `src/islands/room3d/routing/useRoomRoute.ts`: initial room = payload.route lookup in the URL↔room map; unknown routes never mount (static 404 stands alone) — depends on T013
-- [ ] T031 [US2] Room-entry camera poses in `src/islands/room3d/rooms/roomEntry.ts`: define per-room entry shot (position/target) used when a room is entered directly (deep link/refresh) so the landing framing matches the in-app arrival framing
-- [ ] T032 [US2] Meta sync completeness in `src/islands/room3d/routing/meta.ts`: on in-app navigation set document.title + meta[name=description] + link[rel=canonical] from destination payload/navigation data; never touch sitemap or other head tags (contracts/url-room-map.md rule 3)
-- [ ] T033 [US2] Add a route-walk validation script `scripts/validate-rooms.mjs` (node, dev-server probe): for each of the 10 map entries assert the island boots into the matching room and flat HTML content is present — wired as the SC-005 check; run manually per quickstart.md §2 step 8
-- [ ] T034 [US2] Validate US2 independently: quickstart.md §2 steps 4+8 (deep link, back/forward, refresh) on all services + about; linkinator still green
+- [ ] T069 [US2] Boot-time deep-link resolution in `src/islands/room3d/routing/useRoomRoute.ts`: initial room = pathname lookup (T026) drives which room renders first — depends on T026
+- [ ] T070 [P] [US2] Define per-room entry poses in `src/islands/room3d/rooms/roomEntry.ts`: entry shot (position/target) per room so deep-link landing framing matches in-app arrival framing
+- [ ] T071 [P] [US2] Implement meta sync in `src/islands/room3d/routing/meta.ts`: on in-app navigation set document.title + meta[name=description] + link[rel=canonical] from destination payload/navigation data; never touch sitemap or other head tags
+- [ ] T072 [US2] Create the route-walk validation script `scripts/validate-rooms.mjs` (node, dev-server probe): for each of the 10 map entries assert the island boots into the matching room and flat HTML content is present (SC-005)
+- [ ] T073 [US2] Validate US2 independently: quickstart.md §2 steps 4+8 (deep link, back/forward, refresh) on all services + about; run `node scripts/validate-rooms.mjs`; linkinator still green
 
 **Checkpoint**: US1 + US2 both functional — navigable 3D with correct deep links.
 
@@ -104,19 +178,23 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 ## Phase 5: User Story 3 — Graceful fallback everywhere (Priority: P2)
 
-**Goal**: No-WebGL, no-JS, reduced-motion, low-power, and context-loss visitors always get complete flat pages or safe reduced behaviour.
+**Goal**: No-WebGL, no-JS, reduced-motion, low-power, context-loss, and declined visitors always get complete flat pages or safe reduced behaviour.
 
-**Independent Test**: load every route with WebGL disabled / JS disabled / reduced-motion emulated; verify flat content, no stuck boot, no console errors; context loss recovers.
+**Independent Test**: load every route with WebGL disabled / JS disabled / reduced-motion emulated; verify flat content, no stuck boot, no console errors; context loss recovers; decline persists.
 
 ### Implementation for User Story 3
 
-- [ ] T035 [US3] Harden no-WebGL path in `src/islands/room3d/Room3D.tsx`: detect at mount AND before Canvas creation; render null, ensure `#boot` removal timeout fires, flat page fully interactive (depends on T011)
-- [ ] T036 [US3] Reduced-motion behaviour in `src/islands/room3d/rig/CameraRig.tsx` and `src/islands/room3d/fx/Effects.tsx`: camera transitions become jump cuts (smoothTime 0), postprocessing disabled, boot overlay animations already static (T009)
-- [ ] T037 [US3] Lite mode in `src/islands/room3d/fx/Effects.tsx` + `Room3D.tsx`: hardwareConcurrency ≤ 4 → drop N8AO, dpr forced 1 (no other changes) per contracts/island-events.md
-- [ ] T038 [US3] Context-loss recovery in `src/islands/room3d/Room3D.tsx`: `webglcontextlost` → unmount canvas overlay revealing intact flat DOM; optional re-init on `webglcontextrestored` (research R10)
-- [ ] T039 [P] [US3] Asset-failure handling in boot flow (`boot/boot.ts` + Room3D): GLB/asset fetch failure surfaces on boot progress and lands the visitor on flat content (spec edge case)
-- [ ] T054 [US3] Decline control per FR-009: add a visible "use flat site" control on the boot overlay (`src/layouts/Base.astro`) and while 3D is running (island UI), which unmounts/reveals the flat page, persists the preference (localStorage), and is honoured on subsequent visits by the T011 mount gate until the visitor re-enables 3D
-- [ ] T040 [US3] Validate US3 independently: execute quickstart.md §3 all five scenarios on `/`, `/services/svc-agentic-netops/`, `/about/`; verify the decline control (T054) persists across reload and is re-enableable; zero broken states
+- [ ] T074 [US3] Harden the no-WebGL path in `src/islands/room3d/Room3D.tsx`: detect at mount AND before Canvas creation; render null, ensure `#boot` removal fires, flat page fully interactive
+- [ ] T075 [US3] Implement reduced-motion camera behaviour in `src/islands/room3d/rig/CameraRig.tsx`: transitions become jump cuts (instant position/target set) when the T019 probe is true
+- [ ] T076 [US3] Disable postprocessing under reduced-motion in `src/islands/room3d/fx/Effects.tsx`: composer skipped entirely (boot overlay animations already static per T014)
+- [ ] T077 [US3] Implement lite mode in `src/islands/room3d/fx/Effects.tsx` + `Room3D.tsx`: hardwareConcurrency ≤ 4 → drop N8AO, dpr forced 1 — no other changes (contracts/island-events.md)
+- [ ] T078 [US3] Implement context-loss recovery in `src/islands/room3d/Room3D.tsx`: `webglcontextlost` → unmount canvas overlay + CSS3D layer revealing intact flat DOM; optional re-init on `webglcontextrestored`
+- [ ] T079 [P] [US3] Implement asset/payload fetch-failure handling in `src/islands/room3d/boot/boot.ts` + `Room3D.tsx`: failure surfaces on boot progress and lands the visitor on flat content (spec edge case)
+- [ ] T080 [US3] Add the flat-site preference helper `src/islands/room3d/flatPreference.ts`: read/write/clear the persisted "use flat site" localStorage choice (same store pattern as theme)
+- [ ] T081 [US3] Add the "use flat site" control to the boot overlay in `src/layouts/Base.astro`: visible at boot, sets the preference (T080) and skips island mount; consumed by the T020 mount gate on subsequent visits
+- [ ] T082 [US3] Add the in-session "use flat site" control to the island UI (`src/islands/room3d/Room3D.tsx`): unmounts the island mid-3D, reveals the flat page, persists the choice (FR-009)
+- [ ] T083 [US3] Add the re-enable affordance to the flat site footer (`src/components/Footer.astro`): clears the preference so 3D returns on the next visit — visible only when the preference is set
+- [ ] T084 [US3] Validate US3 independently: quickstart.md §3 all scenarios on `/`, `/services/svc-agentic-netops/`, `/about/`; decline control persists across reload and is re-enableable; zero broken states
 
 **Checkpoint**: Fallback safety net complete.
 
@@ -130,10 +208,11 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 ### Implementation for User Story 4
 
-- [ ] T041 [P] [US4] Vite chunking in astro.config.mjs `vite.build.rollupOptions.output.manualChunks`: isolate `three` (and fiber/drei/postprocessing) from island app code so shader/app edits don't invalidate the three chunk (research R2/§3)
-- [ ] T042 [US4] Lazy content fetch path: FaqScreen and long service markdown bodies fetch same-origin after scene-ready per research R4 (endpoint file `src/pages/api/[doc].ts` with `prerender = true` if needed); keep each per-route payload JSON document < 30 KB serialized (contracts rule 4)
-- [ ] T043 [US4] Defer-first audit: verify in devtools no three.js/GLB request precedes primary content render; add `<link rel="preload" as="fetch">` for the GLB only where 3D entry is near-certain, and confirm the mount gate (T011) holds on slow CPU throttling
-- [ ] T044 [US4] Validate US4: full LHCI autorun ≥0.95 × 4 on `/`, `/services/svc-agentic-netops/`, `/about/`; record first-load JS delta vs baseline (target ≈ 0 KB pre-mount, ≤ ~300 KB gz deferred) in the feature dir notes
+- [ ] T085 [P] [US4] Add Vite chunking in astro.config.mjs `vite.build.rollupOptions.output.manualChunks`: isolate `three` (and fiber/drei/postprocessing) from island app code so shader/app edits don't invalidate the three chunk
+- [ ] T086 [P] [US4] Create the lazy-content endpoint `src/pages/api/[doc].ts` (`prerender = true`) serving full FAQ answers and long service markdown bodies as sanitized documents, fetched only after scene-ready (research R4)
+- [ ] T087 [US4] Wire lazy fetch-on-open in `FaqScreen` + `ServiceScreen` (`src/islands/room3d/screens/content/`): fetch the T086 document when a lazy screen opens; keep per-route `/rooms/*.json` payloads < 30 KB (contracts rule 4)
+- [ ] T088 [US4] Run the defer-first audit: verify in devtools no three.js/GLB/payload request precedes primary content render; confirm the mount gate (T020) holds under 4× CPU throttling; verify `#boot` shows progress meanwhile
+- [ ] T089 [US4] Validate US4: full LHCI autorun ≥0.95 × 4 on `/`, `/services/svc-agentic-netops/`, `/about/`; record first-load JS delta vs baseline (≈0 KB pre-mount, ≤ ~300 KB gz deferred) in the feature dir notes
 
 **Checkpoint**: Performance gates hold with the 3D layer installed.
 
@@ -147,11 +226,11 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 ### Implementation for User Story 5
 
-- [ ] T045 [P] [US5] Mairp environmental theming pass over `src/islands/room3d/rooms/prepareScene.ts` + materials: palette ONLY from ThemeBridge tokens (teal/cyan/dark bg/light set), CRT-flavoured screen framing in brand style; demo palette (#3b3456/#ffc93c/#ff6b5a) and fonts absent
-- [ ] T046 [P] [US5] Mairp boot copy + micro-UI labels review across `src/layouts/Base.astro` boot overlay and `src/islands/room3d/`: status lines/labels written fresh for a consulting practice; island copy limited to payload content + micro-UI labels (contracts rule 6)
-- [ ] T047 [US5] Optional synthesized audio cues `src/islands/room3d/audio/cues.ts` (Web Audio only, default muted, tap-unlock, ship behind a toggle) — FR-012; omit entirely if it risks scope
-- [ ] T048 [US5] Run the content-source audit (quickstart.md §6) over `src/islands/room3d/`: provenance table for every string/asset → mairp sources (collections, site.ts, repos.yaml, mark.mjs lineage); zero entries from the demo repo; record the table in `specs/001-whole-site-3d/content-audit.md`
-- [ ] T049 [US5] Validate US5 independently: theme toggle in 3D (both themes WCAG AA via existing scripts/a11y.mjs scope), audit table complete, spot-check evidence links on proof screens (SC-006)
+- [ ] T090 [P] [US5] Environmental theming pass over `src/islands/room3d/rooms/prepareScene.ts` + environment materials: palette ONLY from ThemeBridge tokens (teal/cyan/dark bg/light set), CRT-flavoured screen framing in mairp style; demo palette (#3b3456/#ffc93c/#ff6b5a) and fonts absent
+- [ ] T091 [P] [US5] Review boot copy + micro-UI labels across `src/layouts/Base.astro` overlay and `src/islands/room3d/`: status lines written fresh for a consulting practice; island copy limited to payload content + micro-UI labels (contracts rule 6)
+- [ ] T092 [US5] Optional synthesized audio cues `src/islands/room3d/audio/cues.ts` (Web Audio only, default muted, tap-unlock, ship behind a toggle) — FR-012; omit entirely if it risks scope
+- [ ] T093 [US5] Create the content-source audit table `specs/001-whole-site-3d/content-audit.md`: provenance row for every string/asset in `src/islands/room3d/` → mairp sources (collections, site.ts, repos.yaml, mark.mjs lineage); zero entries from the demo repo (quickstart §6)
+- [ ] T094 [US5] Validate US5 independently: theme toggle in 3D (both themes WCAG AA), audit table complete, spot-check evidence links on proof screens (SC-006)
 
 **Checkpoint**: All user stories functional and independently validated.
 
@@ -161,10 +240,11 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 **Purpose**: Hardening, docs, and full gate run
 
-- [ ] T050 [P] Update `README.md` and `DECISIONS.md`: document the 3D architecture (island pattern, payload contract, neutrality rule, asset pipeline) as decisions with rationale
-- [ ] T051 [P] Touch device pass per FR-011's measurable floor: verify 3D is enabled by default on a capable touch/mobile device (or emulation) with lite mode auto-engaged per T037's threshold; tap targets ≥44 CSS px on hotspots/screens, all rooms usable from a 360 px-wide viewport, portrait FOV framing verified, `touch-action: manipulation` guards (research R10/mobile patterns)
-- [ ] T052 Verify CSP posture end-to-end: exactly one hash-pinned inline script per page in dist, island JSON-prop scripts excluded, no CDN requests in network log, blob-worker usage verified or `worker-src 'self' blob:` added deliberately (research R11)
-- [ ] T053 Full gate run per quickstart.md §1: `npm run build`, `npm run check`, linkinator, LHCI; then §2–§6 walkthroughs including the route-walk script (T033) and content audit (T048); fix and re-run until green
+- [ ] T095 [P] Update `README.md` and `DECISIONS.md`: document the 3D architecture (island pattern, payload contract, neutrality rule, asset pipeline) as decisions with rationale
+- [ ] T096 [P] Touch device pass per FR-011: 3D enabled by default on a capable touch device (or emulation), lite auto-engaged per T077, tap targets ≥44 CSS px on hotspots/screens, all rooms usable from 360 px viewport, portrait FOV verified, `touch-action: manipulation` guards
+- [ ] T097 Verify CSP posture end-to-end: exactly one hash-pinned inline script per page in dist, no payload JSON inlined in HTML (FR-016), no CDN requests in network log, blob-worker usage verified or `worker-src 'self' blob:` added deliberately (research R11)
+- [ ] T098 [P] Create the scripted boot-time check `scripts/validate-boot-time.mjs` (Playwright, mid-range profile): cold load `/` → measure navigation start to `#boot` hidden; assert ≤10 s target / ≤20 s ceiling (SC-009)
+- [ ] T099 Full gate run per quickstart.md §1: `npm run build`, `npm run check`, linkinator, LHCI; then §2–§6 walkthroughs including route-walk (T072), boot-time check (T098) and content audit (T093); fix and re-run until green
 
 ---
 
@@ -173,48 +253,29 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 ### Phase Dependencies
 
 - **Setup (Phase 1)**: no dependencies; T005 gates everything (build must stay green from day one)
-- **Foundational (Phase 2)**: depends on Setup; BLOCKS all user stories (payload/boot/theme/routing are consumed by every story)
-- **US1 (Phase 3)**: depends on Phase 2 — the MVP core (rig, scene, screens, rooms)
-- **US2 (Phase 4)**: depends on T013 (foundational router) and benefits from US1 rooms but is independently testable via entry poses; do after US1 for meaningful rooms
-- **US3 (Phase 5)**: depends on Phase 2 (T011) + T010; independent of US1/US2 content work
-- **US4 (Phase 6)**: depends on US1 being installed (something to defer/measure); T041 can start after Phase 1
-- **US5 (Phase 7)**: depends on US1 (surfaces exist to theme/audit); T045/T046 parallelizable
+- **Foundational (Phase 2)**: depends on Setup; BLOCKS all user stories (payload/boot/theme/routing are consumed by every story). Internal order: T006–T010 [P] types/slices → T011 assembly → T012 endpoint → T013 verify; T014/T015 before T016–T018; T019 before T020
+- **US1 (Phase 3)**: depends on Phase 2 — the MVP core (rig, scene, screens, rooms). Internal order: rig (T029–T032) + environment (T033–T038) + screens (T042–T054) are three parallel tracks; rooms (T055–T057) need environment + screens; wiring (T058–T067) needs rooms
+- **US2 (Phase 4)**: depends on T026 (router parse) and US1 rooms for meaningful validation
+- **US3 (Phase 5)**: depends on Phase 2 (T019/T020) + T016; independent of US1/US2 content work — can be built in parallel with US1
+- **US4 (Phase 6)**: depends on US1 being installed (something to defer/measure); T085/T086 can start after Phase 1
+- **US5 (Phase 7)**: depends on US1 (surfaces exist to theme/audit); audit (T093) last before polish
 - **Polish (Phase 8)**: depends on all stories
 
 ### User Story Dependencies
 
 - **US1**: Foundational only — no cross-story dependencies
-- **US2**: Foundational (T013) + US1 rooms for validation content
-- **US3**: Foundational (T010/T011) only — can be built in parallel with US1
-- **US4**: US1 installed; T041 [P] early
-- **US5**: US1 surfaces; audit (T048) last before polish
-
-### Within Each User Story
-
-Screens/components [P] first → rooms/wiring → integration → validation task last.
+- **US2**: Foundational (T026–T028) + US1 rooms for validation content
+- **US3**: Foundational (T016/T019/T020) only — can be built in parallel with US1
+- **US4**: US1 installed; T085/T086 [P] early
+- **US5**: US1 surfaces; audit (T093) last before polish
 
 ### Parallel Opportunities
 
-- Phase 1: T003, T004
-- Phase 2: T006–T014 mostly distinct files (payload/bridge/router/boot) — parallelizable after T003/T004
-- US1: T019/T020 (screens) parallel with T016/T017 (assets); rooms depend on both
+- Phase 2: T006–T010, T014–T017, T019, T023–T025, T026 are distinct files — parallelizable within their sub-tracks
+- US1 track A (rig T029–T032), track B (environment T033–T038, prep T039–T041), track C (screens T042–T054) run fully in parallel; rooms/wiring converge
 - US3: parallel with US1 (different files: gating/fallback vs rooms/screens)
-- US4: T041 [P] anytime after Phase 1
-- US5: T045/T046/T047 parallel
-
----
-
-## Parallel Example: User Story 1
-
-```bash
-# Assets and screen systems first (independent files):
-Task: "Procedural environment scene (T016; GLB path T017/T018 only if adopted)"
-Task: "Self-host decoders + cache headers (T017)"
-Task: "Css3dScreens.tsx portal system (T019)"
-Task: "Screen content components from payload (T020)"
-# Then rooms & wiring (depend on the above):
-Task: "HomeRoom/ServiceRoom/AboutRoom + hotspots (T021–T024)"
-```
+- US4: T085/T086 [P] anytime after Phase 1
+- US5: T090/T091 parallel; T092 optional
 
 ---
 
@@ -223,7 +284,7 @@ Task: "HomeRoom/ServiceRoom/AboutRoom + hotspots (T021–T024)"
 ### MVP First (User Story 1 Only)
 
 1. Phase 1 → Phase 2 (foundation blocks everything)
-2. Phase 3 (US1): rig + scene + screens + rooms
+2. Phase 3 (US1): rig + environment + screens in parallel → rooms → wiring
 3. **STOP and VALIDATE**: quickstart.md §2 steps 1–7 + build/check green
 4. Demo-ready 3D homepage experience
 
@@ -248,7 +309,7 @@ Task: "HomeRoom/ServiceRoom/AboutRoom + hotspots (T021–T024)"
 
 - [P] tasks = different files, no dependencies
 - [Story] label maps task to specific user story for traceability
-- Constitution P5 (content neutrality & provenance) applies to EVERY task: no demo content, mairp sources only; T048 audit is the enforcement gate
-- Commit after each task or logical group
+- Constitution P5 (content neutrality & provenance) applies to EVERY task: no demo content, mairp sources only; T093 audit is the enforcement gate
+- Commit after each task (they are deliberately small — one commit per task is the expected rhythm)
 - Stop at any checkpoint to validate the story independently
 - Avoid: vague tasks, same-file conflicts, cross-story dependencies that break independence

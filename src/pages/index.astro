@@ -10,12 +10,15 @@ import ProofCard from '../components/ProofCard.astro';
 import CertBadges from '../components/CertBadges.astro';
 import FAQ from '../components/FAQ.astro';
 import CopyButton from '../components/CopyButton.astro';
-import { SITE, VENDORS, CERTS, METHOD } from '../lib/site';
+import { SITE, VENDORS, CERTS, METHOD, TRAJECTORY_HOME, PAPERS } from '../lib/site';
+import { buildRoomPayload } from '../lib/room-payload';
+import RoomIsland from '../components/RoomIsland.astro';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const proof = (await getCollection('proof')).sort((a, b) => a.data.order - b.data.order);
 const engagements = (await getCollection('engagements')).sort((a, b) => a.data.order - b.data.order);
 const repos = (await getCollection('repos')).sort((a, b) => a.data.order - b.data.order);
+const faq = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order);
 
 const categories: { id: string; label: string }[] = [
   { id: 'network', label: 'Network & fabric' },
@@ -25,28 +28,14 @@ const categories: { id: string; label: string }[] = [
   { id: 'applied', label: 'Applied agents' },
 ];
 
-const trajectory = [
-  { yr: '2024 — now', ttl: 'Network, Automation & Observability Architect', org: 'Core42 · Abu Dhabi', derisk: 'Sovereign inference, cloud networking, DCI' },
-  { yr: '2019 — 2024', ttl: 'IP/MPLS Network Architect', org: 'Nokia · Portugal', derisk: 'Critical-infrastructure assessment — smart-grid, railway, DTaaS, Secure ZTP' },
-  { yr: '2018 — 2019', ttl: 'Network Consulting Engineer', org: 'Cisco (blue badge) · Honduras', derisk: 'Cisco-estate consulting discipline' },
-  { yr: '2016 — 2018', ttl: 'Network & Security Specialist', org: 'Citi · San Salvador', derisk: 'Financial-services change rigor' },
-  { yr: '2014 — 2016', ttl: 'Telecommunications Engineer', org: 'Tigo · San Salvador', derisk: 'Carrier operations ground truth' },
-];
+const trajectory = TRAJECTORY_HOME;
 
-const papers = [
-  {
-    name: 'Decentralized & Dynamic Zero-Touch Provisioning of Leaf-Spine EVPN Data Centers',
-    venue: 'IEEE',
-    href: 'https://ieeexplore.ieee.org/document/11080420/',
-    note: 'Autonomous agents provision AI infrastructure and networks with zero-touch — inferring roles from topology and self-healing across the fabric.',
-  },
-  {
-    name: 'Kubernetes-Aware Load Balancing for Leaf-Spine EVPN Data Centers',
-    venue: 'Springer · Journal of Cloud Computing',
-    href: 'https://link.springer.com/article/10.1186/s13677-025-00814-0',
-    note: 'Distributed agents at leaf routers feed live Kubernetes pod data into the fabric, dynamically tuning ECMP weights via EVPN/BGP extended communities so routing aligns with pod placement.',
-  },
-];
+// Room Payload for the persistent 3D island (feature 001-whole-site-3d):
+// built from the same collections the flat page renders (FR-007), passed to
+// the island as a single serialized prop (contracts/room-payload.schema.md).
+const payload = buildRoomPayload('home', { services, proof, engagements, repos, faq }, SITE);
+
+const papers = PAPERS;
 ---
 <Base>
   {/* ── Hero ─────────────────────────────────────────────────────────── */}
@@ -276,6 +265,8 @@ const papers = [
       </div>
     </div>
   </Section>
+
+  <RoomIsland payload={payload} />
 </Base>
 
 <style>

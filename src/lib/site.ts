@@ -70,3 +70,55 @@ export const BADGES = [
 
 /** The methodology name (from the research synthesis): the practice's signature. */
 export const METHOD = 'The Verified Fabric' as const;
+
+/**
+ * The Verified Fabric loop steps (mairp-owned copy from the homepage method
+ * section). Single source for the flat page markup and the 3D room payloads.
+ */
+export const METHOD_STEPS = [
+  'Intent — plain language + constraints, captured, scoped, verified against policy',
+  'Agents & controllers — plan, reconcile, dry-run; declarative resources applied deterministically with rollback',
+  'Verified on device — gNMI proves it, or it did not happen; drift re-verified and repaired automatically',
+] as const;
+
+/** Trajectory rail (home variant, with the per-stop de-risk note). */
+export const TRAJECTORY_HOME = [
+  { yr: '2024 — now', ttl: 'Network, Automation & Observability Architect', org: 'Core42 · Abu Dhabi', derisk: 'Sovereign inference, cloud networking, DCI' },
+  { yr: '2019 — 2024', ttl: 'IP/MPLS Network Architect', org: 'Nokia · Portugal', derisk: 'Critical-infrastructure assessment — smart-grid, railway, DTaaS, Secure ZTP' },
+  { yr: '2018 — 2019', ttl: 'Network Consulting Engineer', org: 'Cisco (blue badge) · Honduras', derisk: 'Cisco-estate consulting discipline' },
+  { yr: '2016 — 2018', ttl: 'Network & Security Specialist', org: 'Citi · San Salvador', derisk: 'Financial-services change rigor' },
+  { yr: '2014 — 2016', ttl: 'Telecommunications Engineer', org: 'Tigo · San Salvador', derisk: 'Carrier operations ground truth' },
+];
+
+/** Trajectory timeline (about variant, full postings). */
+export const TRAJECTORY_ABOUT = [
+  { yr: '2024 — present', ttl: 'Network, Automation and Observability Architect', org: 'Core42 · Abu Dhabi, UAE · DCI and cloud networking, sovereign AI programs' },
+  { yr: '2019 — 2024', ttl: 'IP/MPLS Network Architect', org: 'Nokia · Amadora, Portugal — DTaaS (Digital Twin as a Service), Secure ZTP, smart-grid & railway critical infrastructure' },
+  { yr: '2018 — 2019', ttl: 'Network Consulting Engineer', org: 'Layer2 Consulting (Cisco) · Honduras' },
+  { yr: '2016 — 2018', ttl: 'Network & Security Specialist', org: 'Citi (contract) · San Salvador' },
+  { yr: '2014 — 2016', ttl: 'Telecommunications Engineer', org: 'Tigo (contract) · San Salvador' },
+  { yr: '2009', ttl: 'B.Sc. Electrical Engineering', org: 'Universidad Centroamericana (UCA) · San Salvador' },
+];
+
+/** Peer-reviewed, co-authored publications (home + about). */
+export const PAPERS = [
+  {
+    name: 'Decentralized & Dynamic Zero-Touch Provisioning of Leaf-Spine EVPN Data Centers',
+    venue: 'IEEE',
+    href: 'https://ieeexplore.ieee.org/document/11080420/',
+    note: 'Autonomous agents provision AI infrastructure and networks with zero-touch — inferring roles from topology and self-healing across the fabric.',
+  },
+  {
+    name: 'Kubernetes-Aware Load Balancing for Leaf-Spine EVPN Data Centers',
+    venue: 'Springer · Journal of Cloud Computing',
+    href: 'https://link.springer.com/article/10.1186/s13677-025-00814-0',
+    note: 'Distributed agents at leaf routers feed live Kubernetes pod data into the fabric, dynamically tuning ECMP weights via EVPN/BGP extended communities so routing aligns with pod placement.',
+  },
+];
+
+/** Working stack (about page). */
+export const SKILLS = {
+  Networks: 'IP/MPLS, SR, BGP/EVPN, VXLAN, Cisco IOS-XR and NX-OS, Nokia SR Linux and SR OS, SONiC, containerlab',
+  Platforms: 'Kubernetes, Cilium/eBPF, Go operators, Python, gNMI, Prometheus, OpenTelemetry, Grafana',
+  Agents: 'LangGraph, AGNTCY (A2A, SLIM), MCP, LiteLLM, Claude Code',
+};

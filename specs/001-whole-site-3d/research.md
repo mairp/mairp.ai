@@ -40,16 +40,25 @@ deep-link/refresh lands in the right room (FR-006).
 **Alternatives**: hash routing — rejected (breaks canonical/SEO parity); client router
 library — unnecessary (10 routes, trivial state).
 
-## R4. Content delivery: per-page serialized props
+## R4. Content delivery: self-hosted per-route JSON (FR-016)
 
-**Decision**: each Astro page embeds its room payload (own content slice + navigation
-targets) as island props via a new `src/lib/room-payload.ts` builder; large lazy
-content (full FAQ answers, service Markdown bodies beyond a teaser) fetched same-origin
-after scene-ready (`connect-src 'self'` already allows it). Whole collections never
-serialized (Astro puts island props in page HTML).
-**Rationale**: few-KB payloads ≪ one extra round trip; JSON-safe shapes already.
-**Alternatives**: one global `/api/*.json` endpoint — kept as option only for heavy
-lazy content.
+**Decision**: each route ships a prerendered same-origin Room Payload document at
+`/rooms/<route>.json` (Astro static endpoint `src/pages/rooms/[route].json.ts`,
+`prerender = true`, trailing-slash-free file URL), built by `src/lib/room-payload.ts`
+from the content collections. The island fetches its route's payload at 3D boot
+(`fetch('/rooms/<route>.json')`, same-origin — CSP-clean); pages mount the island
+WITHOUT payload props. Nothing payload-related is inlined into first-paint HTML.
+Large lazy content (full FAQ answers, service Markdown bodies beyond a teaser) is
+either a separate lazy JSON doc or fetched on screen-open — same-origin only.
+**Rationale**: FR-016 (clarified 2026-11-10) supersedes the original props-embedded
+direction: first-paint payload must stay at the pre-refactor baseline and no additional
+inline `<script type="application/json">` may appear (keeps the single-hash CSP audit
+trivial). One extra small fetch during boot is acceptable within the ≤10 s budget.
+Whole collections are never serialized — each payload is a page-specific slice.
+**Alternatives**: island props embedded per page (original direction) — rejected by
+FR-016: props serialize into page HTML, inflating first paint and adding script-ish
+JSON blobs; one global combined payload — rejected (per-route slices keep each fetch
+small and route-scoped).
 
 ## R5. Screen content rendering: CSS3D portal
 
@@ -122,10 +131,17 @@ goals.
 (keep DOM under the canvas layer intact); reduced-motion → jump cuts + no postprocessing
 + static boot screen (animations off); keyboard navigation for rooms/screens (focus
 moves to screen content when a screen opens; Escape closes); both themes WCAG AA via
-existing tokens; boot overlay `role="status"`.
-**Rationale**: FR-009/FR-011 + SC-007; flat content must remain the accessible base.
+existing tokens; boot overlay `role="status"`. Additionally an explicit "use flat site"
+control is offered at boot and while 3D runs (FR-009): activating it unmounts the island,
+reveals the flat page, and persists the choice (`localStorage`, same store pattern as
+`theme`) so subsequent visits skip 3D until the visitor re-enables it (a re-enable
+affordance stays available in the flat footer). Mobile: 3D is enabled by default on
+capable touch devices, with lite mode auto-selected on low-power hardware (FR-011).
+**Rationale**: FR-009/FR-011 + SC-007; flat content must remain the accessible base and
+the visitor must retain a permanent opt-out.
 **Alternatives**: "lite 3D" for no-WebGL — nonsensical; skipping focus management —
-rejected (screen readers need it).
+rejected (screen readers need it); session-only decline — rejected (spec requires the
+choice persist until changed).
 
 ## R11. CSP & policy compliance
 
@@ -150,10 +166,12 @@ unlock on first user gesture; ship behind a toggle.
 | Budget | Value | Enforced by |
 |---|---|---|
 | First-paint JS delta (flat page) | 0 KB (island deferred post-LCP) | mount gate + LHCI perf |
-| First-paint CSS delta | ≈ 0 (island styles merged into one file, small) | cssCodeSplit:false review |
+| First-paint HTML delta | ≈ 0 KB (payload NOT inlined; fetched from `/rooms/<route>.json`) | FR-016 + dist diff vs baseline |
+| Room Payload document | ≤ ~30 KB per route, fetched during boot | room-payload contract guard |
+| Boot-to-usable (mid laptop, broadband) | ≤ 10 s target / ≤ 20 s hard ceiling, progressively readable | scripted boot-time check (SC-009, FR-003) |
+| Landing → informed journey | ≤ 60 s incl. boot (SC-002) | quickstart walkthrough |
 | Deferred island JS (gz) | ≤ ~300 KB | bundle analysis in CI (manual gate v1) |
 | 3D assets (compressed GLB) | ≤ ~2 MB total, streamed post-boot | asset pipeline |
-| Scene-usable time (mid laptop) | ≤ 60 s from landing incl. boot | quickstart walkthrough |
 | LHCI | ≥0.95 × 4 categories × 3 routes | existing lighthouserc.json |
 
 ## Constitution re-check (post-Phase-1)

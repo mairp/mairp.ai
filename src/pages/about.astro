@@ -4,22 +4,32 @@
 import Base from '../layouts/Base.astro';
 import CertBadges from '../components/CertBadges.astro';
 import CopyButton from '../components/CopyButton.astro';
-import { SITE, CERTS, VENDORS } from '../lib/site';
+import { SITE, CERTS, VENDORS, TRAJECTORY_ABOUT, SKILLS } from '../lib/site';
+import { getCollection } from 'astro:content';
+import { buildRoomPayload } from '../lib/room-payload';
+import RoomIsland from '../components/RoomIsland.astro';
 
-const trajectory = [
-  { yr: '2024 — present', ttl: 'Network, Automation and Observability Architect', org: 'Core42 · Abu Dhabi, UAE · DCI and cloud networking, sovereign AI programs' },
-  { yr: '2019 — 2024', ttl: 'IP/MPLS Network Architect', org: 'Nokia · Amadora, Portugal — DTaaS (Digital Twin as a Service), Secure ZTP, smart-grid & railway critical infrastructure' },
-  { yr: '2018 — 2019', ttl: 'Network Consulting Engineer', org: 'Layer2 Consulting (Cisco) · Honduras' },
-  { yr: '2016 — 2018', ttl: 'Network & Security Specialist', org: 'Citi (contract) · San Salvador' },
-  { yr: '2014 — 2016', ttl: 'Telecommunications Engineer', org: 'Tigo (contract) · San Salvador' },
-  { yr: '2009', ttl: 'B.Sc. Electrical Engineering', org: 'Universidad Centroamericana (UCA) · San Salvador' },
-];
+const trajectory = TRAJECTORY_ABOUT;
 
-const skills = {
-  Networks: 'IP/MPLS, SR, BGP/EVPN, VXLAN, Cisco IOS-XR and NX-OS, Nokia SR Linux and SR OS, SONiC, containerlab',
-  Platforms: 'Kubernetes, Cilium/eBPF, Go operators, Python, gNMI, Prometheus, OpenTelemetry, Grafana',
-  Agents: 'LangGraph, AGNTCY (A2A, SLIM), MCP, LiteLLM, Claude Code',
-};
+const skills = SKILLS;
+
+// Room Payload for the persistent 3D island (feature 001-whole-site-3d):
+// same collections as the flat pages (FR-007), passed as one prop.
+const svc = await getCollection('services');
+const proofC = await getCollection('proof');
+const engC = await getCollection('engagements');
+const reposC = await getCollection('repos');
+const faqC = await getCollection('faq');
+const payload = buildRoomPayload(
+  'about',
+  { services: svc, proof: proofC, engagements: engC, repos: reposC, faq: faqC },
+  SITE,
+  {
+    title: 'About',
+    description:
+      'Marlon Paz — the consultant behind the practice: trajectory, certifications, publications, languages. Independent network-automation and AI-infrastructure consulting from Abu Dhabi.',
+  },
+);
 ---
 <Base title="About" description="Marlon Paz — the consultant behind the practice: trajectory, certifications, publications, languages. Independent network-automation and AI-infrastructure consulting from Abu Dhabi.">
   <div class="wrap page">
@@ -98,6 +108,8 @@ const skills = {
       <p class="muted">Currently practicing at Core42; the independent practice is separate and makes no claim of company endorsement.</p>
     </div>
   </div>
+
+  <RoomIsland payload={payload} />
 </Base>
 
 <style>

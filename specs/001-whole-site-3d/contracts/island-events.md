@@ -19,11 +19,17 @@ boot overlay, fallback).
 - Island MUST NOT toggle themes itself; it consumes ThemeToggle state.
 
 ## Fallback & failure
+- Persisted "use flat site" choice (FR-009): a visible decline control at boot AND
+  during 3D sets `localStorage` preference and unmounts the island (canvas removed,
+  flat page revealed); the choice persists across visits until the visitor re-enables
+  via a flat-footer affordance. When declined, the island never fetches payloads or 3D
+  assets.
 - `document.createElement('canvas').getContext('webgl2') === null` → island renders
   `null`; flat page stays visible; `#boot` removed.
 - `webglcontextlost` → island unmounts its canvas layer and reveals the flat page
   (flat DOM remains in the accessibility tree at all times; canvas layer is an overlay).
 - Lite mode (hardwareConcurrency ≤ 4): N8AO dropped, dpr forced 1 — no other change.
+  On capable touch devices 3D is on by default (FR-011).
 
 ## Flat-page interactivity parity (inside 3D)
 - Twin chat: island screens MAY include a Twin trigger that clicks the existing

@@ -1,7 +1,8 @@
 # Quickstart: Validating the Whole-Site 3D Experience
 
-Prerequisites: Node ≥ 22, deps installed (`npm i`), original compressed GLB present in
-`public/assets/models/`, working dir `/root/mairp.ai`.
+Prerequisites: Node ≥ 22, deps installed (`npm i`), working dir `/root/mairp.ai`. The
+v1 environment is procedural (in-code geometry — see research.md R6); a compressed GLB
+in `public/assets/models/` is an optional later swap and not needed to validate.
 
 ## 1. Build & policy gates (must pass)
 
@@ -43,13 +44,24 @@ Walkthrough (desktop, WebGL2 browser):
 - JS disabled: every route → complete flat content (the pre-refactor site).
 - Reduced motion (OS setting): 3D allowed but transitions are jump cuts; postprocessing
   off; boot animations static.
-- Low-power emulation (hardwareConcurrency ≤ 4): lite mode (no N8AO, dpr 1) still usable.
+- Decline control (FR-009): click "use flat site" at boot → flat page, island unmounted;
+  reload → stays flat (preference persisted); footer re-enable → 3D returns. Repeat the
+  decline from inside a running 3D session.
+- Low-power emulation (hardwareConcurrency ≤ 4): lite mode (no N8AO, dpr 1) still usable;
+  capable touch device (portrait 360 px): 3D on by default, tap targets ≥44 px.
 - Context loss (devtools or stress test): canvas layer drops, flat page revealed.
+- Payload fetch failure (block `/rooms/*.json` in devtools): boot surfaces the failure
+  and the flat page is shown (edge case: offline/asset failure mid-boot).
 
 ## 4. Performance spot checks
 
 - Network tab on cold load of `/`: no three.js/GLB request before primary content
   render (island deferred); deferred JS bundle ≤ ~300 KB gz; GLB ≤ ~2 MB compressed.
+- FR-016 check: view-source any route — payload data is NOT inlined in the HTML; the
+  island fetches `/rooms/<route>.json` at boot (same-origin, ≤ ~30 KB).
+- Boot-to-usable timing (SC-009): scripted check (Playwright) — cold load `/` on a
+  mid-range profile, measure from navigation start to `#boot` hidden: ≤10 s target,
+  ≤20 s hard ceiling; key content progressively readable during boot.
 - Lighthouse CI passes on all three audited routes (gate #1).
 
 ## 5. Content-parity checklist

@@ -4,14 +4,21 @@ Stable interface between Astro pages and the 3D island. Versions additive-only.
 
 ## Producer
 `src/lib/room-payload.ts` exports `buildRoomPayload(route, collections, site): RoomPayload`.
-Called in each page's frontmatter; result passed as a single prop:
+A prerendered static endpoint `src/pages/rooms/[route].json.ts` (`prerender = true`)
+calls it per route and serves the payload as a self-hosted JSON document (FR-016).
+Pages mount the island WITHOUT payload props; the island fetches its route's document
+at boot:
+
+```ts
+// island boot (same-origin; CSP-clean)
+const payload: RoomPayload = await fetch(`/rooms/${routeKey}.json`).then(r => r.json());
+```
 
 ```astro
 ---
-import { buildRoomPayload } from '../lib/room-payload';
-const payload = buildRoomPayload('home', { services, proof, engagements, repos, faq }, SITE);
+// Base.astro (via RoomIsland.astro) — no payload prop
+<RoomIsland client:only="react" route={Astro.url.pathname} />
 ---
-<RoomIsland client:only="react" payload={payload} />
 ```
 
 ## Shape (authoritative; see ../data-model.md for field detail)
@@ -55,3 +62,5 @@ interface RoomPayload {
 
 ## Consumer
 `src/islands/room3d/` reads only this contract — never imports Astro content APIs.
+Fetch failure or invalid JSON at boot is a boot failure (BootState.failed) → flat-page
+fallback, never a broken 3D state.

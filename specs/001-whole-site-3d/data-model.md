@@ -6,6 +6,11 @@ the derived/serialized shapes the island consumes, plus scene-graph entities.
 
 ## Derived data entities (serialized page → island)
 
+Delivery (FR-016): each RoomPayload is prerendered to a self-hosted JSON document at
+`/rooms/<route>.json` (endpoint `src/pages/rooms/[route].json.ts`, built by
+`src/lib/room-payload.ts`) and fetched by the island at 3D boot — never inlined into
+first-paint HTML.
+
 ### RoomPayload (per page)
 | Field | Type | Source | Validation |
 |---|---|---|---|
@@ -67,12 +72,21 @@ vars; MutationObserver on data-theme → THREE.Color updates; must re-apply on s
 scheme change.
 
 ### BootState
-phases: idle → mounting → loadingAssets (progress 0..1) → compilingFrames (4-frame
-gate) → ready | failed(reason). Drives pre-JS boot overlay; failed → fallback mode.
+phases: idle → mounting → fetchingPayload (`/rooms/<route>.json`; failure → failed) →
+loadingAssets (progress 0..1) → compilingFrames (4-frame gate) → ready | failed(reason).
+Drives pre-JS boot overlay; failed → fallback mode. Boot-to-usable budget: ≤10 s target
+/ ≤20 s hard ceiling (SC-009).
 
 ### FallbackDecision
-inputs: webgl2 support, prefers-reduced-motion, hardwareConcurrency, contextlost
-event; outcomes: full3d / lite3d (no N8AO, dpr 1) / flat (static page).
+inputs: `flatSitePreferred` (persisted visitor choice), webgl2 support,
+prefers-reduced-motion, hardwareConcurrency, contextlost event; outcomes: flat
+(preference or no-WebGL) / full3d / lite3d (no N8AO, dpr 1).
+
+### FlatSitePreference
+persisted visitor choice ("use flat site"), stored in `localStorage` (same store pattern
+as theme). Offered at boot AND while 3D runs (FR-009). Value `true` → island never
+mounts; a footer re-enable affordance flips it back. `undefined` (never chosen) → 3D per
+device defaults (enabled on capable touch, lite auto-selected on low power — FR-011).
 
 ## State transitions
 

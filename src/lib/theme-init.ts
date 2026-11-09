@@ -1,5 +1,9 @@
 // Runs inline before first paint: mark that scripts run (so tabs render in their
-// final state with no layout shift) and apply a theme picked earlier, if any.
-// The CSP allows exactly this text by its SHA-256 (scripts/csp-hash.mjs).
+// final state with no layout shift), apply a theme picked earlier, if any, and
+// arm the page-level boot-overlay removal timeout. If the 3D island never
+// mounts (no WebGL, declined, failed), the pre-JS #boot overlay is removed so
+// the flat page shows; the island's own hide() path wins if it gets there
+// first (contracts/island-events.md). The CSP allows exactly this text by its
+// SHA-256 (scripts/csp-hash.mjs) — no other inline script may be added.
 export const THEME_INIT =
-  "document.documentElement.classList.add('js');try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}";
+  "document.documentElement.classList.add('js');try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){};setTimeout(function(){var b=document.getElementById('boot');if(b&&!b.classList.contains('done'))b.remove()},3000)";
