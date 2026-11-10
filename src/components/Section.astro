@@ -14,7 +14,7 @@ interface Props {
 const { id, title, intro, layout = 'split', tone = 'plain', defer = false } = Astro.props;
 const panel = tone !== 'plain';
 ---
-<section id={id} class:list={['section', layout, { 'cv-auto': defer }]} aria-labelledby={`${id}-title`}>
+<section id={id} class:list={['section', layout, { 'cv-auto': defer, 'has-panel': panel }]} aria-labelledby={`${id}-title`}>
   <div class:list={[{ panel, 'on-ink': tone === 'ink', 'on-yellow': tone === 'yellow' }]}>
     <div class="wrap inner">
       <div class="head">
@@ -31,13 +31,14 @@ const panel = tone !== 'plain';
 <style>
   .section { padding: var(--space-8) 0; }
   .panel { padding: var(--space-8) 0; }
-  .section:has(.panel) { padding: var(--space-4) 0; }
+  .section.has-panel { padding: var(--space-4) 0; }
   .inner { display: grid; gap: var(--space-6); }
   h2 { margin: 0; max-width: 16ch; }
   .intro { margin: var(--space-4) 0 0; color: var(--muted); font-size: var(--step-1); line-height: 1.45; max-width: 34rem; }
   .body { min-width: 0; }
   @media (min-width: 1000px) {
     .section { padding: var(--space-9) 0; }
+    .section.has-panel { padding: var(--space-4) 0; }
     .panel { padding: var(--space-9) 0; }
     .split .inner { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--space-7); }
     .split .head { position: sticky; top: 6rem; align-self: start; }

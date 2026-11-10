@@ -78,6 +78,12 @@ not with the practice. The brief that produced it is kept outside the repository
   typographic place card.
 - **Kept:** sourced figures next to every number, the print stylesheet, the strict CSP
   (no inline styles, one hashed inline script), and every URL and anchor.
+- **Cost of the hero diagram.** Its first version animated SVG geometry (stroke
+  offsets and transforms) and failed Lighthouse on the CI runner (0.74): on a slow,
+  GPU-less machine it added about 2 s of style and layout. It now animates opacity only,
+  in a few steps, inside a `contain: layout paint style` figure, which halves main-thread
+  time on the home page. `text-wrap: balance`, the header blur and the `:has()` selector
+  were removed in the same pass.
 - **Removed:** the theme toggle and dark theme, the dot grid, orb and glow cards, scroll
   reveals, and `content-visibility` on home sections (it made axe report phantom
   overlaps; Lighthouse performance stays at 0.96 to 0.98 without it).
