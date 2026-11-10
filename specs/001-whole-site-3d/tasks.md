@@ -166,11 +166,11 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 ### Implementation for User Story 2
 
-- [ ] T069 [US2] Boot-time deep-link resolution in `src/islands/room3d/routing/useRoomRoute.ts`: initial room = pathname lookup (T026) drives which room renders first — depends on T026
-- [ ] T070 [P] [US2] Define per-room entry poses in `src/islands/room3d/rooms/roomEntry.ts`: entry shot (position/target) per room so deep-link landing framing matches in-app arrival framing
-- [ ] T071 [P] [US2] Implement meta sync in `src/islands/room3d/routing/meta.ts`: on in-app navigation set document.title + meta[name=description] + link[rel=canonical] from destination payload/navigation data; never touch sitemap or other head tags
-- [ ] T072 [US2] Create the route-walk validation script `scripts/validate-rooms.mjs` (node, dev-server probe): for each of the 10 map entries assert the island boots into the matching room and flat HTML content is present (SC-005)
-- [ ] T073 [US2] Validate US2 independently: quickstart.md §2 steps 4+8 (deep link, back/forward, refresh) on all services + about; run `node scripts/validate-rooms.mjs`; linkinator still green
+- [x] T069 [US2] Boot-time deep-link resolution in `src/islands/room3d/routing/useRoomRoute.ts`: initial room = pathname lookup (T026) drives which room renders first — depends on T026
+- [x] T070 [P] [US2] Define per-room entry poses in `src/islands/room3d/rooms/roomEntry.ts`: entry shot (position/target) per room so deep-link landing framing matches in-app arrival framing
+- [x] T071 [P] [US2] Implement meta sync in `src/islands/room3d/routing/meta.ts`: on in-app navigation set document.title + meta[name=description] + link[rel=canonical] from destination payload/navigation data; never touch sitemap or other head tags
+- [x] T072 [US2] Create the route-walk validation script `scripts/validate-rooms.mjs` (node, dev-server probe): for each of the 10 map entries assert the island boots into the matching room and flat HTML content is present (SC-005)
+- [x] T073 [US2] Validate US2 independently: quickstart.md §2 steps 4+8 (deep link, back/forward, refresh) on all services + about; run `node scripts/validate-rooms.mjs`; linkinator still green
 
 **Checkpoint**: US1 + US2 both functional — navigable 3D with correct deep links.
 

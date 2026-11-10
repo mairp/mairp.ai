@@ -28,7 +28,8 @@ import { useRoomRoute } from './routing/useRoomRoute';
 import { routeKeyForPath, type RoomPayload } from '../../lib/room-payload';
 import { Room3DContext, useRoom3D, type NavTargetRef, type Room3DContextValue } from './context';
 import { CameraRig } from './rig/CameraRig';
-import { ENTRY_SHOT, shotsForRoom } from './rig/shots';
+import { shotsForRoom } from './rig/shots';
+import { entryShotFor } from './rooms/roomEntry';
 import { HomeRoom } from './rooms/HomeRoom';
 import { ServiceRoom } from './rooms/ServiceRoom';
 import { AboutRoom } from './rooms/AboutRoom';
@@ -132,7 +133,7 @@ function RoomSession({ payload, lite, reducedMotion, theme }: SessionProps) {
   const router = useRoomRoute(payload);
   const [roomPayload, setRoomPayload] = useState<RoomPayload>(payload);
   const [roomFetchState, setRoomFetchState] = useState<'idle' | 'loading' | 'ready' | 'error'>('ready');
-  const [activeShot, setShotState] = useState(ENTRY_SHOT);
+  const [activeShot, setShotState] = useState(entryShotFor(payload.room));
   const [openScreenId, setOpenScreen] = useState<string | null>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
@@ -157,7 +158,7 @@ function RoomSession({ payload, lite, reducedMotion, theme }: SessionProps) {
         if (!alive) return;
         setRoomPayload(next);
         setRoomFetchState('ready');
-        setShotState(ENTRY_SHOT);
+        setShotState(entryShotFor(next.room));
         setOpenScreen(null);
       })
       .catch(() => {
@@ -243,7 +244,7 @@ function RoomSession({ payload, lite, reducedMotion, theme }: SessionProps) {
     <Room3DContext.Provider value={ctx}>
       {/* Canvas container is aria-hidden; screen DOM (CSS3D layer) and the
           shot-controls UI live outside it and stay screen-reader reachable. */}
-      <div className="room3d-layer" data-lite={lite ? 'true' : undefined}>
+      <div className="room3d-layer" data-room={router.route} data-lite={lite ? 'true' : undefined}>
         <div aria-hidden="true" className="room3d-canvas">
           <Canvas
             shadows={{ type: PCFShadowMap }}

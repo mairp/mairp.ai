@@ -3,7 +3,8 @@
  * (feature 001-whole-site-3d, T013; contracts/url-room-map.md +
  * island-events.md).
  *
- * - Initial room comes from the page's `payload.route` (deep link / refresh).
+ * - Initial room comes from the URL pathname lookup (deep link / refresh),
+ *   falling back to `payload.route`.
  * - In-app navigation pushes a trailing-slash URL via history.pushState — no
  *   page reload, no island re-boot (FR-006).
  * - popstate resolves rooms through the URL ↔ room map only; unknown URLs are
@@ -12,7 +13,10 @@
  *   link[rel=canonical] from the destination target's meta (rule 3).
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { NavTarget, RoomPayload } from '../../../lib/room-payload';
+import { routeFor, routeKeyForPath, type NavTarget, type RoomPayload } from '../../../lib/room-payload';
+import { syncDocumentMeta } from './meta';
+
+export { syncDocumentMeta };
 
 export type TransitionPhase = 'idle' | 'transitioning';
 
@@ -32,23 +36,27 @@ function ensureTrailingSlash(route: string): string {
   return route.endsWith('/') ? route : `${route}/`;
 }
 
+/**
+ * Boot-time deep-link resolution (T069, builds on the T026 pathname lookup):
+ * the URL bar is authoritative — pathname → room key → canonical route. Falls
+ * back to the payload's own route only when the pathname is unmapped.
+ */
+export function resolveInitialRoute(payloadRoute?: string): string {
+  if (typeof window !== 'undefined') {
+    const key = routeKeyForPath(window.location.pathname);
+    if (key) return routeFor(key);
+  }
+  return ensureTrailingSlash(payloadRoute ?? '/');
+}
+
 const EMPTY_NAV: NavTarget[] = [];
 
 function findTarget(navigation: NavTarget[], route: string): NavTarget | undefined {
   return navigation.find((n) => n.route === route);
 }
 
-/** Sync document title, meta description and canonical link (url-room-map rule 3). */
-export function syncDocumentMeta(target: NavTarget) {
-  document.title = target.title;
-  let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-  if (meta) meta.setAttribute('content', target.description);
-  let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-  if (canonical) canonical.setAttribute('href', new URL(target.route, location.origin).href);
-}
-
 export function useRoomRoute(payload?: RoomPayload): RoomRouteState {
-  const initial = useRef(ensureTrailingSlash(payload?.route ?? '/'));
+  const initial = useRef(resolveInitialRoute(payload?.route));
   const [route, setRoute] = useState(initial.current);
   const [phase, setPhase] = useState<TransitionPhase>('idle');
   const navigation = payload?.navigation ?? EMPTY_NAV;
