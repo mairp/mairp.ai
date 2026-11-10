@@ -76,13 +76,16 @@ export function AboutScreen({ section }: { section: AboutSection }) {
         ))}
       </div>
       <div className="rs-h2">Issued badges</div>
-      <ul className="rs-list">
+      <ul className="rs-certs">
         {about.badges.map((b) => (
           <li key={b.url}>
-            <a href={b.url} target="_blank" rel="noopener">
-              {b.name}
-            </a>{' '}
-            — <span className="rs-meta">{b.issuer} · {b.year}</span>
+            <a className="rs-cert" href={b.url} target="_blank" rel="noopener" title={`Verify: ${b.name}`}>
+              <span className="rs-cert-img">
+                <img src={`/assets/badges/${b.img}.webp`} alt={`${b.name}, ${b.issuer}`} width={72} height={72} loading="lazy" decoding="async" />
+              </span>
+              <span className="rs-cert-name">{b.name}</span>
+              <span className="rs-meta">{b.issuer} · {b.year}</span>
+            </a>
           </li>
         ))}
       </ul>

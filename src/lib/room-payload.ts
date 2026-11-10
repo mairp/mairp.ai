@@ -79,7 +79,7 @@ export interface AboutData {
   linkedin: string;
   credly: string;
   certs: readonly string[];
-  badges: { name: string; issuer: string; year: number; url: string }[];
+  badges: { name: string; issuer: string; year: number; url: string; img: string }[];
   vendors: readonly string[];
   trajectory: { yr: string; ttl: string; org: string; derisk: string }[];
   papers: { name: string; venue: string; href: string; note: string }[];
@@ -230,7 +230,7 @@ export function buildRoomPayload(
     linkedin: site.linkedin,
     credly: site.credly,
     certs: CERTS,
-    badges: BADGES.map((b) => ({ name: b.name, issuer: b.issuer, year: b.year, url: b.url })),
+    badges: BADGES.map((b) => ({ name: b.name, issuer: b.issuer, year: b.year, url: b.url, img: b.img })),
     vendors: VENDORS,
     trajectory: TRAJECTORY_HOME,
     papers: PAPERS,
