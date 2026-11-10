@@ -33,6 +33,7 @@ import { HomeRoom } from './rooms/HomeRoom';
 import { ServiceRoom } from './rooms/ServiceRoom';
 import { AboutRoom } from './rooms/AboutRoom';
 import { Css3dScreens, Css3dDriver } from './screens/Css3dScreens';
+import { MobileReader } from './screens/MobileReader';
 import { KeyboardNav } from './screens/focus';
 import { shotForScreen, placementsForRoom, type ContentKey } from './rooms/screenPlacements';
 import { ShotControls } from './rooms/hotspots';
@@ -426,6 +427,7 @@ function RoomSession({ payload, lite, reducedMotion, theme, onFail }: SessionPro
           </CanvasBoundary>
         </div>
         <Css3dScreens />
+        <MobileReader />
         <div className="room3d-ui">
           <ShotControls />
           <KeyboardNav />

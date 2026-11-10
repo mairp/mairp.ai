@@ -23,9 +23,12 @@ import { FocusScreen } from './content/FocusScreen';
 export function ScreenSurface({
   placement,
   payload,
+  reader = false,
 }: {
   placement: ScreenPlacement;
   payload: RoomPayload;
+  /** Flat copy in the phone reader sheet (MobileReader), not an in-world screen. */
+  reader?: boolean;
 }) {
   const { openScreenId } = useRoom3D();
   const open = openScreenId === placement.id;
@@ -84,11 +87,12 @@ export function ScreenSurface({
 
   return (
     <div
-      className={`rs rs-screen${open ? ' rs-open' : ''}`}
-      data-screen-id={placement.id}
+      className={reader ? 'rs rs-screen rs-reader' : `rs rs-screen${open ? ' rs-open' : ''}`}
+      data-screen-id={reader ? undefined : placement.id}
+      data-reader={reader ? placement.id : undefined}
       data-content={placement.contentKey}
       tabIndex={-1}
-      aria-label={open ? 'Screen expanded' : undefined}
+      aria-label={open && !reader ? 'Screen expanded' : undefined}
     >
       {content}
     </div>
