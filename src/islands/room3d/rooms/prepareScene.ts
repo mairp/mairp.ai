@@ -17,6 +17,10 @@
  *   (screens, hotspots) are exempt and keep their own geometry;
  * - WebGL shadow maps are one-shot: `shadowMap.autoUpdate = false`, re-flagged
  *   `needsUpdate` only when lights/scene change.
+ *
+ * US5 T090: this pass sets NO colours of its own — the emissive→basic
+ * conversion clones the material's own (token-derived) emissive colour, so
+ * the palette stays 100% ThemeBridge tokens.
  */
 import {
   BufferGeometry,

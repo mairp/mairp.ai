@@ -37,6 +37,7 @@ import { KeyboardNav } from './screens/focus';
 import { shotForScreen, placementsForRoom, type ContentKey } from './rooms/screenPlacements';
 import { ShotControls } from './rooms/hotspots';
 import { FLAT_EVENT, isFlatPreferred, setFlatPreferred } from './flatPreference';
+import { audioCues } from './audio/cues';
 import { hasWebGL2 } from './capability';
 import './screens/screens.css';
 
@@ -207,6 +208,8 @@ function SceneBackground() {
 }
 
 /* ── Micro-UI labels for keyboard nav targets (contract rule 6) ───────── */
+/* US5 T091: these labels are fresh micro-UI, written for the mairp
+   consulting practice; island content strings come from payload only. */
 
 const SCREEN_LABELS: Partial<Record<ContentKey, string>> = {
   hero: 'Practice overview',
@@ -226,6 +229,22 @@ const SCREEN_LABELS: Partial<Record<ContentKey, string>> = {
   aboutJourney: 'Trajectory and publications',
   aboutCredentials: 'Certifications and skills',
 };
+
+/* ── Audio cues toggle (FR-012, T092): default-muted, tap-unlock ──────── */
+
+function AudioToggle() {
+  const [on, setOn] = useState(() => audioCues.enabled);
+  return (
+    <button
+      type="button"
+      className="room3d-flat-btn"
+      aria-pressed={on}
+      onClick={() => setOn(audioCues.toggle())}
+    >
+      {on ? 'Sound: on' : 'Sound: off'}
+    </button>
+  );
+}
 
 /* ── Session: router + room-payload swap + provider + world ───────────── */
 
@@ -248,6 +267,25 @@ function RoomSession({ payload, lite, reducedMotion, theme, onFail }: SessionPro
 
   const setShot = useCallback((key: string) => setShotState(key), []);
   const openScreen = useCallback((id: string | null) => setOpenScreen(id), []);
+
+  // Audio cues (FR-012, T092): default-muted; a short cue on room arrival and
+  // on screen open, only while the visitor has opted in via the Sound control.
+  const firstRoute = useRef(true);
+  useEffect(() => {
+    if (firstRoute.current) {
+      firstRoute.current = false;
+      return;
+    }
+    audioCues.play('nav');
+  }, [router.route]);
+  const firstScreen = useRef(true);
+  useEffect(() => {
+    if (firstScreen.current) {
+      firstScreen.current = false;
+      return;
+    }
+    if (openScreenId) audioCues.play('open');
+  }, [openScreenId]);
 
   // Persistent session: on route change, fetch the destination payload doc
   // (FR-016) and swap room content; the 3D world never re-boots (FR-006).
@@ -391,6 +429,7 @@ function RoomSession({ payload, lite, reducedMotion, theme, onFail }: SessionPro
         <div className="room3d-ui">
           <ShotControls />
           <KeyboardNav />
+          <AudioToggle />
           <button type="button" className="room3d-flat-btn" onClick={() => setFlatPreferred()}>
             Use flat site
           </button>

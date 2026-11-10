@@ -226,11 +226,11 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 ### Implementation for User Story 5
 
-- [ ] T090 [P] [US5] Environmental theming pass over `src/islands/room3d/rooms/prepareScene.ts` + environment materials: palette ONLY from ThemeBridge tokens (teal/cyan/dark bg/light set), CRT-flavoured screen framing in mairp style; demo palette (#3b3456/#ffc93c/#ff6b5a) and fonts absent
-- [ ] T091 [P] [US5] Review boot copy + micro-UI labels across `src/layouts/Base.astro` overlay and `src/islands/room3d/`: status lines written fresh for a consulting practice; island copy limited to payload content + micro-UI labels (contracts rule 6)
-- [ ] T092 [US5] Optional synthesized audio cues `src/islands/room3d/audio/cues.ts` (Web Audio only, default muted, tap-unlock, ship behind a toggle) — FR-012; omit entirely if it risks scope
-- [ ] T093 [US5] Create the content-source audit table `specs/001-whole-site-3d/content-audit.md`: provenance row for every string/asset in `src/islands/room3d/` → mairp sources (collections, site.ts, repos.yaml, mark.mjs lineage); zero entries from the demo repo (quickstart §6)
-- [ ] T094 [US5] Validate US5 independently: theme toggle in 3D (both themes WCAG AA), audit table complete, spot-check evidence links on proof screens (SC-006)
+- [x] T090 [P] [US5] Environmental theming pass over `src/islands/room3d/rooms/prepareScene.ts` + environment materials: palette ONLY from ThemeBridge tokens (teal/cyan/dark bg/light set), CRT-flavoured screen framing in mairp style; demo palette (#3b3456/#ffc93c/#ff6b5a) and fonts absent
+- [x] T091 [P] [US5] Review boot copy + micro-UI labels across `src/layouts/Base.astro` overlay and `src/islands/room3d/`: status lines written fresh for a consulting practice; island copy limited to payload content + micro-UI labels (contracts rule 6)
+- [x] T092 [US5] Optional synthesized audio cues `src/islands/room3d/audio/cues.ts` (Web Audio only, default muted, tap-unlock, ship behind a toggle) — FR-012; omit entirely if it risks scope
+- [x] T093 [US5] Create the content-source audit table `specs/001-whole-site-3d/content-audit.md`: provenance row for every string/asset in `src/islands/room3d/` → mairp sources (collections, site.ts, repos.yaml, mark.mjs lineage); zero entries from the demo repo (quickstart §6)
+- [x] T094 [US5] Validate US5 independently: theme toggle in 3D (both themes WCAG AA), audit table complete, spot-check evidence links on proof screens (SC-006)
 
 **Checkpoint**: All user stories functional and independently validated.
 

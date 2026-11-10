@@ -63,6 +63,7 @@ export function installRoomBoot(): RoomBoot {
       if (!node) return;
       node.classList.add('failed');
       const hint = node.querySelector('.boot-hint');
+      // US5 T091: failure hint is fresh micro-UI copy, not demo text.
       if (hint) hint.textContent = '3D unavailable — showing the flat page';
       node.style.setProperty('--p', '1');
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

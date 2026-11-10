@@ -12,6 +12,11 @@
  * shadow maps (rooms/prepareScene.ts). Per the U1 remediation decision, an
  * authored GLB under public/assets/models/ remains an OPTIONAL later swap;
  * no decoder plumbing is exercised on this path (T017 is conditional).
+ *
+ * US5 T090: no hardcoded hex; palette strictly from ThemeBridge tokens
+ * (floor/walls tokens.bg/surface · racks/LEDs tokens.border/surface/
+ * accent/accent-2 · screens tokens.bg/border/accent · lights tokens.fg/
+ * accent/accent-2).
  */
 import { useEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';

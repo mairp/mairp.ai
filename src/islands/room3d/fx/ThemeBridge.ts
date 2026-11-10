@@ -6,6 +6,11 @@
  * The island never toggles themes itself: it reads computed CSS custom
  * properties from the document root, observes `data-theme` attribute changes
  * (ThemeToggle) and `prefers-color-scheme` media changes, and re-maps on each.
+ *
+ * US5 T090 contract: the ONLY CSS vars mapped are
+ * `--bg, --surface, --accent, --accent-2, --fg, --muted, --border`
+ * (see VAR_NAMES below) — the palette reaching the 3D scene is strictly the
+ * site token palette; nothing demo-owned passes through this bridge.
  */
 import { Color } from 'three';
 
@@ -73,6 +78,18 @@ export class ThemeBridge {
       if (raw) this.tokens[key].set(raw);
     }
     for (const fn of this.#listeners) fn(this.tokens);
+    // Dev-only theme-remap probe (T094): proves live re-emission on toggles.
+    if (import.meta.env.DEV) {
+      console.info(
+        '[ThemeBridge] remapped',
+        VAR_NAMES.bg,
+        '=',
+        this.tokens.bg.getHexString(),
+        VAR_NAMES.accent,
+        '=',
+        this.tokens.accent.getHexString(),
+      );
+    }
   }
 
   dispose() {

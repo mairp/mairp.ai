@@ -9,6 +9,9 @@
  * composer keeps AgX tone mapping; dpr is forced to 1 by Room3D). Under
  * prefers-reduced-motion (T076) the composer is skipped entirely and the raw
  * scene renders with the renderer's own AgX tone mapping.
+ *
+ * US5 T090: no colour literals — postprocessing adjusts the token-painted
+ * scene only.
  */
 import { useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
