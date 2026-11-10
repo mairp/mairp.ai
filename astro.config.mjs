@@ -15,5 +15,21 @@ export default defineConfig({
     inlineStylesheets: 'never',
   },
   // One small stylesheet for the whole site: a single render-blocking request.
-  vite: { build: { assetsInlineLimit: 0, cssCodeSplit: false } },
+  vite: {
+    build: {
+      assetsInlineLimit: 0,
+      cssCodeSplit: false,
+      rollupOptions: {
+        output: {
+          // Isolate the 3D vendor graph (three + r3f/drei/postprocessing) from island
+          // app code so shader/app edits don't invalidate the long-cached three chunk.
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return undefined;
+            if (/node_modules\/(three|three-stdlib|maath|meshline|troika[^/]*|@react-three\/(fiber|drei))\//.test(id)) return 'three';
+            return undefined;
+          },
+        },
+      },
+    },
+  },
 });

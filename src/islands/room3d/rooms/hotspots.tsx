@@ -101,6 +101,7 @@ export function Hotspot({ id, position, route, screen }: HotspotProps) {
         ref={meshRef}
         onClick={onClick}
         onPointerDown={(e) => {
+          console.log('[dbg] hotspot pointerdown', id);
           e.stopPropagation(); // don't start a camera drag
           setPressed(true);
           setFlag('hotspotPress', true);

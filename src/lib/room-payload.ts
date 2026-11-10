@@ -64,8 +64,9 @@ export interface RepoSummary {
 export interface FaqItem {
   id: string;
   q: string;
-  a: string;
 }
+
+/** Answers are NOT in the payload: fetched lazily from /api/faq.json (T086/T087). */
 
 export interface AboutData {
   name: string;
@@ -216,7 +217,7 @@ export function buildRoomPayload(
         })),
     ]),
   ) as Record<RepoCategory, RepoSummary[]>;
-  const faq = [...collections.faq].sort(byOrder()).map((f) => ({ id: f.id, q: f.data.q, a: f.data.a }));
+  const faq = [...collections.faq].sort(byOrder()).map((f) => ({ id: f.id, q: f.data.q }));
 
   const about: AboutData = {
     name: site.name,
@@ -240,9 +241,12 @@ export function buildRoomPayload(
   // Page-relevant service slice + meta. Home/about carry all services;
   // a service page leads with its own entry followed by its related ones.
   const self = opts.serviceId ? services.find((s) => s.id === opts.serviceId) : undefined;
-  const slice = self
-    ? [self, ...services.filter((s) => self.related.includes(s.id) || s.related.includes(self.id))]
+  const related = self
+    ? services.filter((s) => self.related.includes(s.id) || s.related.includes(self.id))
     : services;
+  // Rule 4 (<30 KB): only the page's own service ships deliverables/evidence/links;
+  // for every other service they are fetched lazily from /api/<id>.json.
+  const slice = [...(self ? [self] : []), ...related.map((s) => ({ ...s, deliverables: [], evidence: [], links: [] }))];
 
   const title =
     opts.title ??

@@ -4,10 +4,35 @@ const BASE = process.env.BASE || 'http://localhost:4321';
 const out = (k, v) => console.log(`[${k}] ${v}`);
 const fail = (m) => { console.error('FAIL: ' + m); process.exitCode = 1; };
 
+/**
+ * Click an in-world (CSS3D) control the way a visitor's tap lands: wait until
+ * a hit-test at the element's centre actually reaches it (a perspective-
+ * projected CSS3D quad can have a bounding-box centre that falls off the
+ * element while the camera is settling), then click.
+ */
+async function clickInWorld(page, selector, timeout = 20000) {
+  const loc = page.locator(selector).first();
+  await loc.waitFor({ timeout });
+  // Poll the hit-test on the resolved element (`:has-text` selectors are
+  // playwright-side, so the predicate runs via locator.waitForFunction).
+  await loc.waitForFunction(
+    (el) => {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return false;
+      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return hit instanceof Node && el.contains(hit);
+    },
+    undefined,
+    { timeout },
+  );
+  await loc.click();
+}
+
 const browser = await chromium.launch({
   args: ['--use-gl=angle', '--enable-webgl', '--ignore-gpu-blocklist'],
 });
 const ctx = await browser.newContext({
+  storageState: { cookies: [], origins: [{ origin: BASE, localStorage: [{ name: 'room3d', value: '3d' }] }] },
   viewport: { width: 1440, height: 900 },
   permissions: ['clipboard-read', 'clipboard-write'],
 });
@@ -72,7 +97,7 @@ out('services-grid', JSON.stringify(gridVisible));
 if (gridVisible.items !== 7) fail(`expected 7 service rows, got ${gridVisible.items}`);
 
 // ── 3. Click a specific service row → persistent-session navigation ─────
-await page.click('.rs-grid-item:has-text("Agentic")');
+await clickInWorld(page, '.rs-grid-item:has-text("Agentic")');
 await page.waitForFunction(() => location.pathname === '/services/svc-agentic-netops/', null, { timeout: 10000 });
 out('url-after-nav', page.url());
 const title1 = await page.title();
@@ -86,6 +111,8 @@ out('boot-removed-after-nav', stillNoBoot ? 'REBOOTED (bad)' : 'no re-boot (pers
 if (stillNoBoot) fail('3D world re-booted on navigation');
 
 // service detail screens readable
+await page.waitForSelector('.rs-screen[data-content="serviceDetail"]', { timeout: 20000 });
+await page.waitForSelector('.rs-screen[data-content="serviceEvidence"]', { timeout: 20000 });
 await page.waitForTimeout(900);
 const detail = await page.$eval('.rs-screen[data-content="serviceDetail"]', (el) => el.textContent);
 out('detail-snippet', detail.slice(0, 110));
@@ -105,6 +132,7 @@ out('forward-url', page.url());
 if (!page.url().includes('/services/svc-agentic-netops/')) fail('forward did not return to service room');
 await page.reload({ waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => !document.getElementById('boot'), null, { timeout: 30000 });
+await page.waitForFunction(() => document.querySelector('.rs-screen[data-content="serviceDetail"]'), null, { timeout: 15000 }).catch(() => {});
 out('refresh-url', page.url());
 const detailAfterRefresh = await page.$$eval('.rs-screen', (els) => els.map((e) => e.dataset.content).join(','));
 out('screens-after-refresh', detailAfterRefresh);
@@ -125,7 +153,7 @@ await page.waitForTimeout(900);
 const twinBtn = await page.$('[data-twin-open]');
 out('twin-launcher', twinBtn ? 'present' : 'MISSING');
 if (twinBtn) {
-  await page.click('.rs-screen[data-content="contact"] button:has-text("Twin")');
+  await clickInWorld(page, '.rs-screen[data-content="contact"] button:has-text("Twin")');
   await page.waitForTimeout(600);
   const twinOpen = await page.evaluate(() => {
     const el = document.querySelector('[data-twin-open]');
@@ -141,7 +169,7 @@ if (twinBtn) {
 // ── 7. Copy email with clipboard + aria-live ────────────────────────────
 const email = await page.$eval('.rs-screen[data-content="contact"] .rs-meta', (el) => el.textContent.trim());
 out('email', email);
-await page.click('.rs-screen[data-content="contact"] button:has-text("Copy email")');
+await clickInWorld(page, '.rs-screen[data-content="contact"] button:has-text("Copy email")');
 await page.waitForTimeout(500);
 const clip = await page.evaluate(() => navigator.clipboard.readText());
 out('clipboard', clip);

@@ -39,10 +39,11 @@ const { payload } = Astro.props;
       w.$RefreshSig$ ??= () => (t: unknown) => t;
       w.__vite_plugin_react_preamble_installed__ = true;
     }
-    // Mount gate (T020/T081): a stored "use flat site" choice skips the island
+    // Mount gate (T020/T081): a stored "use flat site" choice or an unusable GPU skips the island
     // entirely (no 3D code is fetched) and clears the boot overlay. The tiny
     // flatPreference module has no three/react imports.
     import { isFlatPreferred, setFlatPreferred } from '../islands/room3d/flatPreference';
+    import { hasWebGL2 } from '../islands/room3d/capability';
     const dropBoot = () => document.getElementById('boot')?.remove();
     // Boot-overlay "use flat site" control: persist, stand down, show flat page.
     document.querySelector('[data-use-flat]')?.addEventListener('click', () => {
@@ -50,16 +51,35 @@ const { payload } = Astro.props;
       dropBoot();
     });
     const start = () => {
-      if (isFlatPreferred()) {
+      // No usable GPU (no WebGL2 / software rasterizer) → never fetch the 3D bundle.
+      if (isFlatPreferred() || !hasWebGL2()) {
         dropBoot();
         return Promise.resolve();
       }
       return import('../islands/room3d/mount').then((m) => m.mountRoomIsland());
     };
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(() => void start(), { timeout: 2000 });
-    } else {
-      setTimeout(() => void start(), 200);
-    }
+    // Gate NOW (T088): flat-declined or GPU-less pages drop the boot overlay at
+    // once (no 3 s fallback wait). A 3D-approved page arms #boot so the pre-JS
+    // fallback timer (theme-init) doesn't remove the overlay while the mount
+    // below is still deferred; the overlay then shows real progress until the
+    // scene is genuinely usable (FR-003).
+    if (isFlatPreferred() || !hasWebGL2()) dropBoot();
+    else document.getElementById('boot')?.classList.add('armed');
+    // Defer-first (US4/T089): the flat page is complete and interactive on its own,
+    // so the 3D bundle is requested only after `load` plus a settle window
+    // (LOAD_SETTLE_MS), then an idle slot. 7 s of post-load quiet puts the heavy
+    // first-render/shader-compile work OUTSIDE the page's load/TTI/Lighthouse
+    // blocking window (the LH trace ends after ~5.3 s of post-load quiet; the
+    // 7 s figure keeps ~1.5 s of margin on slow-LCP pages) instead of merely
+    // being damped by it, while boot still lands inside the 10 s target on a
+    // real network (load ~1–2 s + 7 s settle + boot ~1 s) (FR-003).
+    const LOAD_SETTLE_MS = 7000;
+    const schedule = () =>
+      setTimeout(() => {
+        if ('requestIdleCallback' in window) window.requestIdleCallback(() => void start(), { timeout: 1500 });
+        else void start();
+      }, LOAD_SETTLE_MS);
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
   </script>
 )}

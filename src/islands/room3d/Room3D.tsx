@@ -16,14 +16,13 @@
  * - hardwareConcurrency ≤ 4 → lite mode (dpr 1, no N8AO);
  * - prefers-reduced-motion → jump-cut camera moves, no composer.
  */
-import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { useProgress } from '@react-three/drei';
+import { Component, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { DefaultLoadingManager } from 'three';
 import { AgXToneMapping, Color, PCFShadowMap } from 'three';
 import { installRoomBoot } from './boot/boot';
 import { ThemeBridge } from './fx/ThemeBridge';
 import { useThemeTokens } from './fx/useThemeTokens';
-import { Effects } from './fx/Effects';
 import { useRoomRoute } from './routing/useRoomRoute';
 import { routeKeyForPath, type RoomPayload } from '../../lib/room-payload';
 import { Room3DContext, useRoom3D, type NavTargetRef, type Room3DContextValue } from './context';
@@ -38,22 +37,13 @@ import { KeyboardNav } from './screens/focus';
 import { shotForScreen, placementsForRoom, type ContentKey } from './rooms/screenPlacements';
 import { ShotControls } from './rooms/hotspots';
 import { FLAT_EVENT, isFlatPreferred, setFlatPreferred } from './flatPreference';
+import { hasWebGL2 } from './capability';
 import './screens/screens.css';
 
 /** Frames that must have rendered before the scene counts as usable (T010). */
 const GATE_FRAMES = 4;
 /** Minimum boot progress shown before any real progress arrives (T010). */
 const MIN_PROGRESS = 0.04;
-
-function hasWebGL2(): boolean {
-  if (typeof document === 'undefined') return false;
-  try {
-    const canvas = document.createElement('canvas');
-    return canvas.getContext('webgl2') !== null;
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Error boundary around the Canvas (T074): if WebGL context creation or the
@@ -64,7 +54,8 @@ class CanvasBoundary extends Component<{ onError: () => void; children: React.Re
   static getDerivedStateFromError() {
     return { failed: true };
   }
-  componentDidCatch() {
+  componentDidCatch(err: unknown) {
+    console.error('[room3d] canvas error', err);
     this.props.onError();
   }
   render() {
@@ -77,13 +68,31 @@ function removeBoot() {
   document.getElementById('boot')?.remove();
 }
 
-/** Reports asset progress to the pre-JS boot overlay (drei useProgress). */
+/**
+ * Reports asset progress to the pre-JS boot overlay. Reads three's
+ * DefaultLoadingManager directly (US4 T089 payload trim): this is the same
+ * source drei's `useProgress` tracks, without pulling drei/zustand into the
+ * initial chunk.
+ */
 function BootProgressReporter() {
-  const { loaded, total } = useProgress();
+  const [progress, setProgress] = useState(MIN_PROGRESS);
   useEffect(() => {
     const boot = installRoomBoot();
-    boot.setProgress(total > 0 ? loaded / total : MIN_PROGRESS);
-  }, [loaded, total]);
+    const onProgress = () => {
+      const { itemsLoaded, itemsTotal } = DefaultLoadingManager as unknown as { itemsLoaded: number; itemsTotal: number };
+      if (itemsTotal > 0) setProgress(itemsLoaded / itemsTotal);
+    };
+    DefaultLoadingManager.onStart = onProgress;
+    DefaultLoadingManager.onProgress = onProgress;
+    DefaultLoadingManager.onLoad = onProgress;
+    DefaultLoadingManager.onError = (url) => console.error('[room3d] load error', url);
+    return () => {
+      DefaultLoadingManager.onStart = DefaultLoadingManager.onProgress = DefaultLoadingManager.onLoad = DefaultLoadingManager.onError = () => {};
+    };
+  }, []);
+  useEffect(() => {
+    installRoomBoot().setProgress(progress);
+  }, [progress]);
   return null;
 }
 
@@ -95,6 +104,96 @@ function SceneReadyGate() {
     frames.current += 1;
     // T010: the scene is usable only after 4 real rendered frames.
     if (frames.current === GATE_FRAMES) hide();
+  });
+  return null;
+}
+
+/**
+ * Postprocessing (N8AO + composer, ~175 KB raw) is its own chunk, requested only
+ * after the scene has rendered usable frames and the main thread has gone quiet
+ * (US4: keeps the initial deferred payload and mount-time TBT down).
+ */
+const LazyEffects = lazy(() => import('./fx/Effects').then((m) => ({ default: m.Effects })));
+function WakeOnMount() {
+  useEffect(() => () => void window.dispatchEvent(new Event(WAKE_EVENT)), []);
+  return null;
+}
+const FX_FALLBACK_MS = 12000;
+function DeferredEffects({ lite, reducedMotion }: { lite: boolean; reducedMotion: boolean }) {
+  const [on, setOn] = useState(false);
+  // Load postprocessing on first real interaction, or after a long quiet fallback
+  // delay — never inside the load/TTI window (US4 TBT), never for reduced motion.
+  useEffect(() => {
+    if (reducedMotion || on) return;
+    let done = false;
+    const go = () => {
+      if (done) return;
+      done = true;
+      cleanup();
+      if ('requestIdleCallback' in window) window.requestIdleCallback(() => setOn(true), { timeout: 3000 });
+      else setTimeout(() => setOn(true), 200);
+    };
+    const evs = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
+    const timer = window.setTimeout(go, FX_FALLBACK_MS);
+    const cleanup = () => {
+      window.clearTimeout(timer);
+      evs.forEach((e) => window.removeEventListener(e, go));
+    };
+    evs.forEach((e) => window.addEventListener(e, go, { passive: true, once: true }));
+    return cleanup;
+  }, [on, reducedMotion]);
+  useEffect(() => {
+    if (on) window.dispatchEvent(new Event(WAKE_EVENT));
+  }, [on]);
+  if (!on) return null;
+  return (
+    <Suspense fallback={<WakeOnMount />}>
+      <LazyEffects lite={lite} reducedMotion={reducedMotion} />
+    </Suspense>
+  );
+}
+
+/**
+ * Render-on-activity (US4): the Canvas runs frameloop="demand"; this driver keeps
+ * invalidating only while the scene is "awake" (boot, pointer/key/touch/wheel/resize,
+ * shot/route/theme/screen changes, FX arrival) and goes fully quiet ~1.5 s after the
+ * last activity. An idle room therefore costs zero main-thread/GPU work (battery,
+ * TBT/TTI), and a software or weak GPU is no longer saturated by a static scene.
+ */
+const WAKE_MS = 800;
+const BOOT_WAKE_MS = 1200;
+export const WAKE_EVENT = 'room3d-wake';
+function WakeDriver({ deps }: { deps: unknown[] }) {
+  const invalidate = useThree((s) => s.invalidate);
+  const getState = useThree((s) => s.get);
+  // R3F's invalidate() ACCUMULATES queued frames (up to 60); only request one when none is pending.
+  const poke = () => {
+    if (getState().internal.frames < 2) invalidate();
+  };
+  const until = useRef(performance.now() + BOOT_WAKE_MS);
+  useEffect(() => {
+    const wake = (ms = WAKE_MS) => {
+      until.current = Math.max(until.current, performance.now() + ms);
+      poke();
+    };
+    const on = () => wake();
+    const evs = ['pointermove', 'pointerdown', 'pointerup', 'wheel', 'keydown', 'touchstart', 'touchmove', 'resize', WAKE_EVENT];
+    evs.forEach((e) => window.addEventListener(e, on, { passive: true }));
+    wake(BOOT_WAKE_MS);
+    return () => evs.forEach((e) => window.removeEventListener(e, on));
+  }, [invalidate]);
+  useEffect(() => {
+    until.current = Math.max(until.current, performance.now() + WAKE_MS * 2);
+    poke();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+  useFrame(() => {
+    if (performance.now() < until.current) {
+      poke();
+    } else {
+      // Asleep: drop any frames R3F queued up from earlier invalidations (it queues up to 60).
+      getState().internal.frames = 0;
+    }
   });
   return null;
 }
@@ -259,7 +358,7 @@ function RoomSession({ payload, lite, reducedMotion, theme, onFail }: SessionPro
           <Canvas
             shadows={{ type: PCFShadowMap }}
             dpr={lite ? [1, 1] : [1, 1.5]}
-            frameloop={hidden ? 'never' : 'always'}
+            frameloop={hidden ? 'never' : 'demand'}
             gl={{ toneMapping: AgXToneMapping }}
             onCreated={({ gl }) => {
               gl.domElement.addEventListener(
@@ -278,11 +377,12 @@ function RoomSession({ payload, lite, reducedMotion, theme, onFail }: SessionPro
             <Suspense fallback={null}>
               <BootProgressReporter />
               <SceneReadyGate />
+              <WakeDriver deps={[activeShot, router.route, theme, openScreenId, focusedId, lite, reducedMotion, roomPayload]} />
               <SceneBackground />
               <CameraRig shots={shotsForRoom(room)} activeKey={activeShot} reducedMotion={reducedMotion} />
               {room === 'home' ? <HomeRoom /> : room === 'about' ? <AboutRoom /> : <ServiceRoom />}
               <Css3dDriver />
-              <Effects lite={lite} reducedMotion={reducedMotion} />
+              <DeferredEffects lite={lite} reducedMotion={reducedMotion} />
             </Suspense>
           </Canvas>
           </CanvasBoundary>

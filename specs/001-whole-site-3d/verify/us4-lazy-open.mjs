@@ -1,0 +1,20 @@
+// T087: lazy docs are fetched only on screen open, after scene-ready.
+import { chromium } from 'playwright';
+const BASE = process.env.BASE || 'http://localhost:4399';
+const b = await chromium.launch({ args: ['--use-gl=angle', '--enable-webgl', '--ignore-gpu-blocklist'] });
+const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, storageState: { cookies: [], origins: [{ origin: BASE, localStorage: [{ name: 'room3d', value: '3d' }] }] } });
+const page = await ctx.newPage();
+const api = []; const errs = [];
+page.on('request', (r) => { const u = new URL(r.url()).pathname; if (u.startsWith('/api/')) api.push(u); });
+page.on('response', (r) => { if (r.status() >= 400) errs.push(r.status() + ' ' + r.url()); });
+await page.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+await page.waitForFunction(() => !document.getElementById('boot'), null, { timeout: 60000 });
+console.log('api-at-scene-ready', JSON.stringify(api));
+await page.waitForSelector('.rs-inner', { timeout: 30000 });
+await page.waitForFunction(() => [...document.querySelectorAll('.rs-eyebrow')].some((e) => e.textContent === 'faq'), null, { timeout: 30000 }).catch(() => {});
+await page.waitForTimeout(3000);
+console.log('api-after-screens-mount', JSON.stringify(api));
+const faq = await page.evaluate(() => { const e = [...document.querySelectorAll('.rs-eyebrow')].find((x) => x.textContent === 'faq'); return e ? [...e.parentElement.querySelectorAll('.rs-card p')].map((p) => p.textContent.length) : null; });
+console.log('faq-answer-lengths', JSON.stringify(faq));
+console.log('http-errors', JSON.stringify(errs));
+await b.close();

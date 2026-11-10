@@ -94,6 +94,8 @@ export function Css3dScreens() {
     const timer = setInterval(() => {
       n += 1;
       setShown(n);
+      // Render-on-demand: a newly mounted screen is positioned by the next CSS3D render.
+      window.dispatchEvent(new Event('room3d-wake'));
       if (n >= ordered.length) clearInterval(timer);
     }, 120);
     return () => clearInterval(timer);

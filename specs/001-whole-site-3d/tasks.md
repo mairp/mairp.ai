@@ -208,11 +208,11 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 ### Implementation for User Story 4
 
-- [ ] T085 [P] [US4] Add Vite chunking in astro.config.mjs `vite.build.rollupOptions.output.manualChunks`: isolate `three` (and fiber/drei/postprocessing) from island app code so shader/app edits don't invalidate the three chunk
-- [ ] T086 [P] [US4] Create the lazy-content endpoint `src/pages/api/[doc].ts` (`prerender = true`) serving full FAQ answers and long service markdown bodies as sanitized documents, fetched only after scene-ready (research R4)
-- [ ] T087 [US4] Wire lazy fetch-on-open in `FaqScreen` + `ServiceScreen` (`src/islands/room3d/screens/content/`): fetch the T086 document when a lazy screen opens; keep per-route `/rooms/*.json` payloads < 30 KB (contracts rule 4)
-- [ ] T088 [US4] Run the defer-first audit: verify in devtools no three.js/GLB/payload request precedes primary content render; confirm the mount gate (T020) holds under 4× CPU throttling; verify `#boot` shows progress meanwhile
-- [ ] T089 [US4] Validate US4: full LHCI autorun ≥0.95 × 4 on `/`, `/services/svc-agentic-netops/`, `/about/`; record first-load JS delta vs baseline (≈0 KB pre-mount, ≤ ~300 KB gz deferred) in the feature dir notes
+- [x] T085 [P] [US4] Add Vite chunking in astro.config.mjs `vite.build.rollupOptions.output.manualChunks`: isolate `three` (and fiber/drei/postprocessing) from island app code so shader/app edits don't invalidate the three chunk
+- [x] T086 [P] [US4] Create the lazy-content endpoint `src/pages/api/[doc].ts` (`prerender = true`) serving full FAQ answers and long service markdown bodies as sanitized documents, fetched only after scene-ready (research R4)
+- [x] T087 [US4] Wire lazy fetch-on-open in `FaqScreen` + `ServiceScreen` (`src/islands/room3d/screens/content/`): fetch the T086 document when a lazy screen opens; keep per-route `/rooms/*.json` payloads < 30 KB (contracts rule 4)
+- [x] T088 [US4] Run the defer-first audit: verify in devtools no three.js/GLB/payload request precedes primary content render; confirm the mount gate (T020) holds under 4× CPU throttling; verify `#boot` shows progress meanwhile
+- [x] T089 [US4] Validate US4: full LHCI autorun ≥0.95 × 4 on `/`, `/services/svc-agentic-netops/`, `/about/`; record first-load JS delta vs baseline (≈0 KB pre-mount, ≤ ~300 KB gz deferred) in the feature dir notes
 
 **Checkpoint**: Performance gates hold with the 3D layer installed.
 

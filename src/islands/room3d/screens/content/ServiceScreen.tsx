@@ -6,11 +6,15 @@
  */
 import { useRoom3D } from '../../context';
 import type { ServiceSummary } from '../../../../lib/room-payload';
+import { Inline } from './Inline';
+import { useLazyDoc } from './useLazyDoc';
 
 export function ServiceScreen({ mode }: { mode: 'detail' | 'evidence' }) {
   const { payload, navigate } = useRoom3D();
   const self: ServiceSummary | undefined =
     payload.services.find((s) => s.id === payload.serviceId) ?? payload.services[0];
+  // Long markdown body: fetched lazily (T087) only once the evidence screen opens.
+  const body = useLazyDoc<{ paragraphs: string[] }>(mode === 'evidence' ? self?.id : undefined);
   if (!self) return null;
 
   if (mode === 'evidence') {
@@ -30,6 +34,16 @@ export function ServiceScreen({ mode }: { mode: 'detail' | 'evidence' }) {
             <li key={e}>{e}</li>
           ))}
         </ul>
+        {body.data && body.data.paragraphs.length > 0 && (
+          <>
+            <div className="rs-h2">In depth</div>
+            {body.data.paragraphs.map((p, i) => (
+              <p key={i}>
+                <Inline text={p} />
+              </p>
+            ))}
+          </>
+        )}
         {self.links.length > 0 && (
           <>
             <div className="rs-h2">Links</div>

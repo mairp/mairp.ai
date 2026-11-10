@@ -16,13 +16,104 @@
  * - Portrait viewports widen the FOV so shot framing keeps key content
  *   visible (T032, FR-011).
  */
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { CameraControls } from '@react-three/drei';
-import CameraControlsImpl from 'camera-controls';
-import { Vector3 } from 'three';
+import type CameraControlsImpl from 'camera-controls';
+import { Box3, MathUtils, Matrix4, Quaternion, Raycaster, Sphere, Spherical, Vector2, Vector3, Vector4 } from 'three';
 import { easing } from 'maath';
+
 import { ROOM_BOUNDS, type Shot } from './shots';
+import { isSceneReady, SCENE_READY_EVENT } from '../boot/boot';
+
+/**
+ * camera-controls is dynamically imported (US4 T085/T089) AND deferred past
+ * scene-ready: its chunk is requested only after the boot overlay has been
+ * hidden (scene-ready latch, boot.ts) plus an idle slot, so it adds nothing to
+ * the initial deferred payload and no boot-window work. `Impl.install({ THREE })` is the camera-controls v3
+ * tree-shaking contract (the same subset drei passes).
+ */
+type CCtor = typeof CameraControlsImpl;
+let implPromise: Promise<CCtor> | null = null;
+function loadCameraControls(): Promise<CCtor> {
+  implPromise ??= import('camera-controls').then((m) => {
+    const Impl = ((m as { default?: CCtor }).default ?? (m as unknown as CCtor)) as CCtor;
+    Impl.install({
+      THREE: {
+        Box3,
+        MathUtils: { clamp: MathUtils.clamp },
+        Matrix4,
+        Quaternion,
+        Raycaster,
+        Sphere,
+        Spherical,
+        Vector2,
+        Vector3,
+        Vector4,
+      },
+    });
+    return Impl;
+  });
+  return implPromise;
+}
+
+/**
+ * Minimal R3F binding for the dynamically imported camera-controls impl
+ * (replaces drei's <CameraControls>, which would pull camera-controls into the
+ * static mount chunk). Until the impl arrives the camera sits at its entry
+ * shot with no free orbit; shots and screens work as soon as the scene renders.
+ * Wake on user-drag events only — 'update' is deliberately NOT hooked because
+ * it fires every frame and would defeat render-on-demand idling.
+ */
+function useLazyCameraControls(camera: import('three').PerspectiveCamera, domElement: HTMLElement | undefined, wake: () => void) {
+  const [controls, setControls] = useState<CameraControlsImpl | null>(null);
+  const [ctor, setCtor] = useState<CCtor | null>(null);
+  useEffect(() => {
+    let alive = true;
+    let cancelArm = () => {};
+    const load = () => {
+      void loadCameraControls().then((Impl) => {
+        if (!alive || !domElement) return;
+        const c = new Impl(camera);
+        c.connect(domElement);
+        (['controlstart', 'control', 'controlend', 'transitionstart'] as const).forEach((e) =>
+          c.addEventListener(e, wake),
+        );
+        setControls(c);
+        // NB: a class constructor is typeof 'function', so React would treat it
+        // as a state UPDATER and call it without `new` — wrap it in a thunk.
+        setCtor(() => Impl);
+        // Render-on-demand: draw a frame so the controls' entry-shot bounds
+        // and any pending transition are applied immediately on arrival.
+        wake();
+      });
+    };
+    // US4 T089: the chunk is requested only after the scene is usable (boot
+    // overlay hidden) AND the main thread is idle — never during boot.
+    const arm = () => {
+      if ('requestIdleCallback' in window) {
+        const h = window.requestIdleCallback(load, { timeout: 4000 });
+        cancelArm = () => window.cancelIdleCallback(h);
+      } else {
+        const t = (window as Window).setTimeout(load, 300);
+        cancelArm = () => window.clearTimeout(t);
+      }
+    };
+    if (isSceneReady()) arm();
+    else window.addEventListener(SCENE_READY_EVENT, arm, { once: true });
+    return () => {
+      alive = false;
+      cancelArm();
+      setControls((current) => {
+        if (current) {
+          current.disconnect();
+          current.dispose?.();
+        }
+        return null;
+      });
+    };
+  }, [camera, domElement, wake]);
+  return { controls, ctor };
+}
 
 export interface CameraRigProps {
   shots: Shot[];
@@ -39,15 +130,22 @@ const tmpTarget = new Vector3();
 const box = { min: new Vector3(...ROOM_BOUNDS.box.min), max: new Vector3(...ROOM_BOUNDS.box.max) };
 
 export function CameraRig({ shots, activeKey, reducedMotion }: CameraRigProps) {
-  const controls = useRef<CameraControlsImpl>(null);
   const camera = useThree((s) => s.camera);
+  const gl = useThree((s) => s.gl);
+  const invalidate = useThree((s) => s.invalidate);
   const size = useThree((s) => s.size);
   const shot = useMemo(() => shots.find((s) => s.key === activeKey) ?? shots[0], [shots, activeKey]);
+  const wake = useRef(() => invalidate()).current;
+
+  // Dynamically imported camera-controls (US4): null until its chunk arrives.
+  const { controls, ctor } = useLazyCameraControls(camera as import('three').PerspectiveCamera, gl.domElement, wake);
 
   // Run-ref token: any frame loop from a previous transition dies when a new
   // shot starts (T031 cancellation of stale transitions).
   const runRef = useRef(0);
   const flight = useRef({ pos: new Vector3(), target: new Vector3(), active: false });
+  /** Whether the camera-controls instance has attached at least once (US4). */
+  const attached = useRef(false);
 
   // Portrait FOV fitting (T032): widen vertical FOV as the aspect narrows so
   // screens keep their framing; restore the base FOV on wide viewports.
@@ -60,13 +158,31 @@ export function CameraRig({ shots, activeKey, reducedMotion }: CameraRigProps) {
   }, [camera, size]);
 
   useEffect(() => {
-    const c = controls.current;
-    if (!c || !shot) return;
+    const c = controls;
+    if (!c || !ctor) {
+      // camera-controls chunk not arrived yet (deferred past scene-ready,
+      // US4 T089): place the camera directly on the shot so the framing is
+      // correct from the first rendered frames and the camera is already
+      // AT the shot when free orbit arrives (no re-frame drift). Shot
+      // changes are jump cuts until the rig chunk is in.
+      if (shot) {
+        camera.position.set(...shot.position);
+        camera.lookAt(tmpTarget.set(...shot.target));
+        document.body.dataset.cameraPos = `${shot.position[0].toFixed(2)},${shot.position[1].toFixed(2)},${shot.position[2].toFixed(2)}`;
+        invalidate();
+      }
+      return;
+    }
+    if (!shot) return;
     const token = ++runRef.current;
+    // True only on the run where the deferred camera-controls chunk has just
+    // attached (US4): the camera is adopted as-is, no transition.
+    const firstAttach = !attached.current;
+    attached.current = true;
     // camera-controls v3: pan is disabled by mapping every pointer input to
     // rotate/dolly only, so the orbit target stays inside the room bounds
     // (T030); damped dragging via smoothTime (replaces enableDamping).
-    const ACTION = CameraControlsImpl.ACTION;
+    const ACTION = ctor.ACTION;
     c.mouseButtons.left = ACTION.ROTATE;
     c.mouseButtons.right = ACTION.ROTATE;
     c.mouseButtons.wheel = ACTION.DOLLY;
@@ -81,12 +197,23 @@ export function CameraRig({ shots, activeKey, reducedMotion }: CameraRigProps) {
     c.minDistance = 1.1;
     c.maxDistance = 15;
 
-    if (reducedMotion) {
-      // Jump cut: instant position/target set (US3 T075 behaviour).
+    if (reducedMotion || firstAttach) {
+      // Reduced motion: jump cut (US3 T075). First attach: the camera is
+      // already framed at the shot by the direct placement above, so adopt it
+      // without a transition — free orbit arriving must not re-frame.
       flight.current.active = false;
+      flight.current.pos.set(...shot.position);
+      flight.current.target.set(...shot.target);
       c.setLookAt(...shot.position, ...shot.target, false);
       clampTarget(c);
       boundToShot(c, shot);
+      // Render-on-demand: setLookAt(false) only writes CC's internal state
+      // and CC's first update() applies its connect-time orientation, so keep
+      // the wake window open until the camera has settled at the shot and the
+      // screens/hotspot projections have been recomputed (US4 defer).
+      invalidate();
+      window.dispatchEvent(new Event('room3d-wake'));
+      setTimeout(() => window.dispatchEvent(new Event('room3d-wake')), 300);
       return;
     }
 
@@ -94,17 +221,20 @@ export function CameraRig({ shots, activeKey, reducedMotion }: CameraRigProps) {
     if (typeof c.getTarget === 'function') c.getTarget(flight.current.target);
     flight.current.active = true;
     void token;
-  }, [shot, reducedMotion]);
+  }, [shot, reducedMotion, controls, ctor]);
 
   // Per-frame damped transition: damp current pos/target toward the shot and
   // feed CameraControls; stops when converged (or cancelled by a newer run).
+  // camera-controls' own `update(delta)` runs first (priority -1, as drei's
+  // binding does) so drags integrate before the transition logic reads state.
   useFrame((_, delta) => {
+    if (controls) controls.update(delta);
     // Observable camera position for tests (T075 jump-cut measurement); only
     // touches the DOM when the rounded value changes.
     const p = camera.position;
     const pos = `${p.x.toFixed(2)},${p.y.toFixed(2)},${p.z.toFixed(2)}`;
     if (document.body.dataset.cameraPos !== pos) document.body.dataset.cameraPos = pos;
-    const c = controls.current;
+    const c = controls;
     if (!c || !shot || !flight.current.active) {
       if (c) clampTarget(c);
       return;
@@ -131,7 +261,7 @@ export function CameraRig({ shots, activeKey, reducedMotion }: CameraRigProps) {
     }
   });
 
-  return <CameraControls ref={controls} makeDefault />;
+  return null;
 }
 
 /**
@@ -167,6 +297,9 @@ const ROOM_INNER = { x: 8.5, z: 6.6 };
 /** Keeps the orbit target inside the room Box3 (T030 pan bounds). */
 function clampTarget(c: CameraControlsImpl) {
   const t = c.getTarget(new Vector3());
+  const x = t.x, y = t.y, z = t.z;
   t.min(box.max).max(box.min);
-  c.setTarget(t.x, t.y, t.z, false);
+  // Only write when actually out of bounds: an unconditional setTarget fires
+  // camera-controls 'update' every frame, which defeats render-on-demand idling.
+  if (t.x !== x || t.y !== y || t.z !== z) c.setTarget(t.x, t.y, t.z, false);
 }

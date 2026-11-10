@@ -27,6 +27,19 @@ declare global {
   }
 }
 
+/**
+ * Scene-ready latch (US4 T089): once `hide()` fires, the scene has rendered
+ * usable frames. Post-scene chunks (camera-controls, like Effects) may only
+ * be requested from here on, keeping them out of the initial deferred payload
+ * and out of the boot window's main-thread work.
+ */
+let sceneReady = false;
+export function isSceneReady(): boolean {
+  return sceneReady;
+}
+/** Event dispatched on `window` exactly when the scene becomes usable. */
+export const SCENE_READY_EVENT = 'room3d:sceneready';
+
 function overlay(): HTMLElement | null {
   return typeof document === 'undefined' ? null : document.getElementById('boot');
 }
@@ -56,13 +69,16 @@ export function installRoomBoot(): RoomBoot {
       window.setTimeout(() => node.remove(), reduced ? 0 : 1200);
     },
     hide() {
+      sceneReady = true;
       const node = overlay();
-      if (!node) return;
-      node.style.setProperty('--p', '1');
-      node.classList.add('done');
+      node?.style.setProperty('--p', '1');
+      node?.classList.add('done');
+      // Scene-ready signal (US4/T087): lazy documents (/api/*) may fetch only
+      // from here on — nothing lazy loads during the boot window.
+      window.dispatchEvent(new Event(SCENE_READY_EVENT));
       // Reduced motion: transition is disabled; remove immediately after a tick.
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.setTimeout(() => node.remove(), reduced ? 0 : 500);
+      window.setTimeout(() => node?.remove(), reduced ? 0 : 500);
     },
   };
   window.__roomBoot = boot;

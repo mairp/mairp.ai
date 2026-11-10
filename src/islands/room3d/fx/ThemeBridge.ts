@@ -7,17 +7,17 @@
  * properties from the document root, observes `data-theme` attribute changes
  * (ThemeToggle) and `prefers-color-scheme` media changes, and re-maps on each.
  */
-import * as THREE from 'three';
+import { Color } from 'three';
 
 /** Token name → payload key consumed by rooms/fx. */
 export interface ThemeTokens {
-  bg: THREE.Color;
-  surface: THREE.Color;
-  accent: THREE.Color;
-  accent2: THREE.Color;
-  fg: THREE.Color;
-  muted: THREE.Color;
-  border: THREE.Color;
+  bg: Color;
+  surface: Color;
+  accent: Color;
+  accent2: Color;
+  fg: Color;
+  muted: Color;
+  border: Color;
 }
 
 const VAR_NAMES: Record<keyof ThemeTokens, string> = {
@@ -41,13 +41,13 @@ export class ThemeBridge {
   constructor(root: HTMLElement = document.documentElement) {
     this.#root = root;
     this.tokens = {
-      bg: new THREE.Color(),
-      surface: new THREE.Color(),
-      accent: new THREE.Color(),
-      accent2: new THREE.Color(),
-      fg: new THREE.Color(),
-      muted: new THREE.Color(),
-      border: new THREE.Color(),
+      bg: new Color(),
+      surface: new Color(),
+      accent: new Color(),
+      accent2: new Color(),
+      fg: new Color(),
+      muted: new Color(),
+      border: new Color(),
     };
     this.#read();
 
