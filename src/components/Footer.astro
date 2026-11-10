@@ -6,39 +6,38 @@ const year = new Date().getFullYear();
   <div class="wrap">
     <div class="cols">
       <div>
-        <p class="mono brand">marlon·paz</p>
-        <p class="muted">{SITE.tagline} {SITE.caption}</p>
-        <p class="muted">Independent consulting — one architect, full stack: fabric to tokens.</p>
-        <p class="langs" aria-label="Working languages">
-          <span><b>EN</b> English</span><span><b>ES</b> Español</span><span><b>PT</b> Português</span>
-        </p>
+        <p class="brand">Marlon Paz</p>
+        <p>Network and AI infrastructure architect. Independent consulting from {SITE.location}, in English, Español and Português.</p>
       </div>
       <nav aria-label="Footer">
         <ul role="list">
           {NAV.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+          <li><a href={SITE.cv}>Consultant profile (PDF)</a></li>
+        </ul>
+        <ul role="list">
           <li><a href={SITE.github}>GitHub</a></li>
           <li><a href={SITE.linkedin}>LinkedIn</a></li>
           <li><a href={SITE.credly}>Credly</a></li>
           <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
-          <li><a href={SITE.cv}>Consultant profile (PDF)</a></li>
         </ul>
       </nav>
-      <div class="legal">
-        <p>Every claim on this site links to public evidence — a repo, a paper or a demo. No invented testimonials, no client logos.</p>
-        <p class="muted">Confidential client work appears only as anonymized capability categories, never as names or details.</p>
-        <p class="muted">Privacy: no cookies, no trackers. Cookie-free, aggregate page counts by Cloudflare Web Analytics.</p>
-        <p class="muted">© {year} {SITE.copyright}. Site <a href="https://github.com/mairp/mairp.ai">open source</a> under MIT.</p>
+      <div class="legal muted">
+        <p>Every claim on this site links to public evidence: a repository, a paper or a recording. No testimonials and no client logos. Confidential client work appears only as anonymised categories.</p>
+        <p>No cookies and no trackers. Page counts are aggregate, by Cloudflare Web Analytics.</p>
+        <p>© {year} {SITE.copyright}. This site is <a href="https://github.com/mairp/mairp.ai">open source</a> under MIT.</p>
       </div>
     </div>
   </div>
 </footer>
 
 <style>
-  .site-footer { border-top: 1px solid; border-image: linear-gradient(to right, var(--accent), var(--border) 45%, transparent) 1; padding: var(--space-7) 0 var(--space-6); font-size: var(--step--1); }
-  .cols { display: grid; gap: var(--space-5); }
-  @media (min-width: 768px) { .cols { grid-template-columns: 1.3fr 1fr 1.6fr; } }
-  .brand { color: var(--fg-strong); font-weight: 700; font-size: var(--step-0); margin-bottom: var(--space-2); }
-  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-1); }
-  ul a { display: inline-block; padding: var(--space-1) 0; }
-  p { margin-bottom: var(--space-2); }
+  .site-footer { border-top: 1px solid var(--border); margin-top: var(--space-8); padding: var(--space-7) 0 var(--space-9); font-size: var(--step--1); }
+  .cols { display: grid; gap: var(--space-6); }
+  @media (min-width: 860px) { .cols { grid-template-columns: 1.2fr 1.3fr 1.5fr; } }
+  .brand { font-family: var(--font-display); font-weight: 700; font-size: var(--step-2); letter-spacing: -0.02em; color: var(--fg-strong); margin-bottom: var(--space-2); }
+  nav { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); align-content: start; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  ul a { display: inline-flex; align-items: center; min-height: 36px; color: var(--fg-strong); text-decoration: none; overflow-wrap: anywhere; }
+  ul a:hover { text-decoration: underline; }
+  p { margin-bottom: var(--space-3); }
 </style>

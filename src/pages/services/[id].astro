@@ -4,8 +4,6 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { SITE } from '../../lib/site';
-import { buildRoomPayload } from '../../lib/room-payload';
-import RoomIsland from '../../components/RoomIsland.astro';
 
 export async function getStaticPaths() {
   const services = await getCollection('services');
@@ -16,98 +14,83 @@ const { Content } = await render(entry);
 const s = entry.data;
 const all = await getCollection('services');
 const related = all.filter((r) => s.related.includes(r.id));
-
-// Room Payload for the persistent 3D island (feature 001-whole-site-3d):
-// this service's slice leads the payload (contracts/url-room-map.md).
-const proofC = await getCollection('proof');
-const engC = await getCollection('engagements');
-const reposC = await getCollection('repos');
-const faqC = await getCollection('faq');
-const payload = buildRoomPayload('service', { services: all, proof: proofC, engagements: engC, repos: reposC, faq: faqC }, SITE, {
-  serviceId: entry.id,
-});
+const [name, tag] = s.name.split(' — ');
 ---
-<Base title={s.name} description={s.oneLine}>
+<Base title={s.name.replace(' — ', ': ')} description={s.oneLine}>
   <div class="wrap page">
-    <p class="eyebrow mono">// service{s.status === 'requires-scoping' && ' · ' + s.status}</p>
-    <h1>{s.name}</h1>
-    <p class="lede">{s.oneLine}</p>
-    <div class="grid grid-2 facts">
-      <div class="card card-top">
-        <h2 class="mono">shape</h2>
-        <p class="mono dur">{s.duration}</p>
-        {s.statusNote && <p class="muted">{s.statusNote}</p>}
-        {s.vendors.length > 0 && <p class="muted mono">{s.vendors.join(' · ')}</p>}
-      </div>
-      <div class="card card-top">
-        <h2 class="mono">outcome</h2>
+    <div class="page-head">
+      <p class="crumb"><a href="/#services">Services</a></p>
+      <h1>{name}</h1>
+      {tag && <p class="tag">{tag}</p>}
+      <p class="lede">{s.oneLine}</p>
+      <p class="ctas">
+        <a class="btn btn-primary" href={`mailto:${SITE.email}?subject=${encodeURIComponent('Scoping: ' + s.name)}`}>Email Marlon about this</a>
+        <button class="btn" type="button" data-twin-open>Ask my digital twin</button>
+      </p>
+    </div>
+
+    <section class="block" aria-labelledby="b-outcome">
+      <h2 id="b-outcome">Outcome</h2>
+      <div class="prose">
         <p>{s.summary}</p>
+        <dl class="facts">
+          <div><dt>Duration</dt><dd>{s.duration}</dd></div>
+          {s.vendors.length > 0 && <div><dt>Works with</dt><dd>{s.vendors.join(', ')}</dd></div>}
+          {s.statusNote && <div><dt>Scoping</dt><dd>{s.statusNote}</dd></div>}
+        </dl>
       </div>
-    </div>
+    </section>
 
-    <div class="bracket">
-      <p class="bracket-title mono">what you get</p>
-      <ul class="deliverables">
-        {s.deliverables.map((d) => <li>{d}</li>)}
-      </ul>
-    </div>
+    <section class="block" aria-labelledby="b-get">
+      <h2 id="b-get">What you get</h2>
+      <div><ul class="rows list">{s.deliverables.map((d) => <li>{d}</li>)}</ul></div>
+    </section>
 
-    <div class="bracket">
-      <p class="bracket-title mono">evidence — public, checkable</p>
-      <ul class="evidence">
-        {s.evidence.map((e) => <li>{e}</li>)}
-      </ul>
-      {s.links.length > 0 && (
-        <p class="ctas">
-          {s.links.map((l) => <a class="btn" href={l.href} target="_blank" rel="noopener noreferrer">{l.label} <span class="arrow" aria-hidden="true">→</span></a>)}
-        </p>
-      )}
-    </div>
+    <section class="block" aria-labelledby="b-evidence">
+      <h2 id="b-evidence">Evidence you can check</h2>
+      <div>
+        <ul class="rows list">{s.evidence.map((e) => <li>{e}</li>)}</ul>
+        {s.links.length > 0 && (
+          <p class="ctas">
+            {s.links.map((l) => <a class="btn" href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>)}
+          </p>
+        )}
+      </div>
+    </section>
 
     {entry.body && (
-      <div class="prose">
-        <Content />
-      </div>
+      <section class="block" aria-labelledby="b-how">
+        <h2 id="b-how">How it works</h2>
+        <div class="prose"><Content /></div>
+      </section>
     )}
 
     {related.length > 0 && (
-      <div class="bracket">
-        <p class="bracket-title mono">pairs with</p>
-        <div class="grid grid-2">
-          {related.map((r) => (
-            <a class="card svc" href={`/services/${r.id}/`}>
-              <h3>{r.data.name}</h3>
-              <p>{r.data.oneLine}</p>
-            </a>
-          ))}
+      <section class="block" aria-labelledby="b-pairs">
+        <h2 id="b-pairs">Pairs with</h2>
+        <div>
+          <ul class="rows pairs">
+            {related.map((r) => (
+              <li><a href={`/services/${r.id}/`}><span class="p-name">{r.data.name.replace(' — ', ': ')}</span><span>{r.data.oneLine}</span></a></li>
+            ))}
+          </ul>
         </div>
-      </div>
+      </section>
     )}
-
-    <div class="cta card">
-      <h2>Scope this on your fabric.</h2>
-      <p class="ctas">
-        <a class="btn btn-primary" href={`mailto:${SITE.email}?subject=${encodeURIComponent('Scoping: ' + s.name)}`}>Email Marlon <span class="arrow" aria-hidden="true">→</span></a>
-        <button class="btn" type="button" data-twin-open>Ask the lab twin</button>
-      </p>
-    </div>
   </div>
-
-  <RoomIsland payload={payload} />
 </Base>
 
 <style>
-  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-3); }
-  h1 { font-size: var(--step-4); max-width: 26ch; }
-  .facts { margin: var(--space-6) 0; }
-  .facts h2 { font-size: var(--step--1); color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; }
-  .dur { color: var(--fg-strong); }
-  .deliverables, .evidence { max-width: 46rem; }
-  .evidence li { font-family: var(--font-mono); font-size: var(--step--1); margin-bottom: var(--space-2); }
-  .prose { max-width: 46rem; margin-top: var(--space-6); }
-  .cta { margin-top: var(--space-7); }
-  .cta .ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; margin: 0; }
-  .svc h3 { color: var(--fg-strong); }
-  .svc p { margin: 0; }
-  .ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-4); }
+  .crumb { margin: 0 0 var(--space-4); font-size: var(--step--1); }
+  .crumb a { display: inline-flex; align-items: center; min-height: 44px; }
+  .tag { font-family: var(--font-display); font-weight: 550; font-size: var(--step-3); line-height: 1.1; letter-spacing: -0.02em; color: var(--accent); margin: 0; }
+  .facts { margin: var(--space-5) 0 0; display: grid; gap: var(--space-3); }
+  .facts div { display: grid; gap: 0 var(--space-4); }
+  .facts dt { font-weight: 650; color: var(--fg-strong); }
+  .facts dd { margin: 0; }
+  @media (min-width: 600px) { .facts div { grid-template-columns: 8rem minmax(0, 1fr); } }
+  .list li { padding: var(--space-3) 0; max-width: 46rem; }
+  .pairs a { display: grid; gap: var(--space-1); padding: var(--space-4) 0; text-decoration: none; color: var(--fg); }
+  .p-name { font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); letter-spacing: -0.015em; color: var(--fg-strong); }
+  .pairs a:hover .p-name { color: var(--accent); }
 </style>

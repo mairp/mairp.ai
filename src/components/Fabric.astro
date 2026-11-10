@@ -1,0 +1,110 @@
+---
+// The hero diagram: the reference fabric from agentic-netops (2 spines, 2 leaves,
+// 4 clients) converging once on load. A plain-language intent is typed, the
+// links light up, each leaf earns its check, and the status reads "verified on
+// device". The resting state is the finished state, so it is complete without
+// animation (reduced motion, print, no CSS animation support).
+// No style attributes anywhere: the CSP forbids them.
+---
+<svg class="fabric" viewBox="0 0 360 396" role="img" aria-labelledby="fabric-title fabric-desc">
+  <title id="fabric-title">A leaf-spine fabric converging on a plain-language intent</title>
+  <desc id="fabric-desc">The intent "stretch this mac-vrf across both leaves" enters at the top. Agents plan and controllers apply it across two spines and two leaves serving four clients. Both leaves confirm, and the service is marked verified on device.</desc>
+
+  {/* intent */}
+  <rect class="chip" x="10" y="8" width="340" height="58" rx="14" />
+  <text class="label" x="26" y="30">Intent, in plain language</text>
+  <text class="typed" x="26" y="52">stretch this mac-vrf across both leaves</text>
+  <rect class="cover" x="24" y="38" width="310" height="22" />
+
+  {/* base wiring */}
+  <g class="wire">
+    <path d="M180 66V90M100 90H260M100 90V112M260 90V112" />
+    <path d="M100 150V212M100 150L260 212M260 150L100 212M260 150V212" />
+    <path d="M100 250L64 303M100 250L136 303M260 250L224 303M260 250L296 303" />
+  </g>
+  {/* the same wiring, lit in sequence */}
+  <g class="lit">
+    <path class="l1" pathLength="1" d="M180 66V90M100 90H260M100 90V112M260 90V112" />
+    <path class="l2" pathLength="1" d="M100 150V212" />
+    <path class="l2" pathLength="1" d="M100 150L260 212" />
+    <path class="l2" pathLength="1" d="M260 150L100 212" />
+    <path class="l2" pathLength="1" d="M260 150V212" />
+    <path class="l3" pathLength="1" d="M100 250L64 303" />
+    <path class="l3" pathLength="1" d="M100 250L136 303" />
+    <path class="l3" pathLength="1" d="M260 250L224 303" />
+    <path class="l3" pathLength="1" d="M260 250L296 303" />
+  </g>
+  <text class="note" x="192" y="82">agents plan, controllers apply</text>
+
+  {/* nodes */}
+  <g class="node">
+    <rect x="58" y="112" width="84" height="38" rx="11" />
+    <rect x="218" y="112" width="84" height="38" rx="11" />
+    <rect x="58" y="212" width="84" height="38" rx="11" />
+    <rect x="218" y="212" width="84" height="38" rx="11" />
+    <circle cx="64" cy="316" r="13" />
+    <circle cx="136" cy="316" r="13" />
+    <circle cx="224" cy="316" r="13" />
+    <circle cx="296" cy="316" r="13" />
+  </g>
+  <g class="name" text-anchor="middle">
+    <text x="100" y="136">spine 1</text>
+    <text x="260" y="136">spine 2</text>
+    <text x="100" y="236">leaf 1</text>
+    <text x="260" y="236">leaf 2</text>
+  </g>
+
+  {/* each leaf confirms */}
+  <g class="check c1">
+    <circle cx="142" cy="212" r="12" />
+    <path d="M136.5 212.5l4 4 7-8.5" />
+  </g>
+  <g class="check c2">
+    <circle cx="302" cy="212" r="12" />
+    <path d="M296.5 212.5l4 4 7-8.5" />
+  </g>
+
+  {/* status */}
+  <g class="status">
+    <rect x="10" y="348" width="340" height="40" rx="20" />
+    <circle class="dot" cx="32" cy="368" r="6" />
+    <text class="ok" x="46" y="373">Verified on device</text>
+    <text class="count" x="334" y="373" text-anchor="end">2 of 2 leaves confirm</text>
+  </g>
+</svg>
+
+<style>
+  .fabric { display: block; width: 100%; height: auto; max-width: 30rem; font-family: var(--font-sans); }
+  .chip { fill: var(--cobalt-deep); }
+  .cover { fill: var(--cobalt-deep); transform-origin: 334px 49px; transform: scaleX(0); }
+  .label { fill: #d3daff; font-size: 11px; font-weight: 500; }
+  .typed { fill: #fff; font-family: var(--font-mono); font-size: 12.5px; }
+  .note { fill: #d3daff; font-size: 10.5px; }
+  .wire path { fill: none; stroke: rgb(255 255 255 / 0.28); stroke-width: 2; stroke-linecap: round; }
+  .lit path { fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .node rect, .node circle { fill: var(--cobalt); stroke: #fff; stroke-width: 2; }
+  .name text { fill: #fff; font-size: 12.5px; font-weight: 650; }
+  .check circle { fill: var(--yellow); }
+  .check path { fill: none; stroke: var(--ink); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+  .check { transform-box: fill-box; transform-origin: center; }
+  .status rect { fill: var(--ink); }
+  .status .dot { fill: var(--yellow); }
+  .status .ok { fill: #fff; font-size: 13px; font-weight: 650; }
+  .status .count { fill: #d5daee; font-size: 11.5px; }
+
+  /* One orchestrated sequence on load; it never loops. */
+  @media (prefers-reduced-motion: no-preference) {
+    .cover { animation: type 1.3s steps(38, end) 0.35s both; }
+    .l1 { animation: draw 0.5s ease-out 1.7s both; }
+    .l2 { animation: draw 0.5s ease-out 2.15s both; }
+    .l3 { animation: draw 0.45s ease-out 2.6s both; }
+    .note { animation: fade 0.4s ease-out 1.7s both; }
+    .c1 { animation: pop 0.38s cubic-bezier(0.3, 1.5, 0.5, 1) 3.05s both; }
+    .c2 { animation: pop 0.38s cubic-bezier(0.3, 1.5, 0.5, 1) 3.3s both; }
+    .status { animation: fade 0.5s ease-out 3.6s both; }
+  }
+  @keyframes type { from { transform: scaleX(1); } }
+  @keyframes draw { from { stroke-dashoffset: 1; } }
+  @keyframes pop { from { transform: scale(0); } }
+  @keyframes fade { from { opacity: 0; } }
+</style>

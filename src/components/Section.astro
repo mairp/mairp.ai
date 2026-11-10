@@ -1,30 +1,47 @@
 ---
-// A home-page section: an anchor, a numbered terminal-style eyebrow, a title and
-// an optional intro. Content goes in the default slot. `raised` sections sit on
-// the dot grid; plain ones on the bare canvas.
-interface Props { id: string; eyebrow?: string; title: string; intro?: string; tone?: 'plain' | 'raised' }
-const { id, eyebrow, title, intro, tone = 'plain' } = Astro.props;
+// A home-page section: an anchor, a title and an optional intro, then content.
+// `split` puts the heading in a left column and the content on the right;
+// `stack` puts the heading above full-width content. `tone` turns the section
+// into one of the inset colour panels.
+interface Props {
+  id: string;
+  title: string;
+  intro?: string;
+  layout?: 'split' | 'stack';
+  tone?: 'plain' | 'ink' | 'yellow';
+  defer?: boolean;
+}
+const { id, title, intro, layout = 'split', tone = 'plain', defer = false } = Astro.props;
+const panel = tone !== 'plain';
 ---
-<section id={id} class:list={['section', tone]} aria-labelledby={`${id}-title`}>
-  <div class="wrap">
-    {eyebrow && <p class="eyebrow mono reveal"><span aria-hidden="true">// </span>{eyebrow}</p>}
-    <h2 id={`${id}-title`} class="reveal">{title}</h2>
-    {intro && <p class="lede intro reveal">{intro}</p>}
-    <slot />
+<section id={id} class:list={['section', layout, { 'cv-auto': defer }]} aria-labelledby={`${id}-title`}>
+  <div class:list={[{ panel, 'on-ink': tone === 'ink', 'on-yellow': tone === 'yellow' }]}>
+    <div class="wrap inner">
+      <div class="head">
+        <h2 id={`${id}-title`}>{title}</h2>
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+      <div class="body">
+        <slot />
+      </div>
+    </div>
   </div>
 </section>
 
 <style>
-  .section { padding: var(--space-9) 0; position: relative; isolation: isolate; }
-  .raised::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: var(--dots-tile); background-size: 12px 12px;
-    mask-image: linear-gradient(to bottom, transparent, #000 7rem, #000 calc(100% - 7rem), transparent);
+  .section { padding: var(--space-8) 0; }
+  .panel { padding: var(--space-8) 0; }
+  .section:has(.panel) { padding: var(--space-4) 0; }
+  .inner { display: grid; gap: var(--space-6); }
+  h2 { margin: 0; max-width: 16ch; }
+  .intro { margin: var(--space-4) 0 0; color: var(--muted); font-size: var(--step-1); line-height: 1.45; max-width: 34rem; }
+  .body { min-width: 0; }
+  @media (min-width: 1000px) {
+    .section { padding: var(--space-9) 0; }
+    .panel { padding: var(--space-9) 0; }
+    .split .inner { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--space-7); }
+    .split .head { position: sticky; top: 6rem; align-self: start; }
+    .stack .head { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-7); align-items: end; }
+    .stack .intro { margin: 0; }
   }
-  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-3); letter-spacing: 0.02em; }
-  h2 { font-size: var(--step-4); max-width: 22ch; }
-  .intro { margin-bottom: var(--space-7); color: var(--muted); }
 </style>

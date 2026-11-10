@@ -7,30 +7,38 @@ const items = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.
 <div class="faq">
   {items.map((f) => (
     <details id={`faq-${f.id}`}>
-      <summary><span class="q">{f.data.q}</span></summary>
+      <summary><span class="q">{f.data.q}</span><span class="sign" aria-hidden="true"></span></summary>
       <p set:html={inlineMd(f.data.a)} />
     </details>
   ))}
 </div>
 
 <style>
-  .faq { border-top: 1px solid var(--border); max-width: 52rem; }
-  details { border-bottom: 1px solid var(--border); }
+  .faq { border-bottom: 1px solid var(--border); }
+  details { border-top: 1px solid var(--border); }
   summary {
     cursor: pointer;
     list-style: none;
-    padding: var(--space-4) 0;
+    padding: var(--space-5) 0;
     font-family: var(--font-display);
-    font-weight: 500;
+    font-weight: 600;
     font-size: var(--step-1);
+    letter-spacing: -0.015em;
+    line-height: 1.25;
     color: var(--fg-strong);
     display: flex;
-    gap: var(--space-3);
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
     min-height: 44px;
   }
   summary::-webkit-details-marker { display: none; }
-  summary::before { content: '+'; color: var(--accent); flex: none; width: 1ch; font-family: var(--font-mono); }
-  details p { color: var(--muted); }
-  details[open] summary::before { content: '−'; }
-  details p { margin: 0 0 var(--space-4) calc(1ch + var(--space-3)); }
+  summary:hover { color: var(--accent); }
+  /* A plus that becomes a minus when the answer is open. */
+  .sign { flex: none; position: relative; width: 16px; height: 16px; }
+  .sign::before, .sign::after { content: ''; position: absolute; left: 0; top: 7px; width: 16px; height: 2px; background: currentColor; }
+  .sign::after { rotate: 90deg; transition: rotate 0.2s; }
+  details[open] .sign::after { rotate: 0deg; }
+  details p { margin: 0 0 var(--space-5); max-width: 44rem; }
+  @media (prefers-reduced-motion: reduce) { .sign::after { transition: none; } }
 </style>

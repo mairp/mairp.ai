@@ -1,10 +1,9 @@
 ---
 // Every page: meta and social cards, JSON-LD, skip link, header, footer,
 // and the digital-twin chat widget.
-import '@fontsource-variable/inter/wght.css';
-import '@fontsource/poppins/latin-500.css';
-import '@fontsource/poppins/latin-600.css';
-import display from '@fontsource/poppins/files/poppins-latin-500-normal.woff2?url';
+import '@fontsource-variable/bricolage-grotesque/wght.css';
+import '@fontsource-variable/hanken-grotesk/wght.css';
+import display from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -59,7 +58,7 @@ const jsonLd = {
 };
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -68,9 +67,8 @@ const jsonLd = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
-    <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#0f1512" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#f4f5fa" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -84,7 +82,7 @@ const jsonLd = {
     <meta property="og:image" content={og} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${SITE.name} — ${SITE.practice}: ${SITE.tagline} ${SITE.caption}`} />
+    <meta property="og:image:alt" content={`${SITE.name}, network and AI infrastructure architect. ${SITE.tagline} ${SITE.caption}`} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
@@ -92,24 +90,6 @@ const jsonLd = {
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </head>
   <body>
-    {/* ── Pre-JS boot overlay (feature 001-whole-site-3d, T009) ──────────
-         Shown from first paint so the deferred 3D island has a visible loading
-         surface. Removed by window.__roomBoot.hide() (island, after the scene
-         is truly usable) or, if the island never mounts, by the page-level
-         timeout in src/lib/theme-init.ts — no new inline scripts (CSP).
-         Status copy is mairp-owned micro-UI text, not content. */}
-    <div id="boot" role="status" aria-live="polite">
-      <div class="boot-box">
-        <p class="boot-brand mono">mairp.ai</p>
-        <div class="boot-bar" aria-hidden="true"><div class="boot-fill"></div></div>
-        <p class="boot-status mono">
-          <span>initializing</span>
-          <span>loading environment</span>
-          <span>preparing screens</span>
-        </p>
-        <p class="boot-hint mono">3D experience loading — the full page stays available below</p>
-      </div>
-    </div>
     <a class="skip-link" href="#main">Skip to content</a>
     <Header />
     <main id="main" tabindex="-1">
@@ -119,65 +99,3 @@ const jsonLd = {
     <Twin />
   </body>
 </html>
-
-<style>
-  /* Boot overlay: pre-JS loading surface. No style attributes (CSP style-src
-     'self'); these rules ship in the single site stylesheet. Progress is set
-     by the island via the CSS custom property --p on #boot. */
-  #boot {
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    display: grid;
-    place-items: center;
-    background: var(--bg);
-    color: var(--fg);
-  }
-  .boot-box { width: min(22rem, 80vw); text-align: center; }
-  .boot-brand { color: var(--accent); font-size: var(--step-1); letter-spacing: 0.14em; margin: 0 0 var(--space-4); }
-  .boot-bar {
-    height: 3px;
-    background: var(--surface-2);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .boot-fill {
-    height: 100%;
-    width: calc(var(--p, 0.04) * 100%);
-    min-width: 4%;
-    background: linear-gradient(to right, var(--accent), var(--accent-2));
-    transition: width 0.3s ease;
-  }
-  .boot-status { position: relative; height: 1.4em; margin: var(--space-3) 0 0; font-size: var(--step--1); color: var(--muted); }
-  .boot-status span {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    animation: boot-line 7.5s infinite;
-  }
-  .boot-status span:nth-child(2) { animation-delay: 2.5s; }
-  .boot-status span:nth-child(3) { animation-delay: 5s; }
-  @keyframes boot-line {
-    0%, 30% { opacity: 0; }
-    5%, 25% { opacity: 1; }
-    33%, 100% { opacity: 0; }
-  }
-  .boot-hint { margin: var(--space-3) 0 0; font-size: 0.75rem; color: var(--muted); }
-  /* Removal: the island adds .done then removes the node (T010). */
-  #boot.done { opacity: 0; transition: opacity 0.45s ease; }
-  @media (prefers-reduced-motion: reduce) {
-    .boot-status span { animation: none; opacity: 1; position: static; }
-    .boot-status span:nth-child(2),
-    .boot-status span:nth-child(3) { display: none; }
-    #boot.done { transition: none; }
-  }
-  /* 3D island overlay layer: canvas sits above the page but below the boot
-     overlay and header chrome; the flat DOM stays in the accessibility tree. */
-  .room3d-layer {
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    pointer-events: none;
-  }
-  .room3d-layer canvas { display: block; }
-</style>

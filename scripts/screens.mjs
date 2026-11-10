@@ -8,7 +8,7 @@ import { chromium } from 'playwright';
 const base = process.argv[2] ?? 'http://localhost:4321';
 const pages = (process.env.PAGES ?? '/,/services/svc-agentic-netops/,/services/svc-local-inference/,/about/,/nope/').split(',');
 const widths = [390, 768, 1440];
-const themes = ['dark', 'light'];
+const themes = ['light'];
 mkdirSync('.review', { recursive: true });
 
 const browser = await chromium.launch();

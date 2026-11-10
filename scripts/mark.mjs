@@ -1,25 +1,27 @@
-// The practice mark: a three-node fabric path whose final node carries the
-// verification check — "intent in, evidence out" as geometry. Pure shapes so
-// gen-og.mjs can rasterise it at any size.
+// The mark: a three-node fabric path whose final node carries the verification
+// check, on a cobalt tile. Pure shapes so gen-og.mjs can rasterise it at any size.
+export const COBALT = '#2742f5';
+export const YELLOW = '#ffd12e';
+export const INK = '#0b1230';
 const FG = '#ffffff';
-const ACCENT = '#00b3a4';
-const CYAN = '#22d3ee';
 
-/** SVG fragment of the mark. (x, y) = top-left of its bounding box, s = size. */
+/** SVG fragment of the mark's lines and nodes. (x, y) = top-left, s = size. */
 export function markSvg(x, y, s, { check = true } = {}) {
-  const r = s * 0.09; // node radius
-  const n1 = [x + s * 0.08, y + s * 0.78];
-  const n2 = [x + s * 0.42, y + s * 0.30];
-  const n3 = [x + s * 0.80, y + s * 0.66];
-  const seg = (a, b, c) =>
-    `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="${s * 0.055}" stroke-linecap="round" />`;
-  const node = (p, fill) => `<circle cx="${p[0]}" cy="${p[1]}" r="${r}" fill="${fill}" />`;
-  const glow = (p) =>
-    `<circle cx="${p[0]}" cy="${p[1]}" r="${r * 2.2}" fill="url(#markGlow)" />`;
+  const r = s * 0.1;
+  const n1 = [x + s * 0.1, y + s * 0.76];
+  const n2 = [x + s * 0.42, y + s * 0.3];
+  const n3 = [x + s * 0.8, y + s * 0.64];
+  const seg = (a, b) =>
+    `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${FG}" stroke-width="${s * 0.07}" stroke-linecap="round" />`;
+  const node = (p, fill, k = 1) => `<circle cx="${p[0]}" cy="${p[1]}" r="${r * k}" fill="${fill}" />`;
   const chk = check
-    ? `<polyline points="${n3[0] - r * 0.52},${n3[1]} ${n3[0] - r * 0.1},${n3[1] + r * 0.42} ${n3[0] + r * 0.62},${n3[1] - r * 0.46}" fill="none" stroke="${FG}" stroke-width="${s * 0.05}" stroke-linecap="round" stroke-linejoin="round" />`
+    ? `<polyline points="${n3[0] - r * 0.75},${n3[1] + r * 0.05} ${n3[0] - r * 0.15},${n3[1] + r * 0.62} ${n3[0] + r * 0.85},${n3[1] - r * 0.6}" fill="none" stroke="${INK}" stroke-width="${s * 0.06}" stroke-linecap="round" stroke-linejoin="round" />`
     : '';
-  return `<defs><radialGradient id="markGlow"><stop offset="0" stop-color="${CYAN}" stop-opacity="0.5"/><stop offset="1" stop-color="${CYAN}" stop-opacity="0"/></radialGradient></defs>
-${seg(n1, n2, '#5c8f88')}${seg(n2, n3, ACCENT)}
-${node(n1, '#9fb8b2')}${node(n2, FG)}${glow(n3)}${node(n3, ACCENT)}${chk}`;
+  return `${seg(n1, n2)}${seg(n2, n3)}${node(n1, FG)}${node(n2, FG)}${node(n3, YELLOW, 1.7)}${chk}`;
+}
+
+/** The mark on its cobalt tile, as a complete SVG of `size` px. */
+export function tileSvg(size) {
+  const pad = size * 0.16;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="${size}" height="${size}" rx="${size * 0.24}" fill="${COBALT}" />${markSvg(pad, pad, size - pad * 2)}</svg>`;
 }

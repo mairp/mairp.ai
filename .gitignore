@@ -9,3 +9,4 @@ prompts/
 .lighthouseci/
 *.log
 dist-construction/
+prompts-redesign/
