@@ -27,7 +27,7 @@
   description: "Development governance for coding agents, as a Claude Code plugin: every phase reviewed by a separate critic, signed and committed."
   lang: "TypeScript"
   langColor: "#3178c6"
-  stars: 1
+  stars: 2
   category: method
   pinned: true
   order: 2
@@ -193,20 +193,20 @@
   category: network
   pinned: true
   order: 18
-- id: "specstride-dsh"
-  name: "specstride-dsh"
-  url: https://github.com/mairp/specstride-dsh
-  description: "The dsh host of Specstride: skills, shim, doctor and eval driver over the pinned specstride-core."
+- id: "specstride-core"
+  name: "specstride-core"
+  url: https://github.com/mairp/specstride-core
+  description: "The Specstride engine: loop engineering and governance for coding agents. Independent critic per phase, signed approvals, one commit per approved phase."
   lang: "TypeScript"
   langColor: "#3178c6"
   stars: 1
   category: method
   pinned: false
   order: 19
-- id: "specstride-core"
-  name: "specstride-core"
-  url: https://github.com/mairp/specstride-core
-  description: "The Specstride engine: loop engineering and governance for coding agents. Independent critic per phase, signed approvals, one commit per approved phase."
+- id: "specstride-dsh"
+  name: "specstride-dsh"
+  url: https://github.com/mairp/specstride-dsh
+  description: "The dsh host of Specstride: skills, shim, doctor and eval driver over the pinned specstride-core."
   lang: "TypeScript"
   langColor: "#3178c6"
   stars: 1
