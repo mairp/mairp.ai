@@ -74,9 +74,10 @@ export function CameraRig({ shots, activeKey, reducedMotion }: CameraRigProps) {
     c.touches.two = ACTION.TOUCH_DOLLY_ROTATE;
     c.smoothTime = 0.12;
     c.draggingSmoothTime = 0.12;
-    // Per-shot orbit bounds (T030): azimuth clamped around the shot direction.
-    c.minAzimuthAngle = shot.azimuth[0];
-    c.maxAzimuthAngle = shot.azimuth[1];
+    // Per-shot orbit bounds (T030) are applied once the camera has arrived
+    // (boundToShot): unbounded while flying so setLookAt is never clamped.
+    c.minAzimuthAngle = -Infinity;
+    c.maxAzimuthAngle = Infinity;
     c.minDistance = 1.1;
     c.maxDistance = 15;
 
@@ -85,6 +86,7 @@ export function CameraRig({ shots, activeKey, reducedMotion }: CameraRigProps) {
       flight.current.active = false;
       c.setLookAt(...shot.position, ...shot.target, false);
       clampTarget(c);
+      boundToShot(c, shot);
       return;
     }
 
@@ -125,11 +127,42 @@ export function CameraRig({ shots, activeKey, reducedMotion }: CameraRigProps) {
     if (settled) {
       flight.current.active = false;
       clampTarget(c);
+      boundToShot(c, shot);
     }
   });
 
   return <CameraControls ref={controls} makeDefault />;
 }
+
+/**
+ * Orbit bounds for the shot the camera has arrived at. `shot.azimuth` is an
+ * offset around the shot's OWN viewing direction: camera-controls' azimuth is
+ * absolute (0 = looking down -Z), so absolute bounds only fitted back-wall
+ * shots, and the first drag on a side-wall or contact shot swung the camera
+ * across the room (contact: out through the front wall). Dolly-out is capped
+ * so the camera stays inside the room shell.
+ */
+function boundToShot(c: CameraControlsImpl, shot: Shot) {
+  const theta = c.azimuthAngle;
+  c.minAzimuthAngle = theta + shot.azimuth[0];
+  c.maxAzimuthAngle = theta + shot.azimuth[1];
+  const t = c.getTarget(new Vector3());
+  const dir = c.camera.position.clone().sub(t);
+  const dist = dir.length();
+  dir.normalize();
+  let room = Infinity; // distance from the target to the inner shell along dir
+  const lim = [ROOM_INNER.x, 0, ROOM_INNER.z];
+  for (const axis of [0, 2] as const) {
+    const d = dir.getComponent(axis);
+    if (Math.abs(d) < 1e-6) continue;
+    const edge = (Math.sign(d) * lim[axis] - t.getComponent(axis)) / d;
+    room = Math.min(room, edge);
+  }
+  c.maxDistance = Math.max(dist, Math.min(15, room));
+}
+
+/** Inner half-extents the camera may reach (room shell 18 × 14 minus a margin). */
+const ROOM_INNER = { x: 8.5, z: 6.6 };
 
 /** Keeps the orbit target inside the room Box3 (T030 pan bounds). */
 function clampTarget(c: CameraControlsImpl) {

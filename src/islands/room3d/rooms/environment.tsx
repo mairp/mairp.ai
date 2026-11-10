@@ -25,6 +25,8 @@ import { placementsForRoom, type ScreenPlacement } from './screenPlacements';
 const W = 18; // x extent
 const D = 14; // z extent
 const H = 4.4; // wall height
+/** Rack centre |x|: spans 7.1–8.3, clear of the back-wall screens (|x| ≤ 6.3) and the side walls. */
+const RACK_X = 7.7;
 
 /** Rounded-corner plane geometry for screen glass (T037). */
 export function makeRoundedPlaneGeometry(width: number, height: number, radius = 0.08): ShapeGeometry {
@@ -215,12 +217,22 @@ export function Environment() {
         <planeGeometry args={[D, H]} />
         <meshStandardMaterial color={tokens.bg} roughness={0.9} />
       </mesh>
-      {/* ceiling cable tray grid (muted lines) */}
-      <gridHelper args={[D, 10, tokens.muted, tokens.muted]} position={[0, H, 0]} />
+      {/* front wall (behind the contact console) and ceiling: without them
+          the page background showed through as grey bands */}
+      <mesh position={[0, H / 2, D / 2]} rotation={[0, Math.PI, 0]} userData={{ static: true, shadow: 'receive' }}>
+        <planeGeometry args={[W, H]} />
+        <meshStandardMaterial color={tokens.bg} roughness={0.9} />
+      </mesh>
+      <mesh position={[0, H, 0]} rotation={[Math.PI / 2, 0, 0]} userData={{ static: true }}>
+        <planeGeometry args={[W, D]} />
+        <meshStandardMaterial color={tokens.bg} roughness={0.95} />
+      </mesh>
+      {/* ceiling cable tray grid (muted lines), spanning the full W × D ceiling */}
+      <gridHelper args={[1, 10, tokens.muted, tokens.muted]} scale={[W, 1, D]} position={[0, H - 0.01, 0]} />
 
       {/* ── props ─────────────────────────────────────────────────────── */}
-      <Rack position={[-6.9, 1.35, -D / 2 + 0.42]} ledColor={tokens.border} frameColor={tokens.surface} accentColor={tokens.accent} />
-      <Rack position={[6.9, 1.35, -D / 2 + 0.42]} ledColor={tokens.border} frameColor={tokens.surface} accentColor={tokens.accent2} />
+      <Rack position={[-RACK_X, 1.35, -D / 2 + 0.42]} ledColor={tokens.border} frameColor={tokens.surface} accentColor={tokens.accent} />
+      <Rack position={[RACK_X, 1.35, -D / 2 + 0.42]} ledColor={tokens.border} frameColor={tokens.surface} accentColor={tokens.accent2} />
       <CableRun from={[-W / 2 + 0.6, 0.06, -D / 2 + 1.6]} to={[W / 2 - 0.6, 0.06, -D / 2 + 1.6]} ledColor={tokens.surface} accentColor={tokens.accent} />
       <CableRun from={[-W / 2 + 0.6, 0.06, D / 2 - 1.4]} to={[W / 2 - 0.6, 0.06, D / 2 - 1.4]} ledColor={tokens.surface} accentColor={tokens.accent2} />
 
@@ -251,8 +263,8 @@ export function Environment() {
       />
       {/* screen-glow accents (point lights, no shadows — budget) */}
       <pointLight position={[0, 2.4, -5.4]} intensity={2.4} distance={7} decay={1.8} color={tokens.accent} />
-      <pointLight position={[-6.9, 2.6, -D / 2 + 0.6]} intensity={1.6} distance={5} decay={1.8} color={tokens.accent2} />
-      <pointLight position={[6.9, 2.6, -D / 2 + 0.6]} intensity={1.6} distance={5} decay={1.8} color={tokens.accent} />
+      <pointLight position={[-RACK_X, 2.6, -D / 2 + 0.6]} intensity={1.6} distance={5} decay={1.8} color={tokens.accent2} />
+      <pointLight position={[RACK_X, 2.6, -D / 2 + 0.6]} intensity={1.6} distance={5} decay={1.8} color={tokens.accent} />
       <pointLight position={[0, 2.2, 4.6]} intensity={1.4} distance={5} decay={1.8} color={tokens.accent2} />
     </group>
   );

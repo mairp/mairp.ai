@@ -53,12 +53,12 @@ export const HOME_PLACEMENTS: ScreenPlacement[] = [
   { id: 'home-hero', room: 'home', position: [0, 1.9, -6.9], rotationY: 0, width: 5.2, height: 3.0, contentKey: 'hero', interactive: false },
   { id: 'home-method', room: 'home', position: [-4.6, 1.9, -6.88], rotationY: 0, width: 3.4, height: 2.3, contentKey: 'method', interactive: false },
   { id: 'home-work', room: 'home', position: [4.6, 1.9, -6.88], rotationY: 0, width: 3.4, height: 2.3, contentKey: 'work', interactive: false },
-  { id: 'home-proof', room: 'home', position: [-8.9, 1.9, -4.6], rotationY: Math.PI / 2, width: 3.6, height: 2.5, contentKey: 'proof', interactive: true, lazy: true },
-  { id: 'home-services', room: 'home', position: [8.9, 1.9, -4.6], rotationY: -Math.PI / 2, width: 4.0, height: 2.6, contentKey: 'servicesGrid', interactive: true, scroll: true, lazy: true },
+  { id: 'home-proof', room: 'home', position: [-8.9, 1.9, -4.2], rotationY: Math.PI / 2, width: 3.6, height: 2.5, contentKey: 'proof', interactive: true, lazy: true },
+  { id: 'home-services', room: 'home', position: [8.9, 1.9, -4.2], rotationY: -Math.PI / 2, width: 4.0, height: 2.6, contentKey: 'servicesGrid', interactive: true, scroll: true, lazy: true },
   { id: 'home-repos', room: 'home', position: [-8.9, 1.9, 0], rotationY: Math.PI / 2, width: 3.6, height: 2.5, contentKey: 'repos', interactive: true, scroll: true, lazy: true },
   { id: 'home-trajectory', room: 'home', position: [8.9, 1.9, 0], rotationY: -Math.PI / 2, width: 3.6, height: 2.5, contentKey: 'trajectory', interactive: true, scroll: true, lazy: true },
-  { id: 'home-faq', room: 'home', position: [-8.9, 1.9, 4.6], rotationY: Math.PI / 2, width: 3.6, height: 2.5, contentKey: 'faq', interactive: true, scroll: true, lazy: true },
-  { id: 'home-background', room: 'home', position: [8.9, 1.9, 4.6], rotationY: -Math.PI / 2, width: 3.6, height: 2.5, contentKey: 'background', interactive: true, scroll: true, lazy: true },
+  { id: 'home-faq', room: 'home', position: [-8.9, 1.9, 4.2], rotationY: Math.PI / 2, width: 3.6, height: 2.5, contentKey: 'faq', interactive: true, scroll: true, lazy: true },
+  { id: 'home-background', room: 'home', position: [8.9, 1.9, 4.2], rotationY: -Math.PI / 2, width: 3.6, height: 2.5, contentKey: 'background', interactive: true, scroll: true, lazy: true },
   { id: 'home-contact', room: 'home', position: [0, 1.7, 5.4], rotationY: Math.PI, width: 3.2, height: 2.1, contentKey: 'contact', interactive: true, lazy: true },
 ];
 
