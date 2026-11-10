@@ -156,6 +156,20 @@ export function routeFor(id: string): string {
   return `/services/${id}/`;
 }
 
+/**
+ * URL pathname → Room Payload document key under /rooms/ (FR-016, T066).
+ * Inverse of routeFor on the payload-key namespace: '/' → 'home',
+ * '/about/' → 'about', '/services/svc-x/' → 'svc-x'. Unknown paths return
+ * undefined — the island then never fetches and never mounts (map rule 4/5).
+ */
+export function routeKeyForPath(pathname: string): string | undefined {
+  const p = pathname.endsWith('/') ? pathname : `${pathname}/`;
+  if (p === '/') return 'home';
+  if (p === '/about/') return 'about';
+  const m = /^\/services\/([a-z0-9-]+)\/$/.exec(p);
+  return m ? m[1] : undefined;
+}
+
 export type BuildRoomPayloadOptions = {
   /** For service pages: the page's own service id (its slice + meta come first). */
   serviceId?: string;

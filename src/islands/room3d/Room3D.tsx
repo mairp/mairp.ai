@@ -1,32 +1,42 @@
 /**
- * Room3D — root of the lazy-loaded 3D island (feature 001-whole-site-3d).
+ * Room3D.tsx — root of the lazy-loaded 3D island (feature 001-whole-site-3d).
  *
- * Phase 2 foundation (T011 + T014): WebGL/environment detection and mount
- * gating, plus the Canvas root per research R9. Rooms, screens and the camera
- * rig land with the user stories; this module owns the boundary so three.js
- * never enters a non-island import graph (FR-002).
+ * Phase 3 (T066/T067): the island fetches its per-route Room Payload document
+ * at boot (`/rooms/<key>.json`, FR-016 — same-origin, never inlined into
+ * first-paint HTML), feeds boot progress (useProgress → `__roomBoot`), and
+ * hides the overlay only after the SceneReady 4-frame gate. Fetch failure at
+ * any phase lands the visitor on the flat page (US3 fallback path).
  *
- * Gating rules (contracts/island-events.md, FR-009):
+ * Gating rules (contracts/island-events.md, FR-009, Phase 2 foundation):
  * - no webgl2 → render nothing, remove #boot, flat page shows;
  * - stored preference `room3d: 'flat'` → same as above;
  * - mount is deferred to requestIdleCallback (after the page is interactive);
  * - `webglcontextlost` → unmount the canvas layer, flat page is revealed
  *   (flat DOM stays in the accessibility tree; the canvas is an overlay);
- * - hardwareConcurrency ≤ 4 → lite mode (dpr forced to 1; fewer effects later).
+ * - hardwareConcurrency ≤ 4 → lite mode (dpr 1, no N8AO);
+ * - prefers-reduced-motion → jump-cut camera moves, no composer.
  */
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useProgress } from '@react-three/drei';
-import { AgXToneMapping, PCFShadowMap } from 'three';
+import { AgXToneMapping, Color, PCFShadowMap } from 'three';
 import { installRoomBoot } from './boot/boot';
 import { ThemeBridge } from './fx/ThemeBridge';
+import { useThemeTokens } from './fx/useThemeTokens';
+import { Effects } from './fx/Effects';
 import { useRoomRoute } from './routing/useRoomRoute';
-import type { RoomPayload } from '../../lib/room-payload';
-
-export interface RoomIslandProps {
-  /** Per-page serialized room payload (contracts/room-payload.schema.md). */
-  payload?: RoomPayload;
-}
+import { routeKeyForPath, type RoomPayload } from '../../lib/room-payload';
+import { Room3DContext, useRoom3D, type NavTargetRef, type Room3DContextValue } from './context';
+import { CameraRig } from './rig/CameraRig';
+import { ENTRY_SHOT, shotsForRoom } from './rig/shots';
+import { HomeRoom } from './rooms/HomeRoom';
+import { ServiceRoom } from './rooms/ServiceRoom';
+import { AboutRoom } from './rooms/AboutRoom';
+import { Css3dScreens, Css3dDriver } from './screens/Css3dScreens';
+import { KeyboardNav } from './screens/focus';
+import { shotForScreen, placementsForRoom, type ContentKey } from './rooms/screenPlacements';
+import { ShotControls } from './rooms/hotspots';
+import './screens/screens.css';
 
 /** Stored 3D preference (FR-009): 'flat' permanently declines the experience. */
 const PREF_KEY = 'room3d';
@@ -80,87 +90,282 @@ function SceneReadyGate() {
   return null;
 }
 
-/** Wires the ThemeBridge into the scene (T012); rooms consume it via props later. */
-function SceneSetup() {
-  useEffect(() => {
-    const bridge = new ThemeBridge();
-    return () => bridge.dispose();
-  }, []);
-  return null;
+/** Scene background colour tracks the theme tokens (FR-008). */
+function SceneBackground() {
+  const { theme } = useRoom3D();
+  const tokens = useThemeTokens(theme);
+  const bg = useMemo(() => new Color(tokens.bg), [tokens.bg]);
+  return <color attach="background" args={[bg]} />;
 }
 
-export function RoomIsland({ payload }: RoomIslandProps) {
-  const [active, setActive] = useState(false);
-  const [lite, setLite] = useState(false);
-  const [ctxLost, setCtxLost] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const cancelIdle = useRef<(() => void) | null>(null);
-  // Persistent session router (T013); room rendering consumes it in later phases.
+/* ── Micro-UI labels for keyboard nav targets (contract rule 6) ───────── */
+
+const SCREEN_LABELS: Partial<Record<ContentKey, string>> = {
+  hero: 'Practice overview',
+  servicesGrid: 'Services grid',
+  serviceDetail: 'Service detail',
+  serviceEvidence: 'Deliverables and evidence',
+  related: 'Related services',
+  proof: 'Proof wall',
+  method: 'Method',
+  work: 'Engagement shapes',
+  repos: 'Open-source repos',
+  trajectory: 'Trajectory',
+  background: 'Background and certifications',
+  faq: 'FAQ',
+  contact: 'Contact console',
+  aboutBio: 'Bio',
+  aboutJourney: 'Trajectory and publications',
+  aboutCredentials: 'Certifications and skills',
+};
+
+/* ── Session: router + room-payload swap + provider + world ───────────── */
+
+interface SessionProps {
+  payload: RoomPayload;
+  lite: boolean;
+  reducedMotion: boolean;
+  theme: ThemeBridge;
+}
+
+function RoomSession({ payload, lite, reducedMotion, theme }: SessionProps) {
   const router = useRoomRoute(payload);
-  void router;
+  const [roomPayload, setRoomPayload] = useState<RoomPayload>(payload);
+  const [roomFetchState, setRoomFetchState] = useState<'idle' | 'loading' | 'ready' | 'error'>('ready');
+  const [activeShot, setShotState] = useState(ENTRY_SHOT);
+  const [openScreenId, setOpenScreen] = useState<string | null>(null);
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+  const [hidden, setHidden] = useState(false);
 
-  // Detection + gating: runs once on hydration (client-side only via client:only).
+  const setShot = useCallback((key: string) => setShotState(key), []);
+  const openScreen = useCallback((id: string | null) => setOpenScreen(id), []);
+
+  // Persistent session: on route change, fetch the destination payload doc
+  // (FR-016) and swap room content; the 3D world never re-boots (FR-006).
   useEffect(() => {
-    if (!payload || readPref() === 'flat' || !hasWebGL2()) {
-      // The island will not run — drop the boot overlay, flat page shows.
-      removeBoot();
-      return;
-    }
-    setLite(typeof navigator !== 'undefined' && (navigator.hardwareConcurrency || 8) <= 4);
-    const schedule = () => setActive(true);
-    let handle: number;
-    if ('requestIdleCallback' in window) {
-      handle = window.requestIdleCallback(schedule, { timeout: 2000 });
-      cancelIdle.current = () => window.cancelIdleCallback(handle);
-    } else {
-      const t = setTimeout(schedule, 200);
-      cancelIdle.current = () => clearTimeout(t);
-    }
-    return () => cancelIdle.current?.();
-  }, [payload]);
+    if (router.route === roomPayload.route) return;
+    const key = routeKeyForPath(router.route);
+    if (!key) return;
+    let alive = true;
+    setRoomFetchState('loading');
+    fetch(`/rooms/${key}.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`payload ${res.status}`);
+        return res.json() as Promise<RoomPayload>;
+      })
+      .then((next) => {
+        if (!alive) return;
+        setRoomPayload(next);
+        setRoomFetchState('ready');
+        setShotState(ENTRY_SHOT);
+        setOpenScreen(null);
+      })
+      .catch(() => {
+        if (alive) setRoomFetchState('error');
+      });
+    return () => {
+      alive = false;
+    };
+  }, [router.route, roomPayload.route]);
 
-  // Pause rendering when the tab is hidden (T014).
+  // Pause rendering when the tab is hidden (T014, Phase 2).
   useEffect(() => {
     const onVisibility = () => setHidden(document.hidden);
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
 
-  // webglcontextlost → reveal the flat page (US3 foundation).
-  useEffect(() => {
-    if (ctxLost) removeBoot();
-  }, [ctxLost]);
+  // Navigable targets for keyboard cycling (screens + mapped routes).
+  const navTargets = useMemo<NavTargetRef[]>(
+    () => [
+      ...placementsForRoom(roomPayload.room)
+        .filter((p) => p.interactive)
+        .map((p) => ({
+          id: p.id,
+          kind: 'screen' as const,
+          label: SCREEN_LABELS[p.contentKey] ?? p.id,
+          activate: () => {
+            setShot(shotForScreen(p.contentKey));
+            openScreen(p.id);
+          },
+        })),
+      ...roomPayload.navigation
+        .filter((n) => n.route !== roomPayload.route)
+        .map((n) => ({
+          id: `nav:${n.route}`,
+          kind: 'hotspot' as const,
+          label: n.label,
+          activate: () => router.navigate(n.route),
+        })),
+    ],
+    [roomPayload, router, setShot, openScreen],
+  );
 
-  if (!payload || !active || ctxLost) return null;
+  const ctx = useMemo<Room3DContextValue>(
+    () => ({
+      payload,
+      roomPayload,
+      route: router.route,
+      navigate: router.navigate,
+      lite,
+      reducedMotion,
+      theme,
+      activeShot,
+      setShot,
+      openScreenId,
+      openScreen,
+      focusedId,
+      setFocusedId,
+      navTargets,
+      registerNavTargets: () => {},
+      roomFetchState,
+    }),
+    [
+      payload,
+      roomPayload,
+      router,
+      lite,
+      reducedMotion,
+      theme,
+      activeShot,
+      setShot,
+      openScreenId,
+      openScreen,
+      focusedId,
+      navTargets,
+      roomFetchState,
+    ],
+  );
 
-  const dpr: [number, number] = lite ? [1, 1] : [1, 1.5];
+  const room = roomPayload.room;
 
   return (
-    <div className="room3d-layer" aria-hidden="true" data-lite={lite ? 'true' : undefined}>
-      <Canvas
-        shadows={{ type: PCFShadowMap }}
-        dpr={dpr}
-        frameloop={hidden ? 'never' : 'always'}
-        gl={{ toneMapping: AgXToneMapping, antialias: !lite }}
-        onCreated={({ gl }) => {
-          gl.domElement.addEventListener(
-            'webglcontextlost',
-            (event) => {
-              event.preventDefault();
-              setCtxLost(true);
-            },
-            { once: true },
-          );
-        }}
-      >
-        <Suspense fallback={null}>
-          {/* Rooms, screens and the camera rig mount here in the user-story phases. */}
-          <BootProgressReporter />
-          <SceneReadyGate />
-          <SceneSetup />
-        </Suspense>
-      </Canvas>
-    </div>
+    <Room3DContext.Provider value={ctx}>
+      {/* Canvas container is aria-hidden; screen DOM (CSS3D layer) and the
+          shot-controls UI live outside it and stay screen-reader reachable. */}
+      <div className="room3d-layer" data-lite={lite ? 'true' : undefined}>
+        <div aria-hidden="true" className="room3d-canvas">
+          <Canvas
+            shadows={{ type: PCFShadowMap }}
+            dpr={lite ? [1, 1] : [1, 1.5]}
+            frameloop={hidden ? 'never' : 'always'}
+            gl={{ toneMapping: AgXToneMapping, antialias: !lite }}
+            onCreated={({ gl }) => {
+              gl.domElement.addEventListener(
+                'webglcontextlost',
+                (event) => {
+                  event.preventDefault();
+                  removeBoot();
+                  // US3 path: reveal the flat page instead of a frozen canvas.
+                  document.getElementById('room-island-root')?.classList.add('room3d-ctxlost');
+                  setCtxLostGlobal(true);
+                },
+                { once: true },
+              );
+            }}
+          >
+            <Suspense fallback={null}>
+              <BootProgressReporter />
+              <SceneReadyGate />
+              <SceneBackground />
+              <CameraRig shots={shotsForRoom(room)} activeKey={activeShot} reducedMotion={reducedMotion} />
+              {room === 'home' ? <HomeRoom /> : room === 'about' ? <AboutRoom /> : <ServiceRoom />}
+              <Css3dDriver />
+              <Effects lite={lite} reducedMotion={reducedMotion} />
+            </Suspense>
+          </Canvas>
+        </div>
+        <Css3dScreens />
+        <div className="room3d-ui">
+          <ShotControls />
+          <KeyboardNav />
+        </div>
+      </div>
+    </Room3DContext.Provider>
+  );
+}
+
+/** Context-loss signal shared with the mount gate (module-level store). */
+let setCtxLostExternal: ((lost: boolean) => void) | null = null;
+function setCtxLostGlobal(lost: boolean) {
+  setCtxLostExternal?.(lost);
+}
+
+/* ── Mount gating + boot payload fetch ────────────────────────────────── */
+
+export function RoomIsland() {
+  const [active, setActive] = useState(false);
+  const [lite, setLite] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [payload, setPayload] = useState<RoomPayload | null>(null);
+  const [bootFailed, setBootFailed] = useState(false);
+  const [ctxLost, setCtxLost] = useState(false);
+  // Document-lifetime singleton; the island is its only owner (no dispose:
+  // StrictMode double-mount would leave a disposed observer disconnected).
+  const [theme] = useState(() => new ThemeBridge());
+  const cancelIdle = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    setCtxLostExternal = setCtxLost;
+    return () => {
+      setCtxLostExternal = null;
+    };
+  }, []);
+
+  // Detection + gating: runs once on mount (client-side island).
+  useEffect(() => {
+    if (readPref() === 'flat' || !hasWebGL2()) {
+      removeBoot();
+      return;
+    }
+    setLite(typeof navigator !== 'undefined' && (navigator.hardwareConcurrency || 8) <= 4);
+    setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const schedule = () => setActive(true);
+    if ('requestIdleCallback' in window) {
+      const handle = window.requestIdleCallback(schedule, { timeout: 2000 });
+      cancelIdle.current = () => window.cancelIdleCallback(handle);
+    } else {
+      const t = setTimeout(schedule, 200);
+      cancelIdle.current = () => clearTimeout(t);
+    }
+    return () => cancelIdle.current?.();
+  }, []);
+
+  // T066: fetch this route's Room Payload document at boot. Failure → boot
+  // failed state → flat page (never a broken 3D state).
+  useEffect(() => {
+    if (!active || payload || bootFailed) return;
+    const key = routeKeyForPath(new URL(window.location.href).pathname);
+    if (!key) {
+      removeBoot();
+      return;
+    }
+    let alive = true;
+    const boot = installRoomBoot();
+    boot.setProgress(0.12);
+    fetch(`/rooms/${key}.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`payload ${res.status}`);
+        boot.setProgress(0.4);
+        return res.json() as Promise<RoomPayload>;
+      })
+      .then((next) => {
+        if (alive) setPayload(next);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setBootFailed(true);
+        removeBoot();
+      });
+    return () => {
+      alive = false;
+    };
+  }, [active, payload, bootFailed]);
+
+  if (!active || !payload || bootFailed || ctxLost) return null;
+
+  return (
+    <RoomSession payload={payload} lite={lite} reducedMotion={reducedMotion} theme={theme} />
   );
 }
 

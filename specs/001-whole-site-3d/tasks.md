@@ -92,67 +92,67 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 ### Camera rig (research R8)
 
-- [ ] T029 [US1] Define the SHOTS registry types + per-room shot data structure in `src/islands/room3d/rig/shots.ts` (key, label, shortLabel for <600px, position, target, smoothTime, azimuth bounds, arrival effects)
-- [ ] T030 [US1] Implement the bounded CameraControls setup in `src/islands/room3d/rig/CameraRig.tsx`: drei CameraControls `makeDefault`, per-shot azimuth min/max and pan Box3 constraints from shots.ts
-- [ ] T031 [US1] Implement tweened shot transitions in `src/islands/room3d/rig/CameraRig.tsx`: damped `setLookAt` (smoothTime per shot), run-ref cancellation of stale transitions on rapid shot changes
-- [ ] T032 [US1] Implement portrait FOV fitting in `src/islands/room3d/rig/CameraRig.tsx`: widen FOV on narrow viewports so shot framing keeps key content visible (demo pattern)
+- [x] T029 [US1] Define the SHOTS registry types + per-room shot data structure in `src/islands/room3d/rig/shots.ts` (key, label, shortLabel for <600px, position, target, smoothTime, azimuth bounds, arrival effects)
+- [x] T030 [US1] Implement the bounded CameraControls setup in `src/islands/room3d/rig/CameraRig.tsx`: drei CameraControls `makeDefault`, per-shot azimuth min/max and pan Box3 constraints from shots.ts
+- [x] T031 [US1] Implement tweened shot transitions in `src/islands/room3d/rig/CameraRig.tsx`: damped `setLookAt` (smoothTime per shot), run-ref cancellation of stale transitions on rapid shot changes
+- [x] T032 [US1] Implement portrait FOV fitting in `src/islands/room3d/rig/CameraRig.tsx`: widen FOV on narrow viewports so shot framing keeps key content visible (demo pattern)
 
 ### Procedural environment (research R6/R7 — original mairp "fabric room", no GLB required)
 
-- [ ] T033 [P] [US1] Build the room shell (floor, walls, ceiling grid) in `src/islands/room3d/rooms/environment.tsx` using primitives + ThemeBridge token materials only
-- [ ] T034 [P] [US1] Build the rack props (network racks with rails + unit outlines) in `src/islands/room3d/rooms/environment.tsx` as reusable instanced/merged geometry
-- [ ] T035 [P] [US1] Build patch panels + cable-run props in `src/islands/room3d/rooms/environment.tsx` (accent-colored status LEDs using accent2 token)
-- [ ] T036 [US1] Define the screen-placement registry in `src/islands/room3d/rooms/screenPlacements.ts`: per room, screen id → world position/rotation/size/contentKey/interactive/lazy (data-model.md ScreenPlacement)
-- [ ] T037 [US1] Create the screen mesh geometry in `src/islands/room3d/rooms/environment.tsx`: rounded-corner planes per placement with dark-glass backing material
-- [ ] T038 [US1] Add the lighting rig in `src/islands/room3d/rooms/environment.tsx`: ambient + directional + screen-glow rect/point lights, colors from ThemeBridge tokens; light intensities re-derived for this scene (never demo constants)
+- [x] T033 [P] [US1] Build the room shell (floor, walls, ceiling grid) in `src/islands/room3d/rooms/environment.tsx` using primitives + ThemeBridge token materials only
+- [x] T034 [P] [US1] Build the rack props (network racks with rails + unit outlines) in `src/islands/room3d/rooms/environment.tsx` as reusable instanced/merged geometry
+- [x] T035 [P] [US1] Build patch panels + cable-run props in `src/islands/room3d/rooms/environment.tsx` (accent-colored status LEDs using accent2 token)
+- [x] T036 [US1] Define the screen-placement registry in `src/islands/room3d/rooms/screenPlacements.ts`: per room, screen id → world position/rotation/size/contentKey/interactive/lazy (data-model.md ScreenPlacement)
+- [x] T037 [US1] Create the screen mesh geometry in `src/islands/room3d/rooms/environment.tsx`: rounded-corner planes per placement with dark-glass backing material
+- [x] T038 [US1] Add the lighting rig in `src/islands/room3d/rooms/environment.tsx`: ambient + directional + screen-glow rect/point lights, colors from ThemeBridge tokens; light intensities re-derived for this scene (never demo constants)
 
 ### Scene preparation & optimization (research R9)
 
-- [ ] T039 [US1] Implement shadow/emissive prep in `src/islands/room3d/rooms/prepareScene.ts`: castShadow/receiveShadow flags, emissive-only materials → MeshBasicMaterial
-- [ ] T040 [US1] Implement mergeStatic-style static geometry merging in `src/islands/room3d/rooms/prepareScene.ts`: merge by (material, shadow flags, attribute layout) with a live-mesh exemption list; replaced originals get empty geometry + negative-radius bounding sphere
-- [ ] T041 [US1] Enable one-shot shadow maps in `src/islands/room3d/rooms/prepareScene.ts`: `shadowMap.autoUpdate = false`, re-flag `needsUpdate` only when lights/scene change
+- [x] T039 [US1] Implement shadow/emissive prep in `src/islands/room3d/rooms/prepareScene.ts`: castShadow/receiveShadow flags, emissive-only materials → MeshBasicMaterial
+- [x] T040 [US1] Implement mergeStatic-style static geometry merging in `src/islands/room3d/rooms/prepareScene.ts`: merge by (material, shadow flags, attribute layout) with a live-mesh exemption list; replaced originals get empty geometry + negative-radius bounding sphere
+- [x] T041 [US1] Enable one-shot shadow maps in `src/islands/room3d/rooms/prepareScene.ts`: `shadowMap.autoUpdate = false`, re-flag `needsUpdate` only when lights/scene change
 
 ### CSS3D screen system (research R5)
 
-- [ ] T042 [P] [US1] Implement the DOM-only CSS3DRenderer layer in `src/islands/room3d/screens/Css3dScreens.tsx`: second renderer stacked over the canvas, CSS_SCALE=1000, per-frame camera mirroring (`view.copy(camera); view.position.multiplyScalar(CSS_SCALE)`)
-- [ ] T043 [P] [US1] Implement portal mounting in `src/islands/room3d/screens/Css3dScreens.tsx`: `createPortal` into detached divs sized 640 CSS px wide, one per ScreenPlacement, aligned to screen meshes
-- [ ] T044 [US1] Wire pointer-events policy in `src/islands/room3d/screens/Css3dScreens.tsx`: interactive screens accept pointer events (links/buttons); display-only screens `pointer-events: none`
+- [x] T042 [P] [US1] Implement the DOM-only CSS3DRenderer layer in `src/islands/room3d/screens/Css3dScreens.tsx`: second renderer stacked over the canvas, CSS_SCALE=1000, per-frame camera mirroring (`view.copy(camera); view.position.multiplyScalar(CSS_SCALE)`)
+- [x] T043 [P] [US1] Implement portal mounting in `src/islands/room3d/screens/Css3dScreens.tsx`: `createPortal` into detached divs sized 640 CSS px wide, one per ScreenPlacement, aligned to screen meshes
+- [x] T044 [US1] Wire pointer-events policy in `src/islands/room3d/screens/Css3dScreens.tsx`: interactive screens accept pointer events (links/buttons); display-only screens `pointer-events: none`
 
 ### Screen content components (payload-only copy; contracts rule 6)
 
-- [ ] T045 [P] [US1] Create `src/islands/room3d/screens/screens.css` with token-driven styles (CSS vars only — no hardcoded hex) for all screen surfaces
-- [ ] T046 [P] [US1] Implement `ServiceScreen` in `src/islands/room3d/screens/content/ServiceScreen.tsx`: name/oneLine/status/statusNote/duration, fact cards, deliverables, evidence list with real `<a target="_blank">` links
-- [ ] T047 [P] [US1] Implement `ServicesGridScreen` in `src/islands/room3d/screens/content/ServicesGridScreen.tsx`: all 7 services with one-liners, each clickable → navigate to its service room
-- [ ] T048 [P] [US1] Implement `ProofScreen` in `src/islands/room3d/screens/content/ProofScreen.tsx`: dated badges with source + evidence URLs verbatim (FR-010/SC-006)
-- [ ] T049 [P] [US1] Implement `ReposScreen` in `src/islands/room3d/screens/content/ReposScreen.tsx`: repos grouped by the 5 categories, name/url/description/lang/stars from RepoSummary
-- [ ] T050 [P] [US1] Implement `MethodScreen` in `src/islands/room3d/screens/content/MethodScreen.tsx`: "The Verified Fabric" name + loop steps from the payload
-- [ ] T051 [P] [US1] Implement `FaqScreen` in `src/islands/room3d/screens/content/FaqScreen.tsx`: 9 Q/A items rendering only sanitized inline-md (code spans + text links)
-- [ ] T052 [P] [US1] Implement `AboutScreen` in `src/islands/room3d/screens/content/AboutScreen.tsx`: bio lede, trajectory timeline, certs/badges, skills, publications from AboutData
-- [ ] T053 [US1] Implement `EngagementsScreen` in `src/islands/room3d/screens/content/EngagementsScreen.tsx`: 6 engagement shapes with deliverable + prerequisites
-- [ ] T054 [US1] Implement `ContactScreen` in `src/islands/room3d/screens/content/ContactScreen.tsx`: email display + copy affordance + Twin trigger + CV/link CTAs (interactivity wired in T056/T057)
+- [x] T045 [P] [US1] Create `src/islands/room3d/screens/screens.css` with token-driven styles (CSS vars only — no hardcoded hex) for all screen surfaces
+- [x] T046 [P] [US1] Implement `ServiceScreen` in `src/islands/room3d/screens/content/ServiceScreen.tsx`: name/oneLine/status/statusNote/duration, fact cards, deliverables, evidence list with real `<a target="_blank">` links
+- [x] T047 [P] [US1] Implement `ServicesGridScreen` in `src/islands/room3d/screens/content/ServicesGridScreen.tsx`: all 7 services with one-liners, each clickable → navigate to its service room
+- [x] T048 [P] [US1] Implement `ProofScreen` in `src/islands/room3d/screens/content/ProofScreen.tsx`: dated badges with source + evidence URLs verbatim (FR-010/SC-006)
+- [x] T049 [P] [US1] Implement `ReposScreen` in `src/islands/room3d/screens/content/ReposScreen.tsx`: repos grouped by the 5 categories, name/url/description/lang/stars from RepoSummary
+- [x] T050 [P] [US1] Implement `MethodScreen` in `src/islands/room3d/screens/content/MethodScreen.tsx`: "The Verified Fabric" name + loop steps from the payload
+- [x] T051 [P] [US1] Implement `FaqScreen` in `src/islands/room3d/screens/content/FaqScreen.tsx`: 9 Q/A items rendering only sanitized inline-md (code spans + text links)
+- [x] T052 [P] [US1] Implement `AboutScreen` in `src/islands/room3d/screens/content/AboutScreen.tsx`: bio lede, trajectory timeline, certs/badges, skills, publications from AboutData
+- [x] T053 [US1] Implement `EngagementsScreen` in `src/islands/room3d/screens/content/EngagementsScreen.tsx`: 6 engagement shapes with deliverable + prerequisites
+- [x] T054 [US1] Implement `ContactScreen` in `src/islands/room3d/screens/content/ContactScreen.tsx`: email display + copy affordance + Twin trigger + CV/link CTAs (interactivity wired in T056/T057)
 
 ### Rooms
 
-- [ ] T055 [US1] Build the home room `src/islands/room3d/rooms/HomeRoom.tsx`: shot set (overview/proof/services/method/work/repos/trajectory/background/faq/contact) + screen placements bound to payload slices + hotspots
-- [ ] T056 [US1] Build the service room template `src/islands/room3d/rooms/ServiceRoom.tsx`: ServiceScreen + related-services screens from the page payload slice; requires-scoping status handling (svc-enablement)
-- [ ] T057 [US1] Build the about room `src/islands/room3d/rooms/AboutRoom.tsx`: AboutScreen placements + entry shot + navigation hotspots
-- [ ] T058 [US1] Implement the hotspot mesh component in `src/islands/room3d/rooms/hotspots.tsx`: clickable 3D affordances (R3F pointer events) triggering room navigation
-- [ ] T059 [US1] Implement hover/press feedback in `src/islands/room3d/rooms/hotspots.tsx`: pointer cursor, hover glow/emissive pop, press animation (demo mechanic, mairp styling)
-- [ ] T060 [US1] Implement the shot-controls UI in `src/islands/room3d/rooms/hotspots.tsx`: on-screen shot labels (short labels < 600 px) as accessible buttons driving CameraRig
+- [x] T055 [US1] Build the home room `src/islands/room3d/rooms/HomeRoom.tsx`: shot set (overview/proof/services/method/work/repos/trajectory/background/faq/contact) + screen placements bound to payload slices + hotspots
+- [x] T056 [US1] Build the service room template `src/islands/room3d/rooms/ServiceRoom.tsx`: ServiceScreen + related-services screens from the page payload slice; requires-scoping status handling (svc-enablement)
+- [x] T057 [US1] Build the about room `src/islands/room3d/rooms/AboutRoom.tsx`: AboutScreen placements + entry shot + navigation hotspots
+- [x] T058 [US1] Implement the hotspot mesh component in `src/islands/room3d/rooms/hotspots.tsx`: clickable 3D affordances (R3F pointer events) triggering room navigation
+- [x] T059 [US1] Implement hover/press feedback in `src/islands/room3d/rooms/hotspots.tsx`: pointer cursor, hover glow/emissive pop, press animation (demo mechanic, mairp styling)
+- [x] T060 [US1] Implement the shot-controls UI in `src/islands/room3d/rooms/hotspots.tsx`: on-screen shot labels (short labels < 600 px) as accessible buttons driving CameraRig
 
 ### Interactivity parity (contracts/island-events.md)
 
-- [ ] T061 [US1] Wire copy-email in `src/islands/room3d/screens/content/ContactScreen.tsx`: reuse the page CopyButton behavior (dispatch click on `button.copy[data-copy]` or its clipboard+aria-live pattern); announce via existing aria-live
-- [ ] T062 [US1] Wire the Twin trigger in `src/islands/room3d/screens/content/ContactScreen.tsx`: click the existing `[data-twin-open]` launcher — never reimplement the chat
-- [ ] T063 [US1] Implement keyboard navigation in `src/islands/room3d/screens/focus.ts`: `J`/`K` or `←`/`→` cycle navigation targets, `Enter` opens focused screen, `Escape` closes; canvas container `aria-hidden`
-- [ ] T064 [US1] Implement focus management in `src/islands/room3d/screens/focus.ts`: focus moves into open screen DOM on open, restored to the triggering hotspot on close
+- [x] T061 [US1] Wire copy-email in `src/islands/room3d/screens/content/ContactScreen.tsx`: reuse the page CopyButton behavior (dispatch click on `button.copy[data-copy]` or its clipboard+aria-live pattern); announce via existing aria-live
+- [x] T062 [US1] Wire the Twin trigger in `src/islands/room3d/screens/content/ContactScreen.tsx`: click the existing `[data-twin-open]` launcher — never reimplement the chat
+- [x] T063 [US1] Implement keyboard navigation in `src/islands/room3d/screens/focus.ts`: `J`/`K` or `←`/`→` cycle navigation targets, `Enter` opens focused screen, `Escape` closes; canvas container `aria-hidden`
+- [x] T064 [US1] Implement focus management in `src/islands/room3d/screens/focus.ts`: focus moves into open screen DOM on open, restored to the triggering hotspot on close
 
 ### Postprocessing & boot wiring
 
-- [ ] T065 [US1] Implement the postprocessing pipeline `src/islands/room3d/fx/Effects.tsx`: EffectComposer multisampling 0 → N8AO (halfRes, medium) → in-composer AgX ToneMapping; skip N8AO when lite flag set
-- [ ] T066 [US1] Wire payload fetch at boot in `src/islands/room3d/Room3D.tsx`: fetch `/rooms/<routeKey>.json` (FR-016, same-origin), hold in React context for screens; fetch failure → boot failed state (US3 fallback)
-- [ ] T067 [US1] Wire boot progress in `src/islands/room3d/Room3D.tsx`: useProgress → `__roomBoot.setProgress`; progressive screen rendering as payload slices/assets arrive (FR-003); SceneReady 4-frame gate → `hide()`
-- [ ] T068 [US1] Validate US1 independently: dev-server walkthrough of quickstart.md §2 steps 1–7 (boot, navigate, service detail, back/forward, theme toggle, Twin, copy-email) and `npm run build && npm run check` green; **record boot-to-usable time on the reference machine (SC-009: ≤10 s target / ≤20 s ceiling) in `specs/001-whole-site-3d/notes.md`**
+- [x] T065 [US1] Implement the postprocessing pipeline `src/islands/room3d/fx/Effects.tsx`: EffectComposer multisampling 0 → N8AO (halfRes, medium) → in-composer AgX ToneMapping; skip N8AO when lite flag set
+- [x] T066 [US1] Wire payload fetch at boot in `src/islands/room3d/Room3D.tsx`: fetch `/rooms/<routeKey>.json` (FR-016, same-origin), hold in React context for screens; fetch failure → boot failed state (US3 fallback)
+- [x] T067 [US1] Wire boot progress in `src/islands/room3d/Room3D.tsx`: useProgress → `__roomBoot.setProgress`; progressive screen rendering as payload slices/assets arrive (FR-003); SceneReady 4-frame gate → `hide()`
+- [x] T068 [US1] Validate US1 independently: dev-server walkthrough of quickstart.md §2 steps 1–7 (boot, navigate, service detail, back/forward, theme toggle, Twin, copy-email) and `npm run build && npm run check` green; **record boot-to-usable time on the reference machine (SC-009: ≤10 s target / ≤20 s ceiling) in `specs/001-whole-site-3d/notes.md`**
 
 **Checkpoint**: MVP — the practice is fully discoverable and navigable in 3D from the homepage.
 
