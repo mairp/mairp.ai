@@ -362,6 +362,26 @@
   background: color-mix(in oklab, var(--accent) 10%, transparent);
 }
 
+/* "Use flat site" decline control (FR-009), 44 px target. */
+.room3d-flat-btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--bg) 78%, transparent);
+  color: var(--fg);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.room3d-flat-btn:hover,
+.room3d-flat-btn:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}
+
 /* Context loss: drop the whole overlay layer so the flat page shows (US3). */
 #room-island-root.room3d-ctxlost { display: none; }
 

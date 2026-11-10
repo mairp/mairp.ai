@@ -184,17 +184,17 @@ Single Astro project at repository root. Island code in `src/islands/room3d/`; w
 
 ### Implementation for User Story 3
 
-- [ ] T074 [US3] Harden the no-WebGL path in `src/islands/room3d/Room3D.tsx`: detect at mount AND before Canvas creation; render null, ensure `#boot` removal fires, flat page fully interactive
-- [ ] T075 [US3] Implement reduced-motion camera behaviour in `src/islands/room3d/rig/CameraRig.tsx`: transitions become jump cuts (instant position/target set) when the T019 probe is true
-- [ ] T076 [US3] Disable postprocessing under reduced-motion in `src/islands/room3d/fx/Effects.tsx`: composer skipped entirely (boot overlay animations already static per T014)
-- [ ] T077 [US3] Implement lite mode in `src/islands/room3d/fx/Effects.tsx` + `Room3D.tsx`: hardwareConcurrency ≤ 4 → drop N8AO, dpr forced 1 — no other changes (contracts/island-events.md)
-- [ ] T078 [US3] Implement context-loss recovery in `src/islands/room3d/Room3D.tsx`: `webglcontextlost` → unmount canvas overlay + CSS3D layer revealing intact flat DOM; optional re-init on `webglcontextrestored`
-- [ ] T079 [P] [US3] Implement asset/payload fetch-failure handling in `src/islands/room3d/boot/boot.ts` + `Room3D.tsx`: failure surfaces on boot progress and lands the visitor on flat content (spec edge case)
-- [ ] T080 [US3] Add the flat-site preference helper `src/islands/room3d/flatPreference.ts`: read/write/clear the persisted "use flat site" localStorage choice (same store pattern as theme)
-- [ ] T081 [US3] Add the "use flat site" control to the boot overlay in `src/layouts/Base.astro`: visible at boot, sets the preference (T080) and skips island mount; consumed by the T020 mount gate on subsequent visits
-- [ ] T082 [US3] Add the in-session "use flat site" control to the island UI (`src/islands/room3d/Room3D.tsx`): unmounts the island mid-3D, reveals the flat page, persists the choice (FR-009)
-- [ ] T083 [US3] Add the re-enable affordance to the flat site footer (`src/components/Footer.astro`): clears the preference so 3D returns on the next visit — visible only when the preference is set
-- [ ] T084 [US3] Validate US3 independently: quickstart.md §3 all scenarios on `/`, `/services/svc-agentic-netops/`, `/about/`; decline control persists across reload and is re-enableable; zero broken states
+- [x] T074 [US3] Harden the no-WebGL path in `src/islands/room3d/Room3D.tsx`: detect at mount AND before Canvas creation; render null, ensure `#boot` removal fires, flat page fully interactive
+- [x] T075 [US3] Implement reduced-motion camera behaviour in `src/islands/room3d/rig/CameraRig.tsx`: transitions become jump cuts (instant position/target set) when the T019 probe is true
+- [x] T076 [US3] Disable postprocessing under reduced-motion in `src/islands/room3d/fx/Effects.tsx`: composer skipped entirely (boot overlay animations already static per T014)
+- [x] T077 [US3] Implement lite mode in `src/islands/room3d/fx/Effects.tsx` + `Room3D.tsx`: hardwareConcurrency ≤ 4 → drop N8AO, dpr forced 1 — no other changes (contracts/island-events.md)
+- [x] T078 [US3] Implement context-loss recovery in `src/islands/room3d/Room3D.tsx`: `webglcontextlost` → unmount canvas overlay + CSS3D layer revealing intact flat DOM; optional re-init on `webglcontextrestored`
+- [x] T079 [P] [US3] Implement asset/payload fetch-failure handling in `src/islands/room3d/boot/boot.ts` + `Room3D.tsx`: failure surfaces on boot progress and lands the visitor on flat content (spec edge case)
+- [x] T080 [US3] Add the flat-site preference helper `src/islands/room3d/flatPreference.ts`: read/write/clear the persisted "use flat site" localStorage choice (same store pattern as theme)
+- [x] T081 [US3] Add the "use flat site" control to the boot overlay in `src/layouts/Base.astro`: visible at boot, sets the preference (T080) and skips island mount; consumed by the T020 mount gate on subsequent visits
+- [x] T082 [US3] Add the in-session "use flat site" control to the island UI (`src/islands/room3d/Room3D.tsx`): unmounts the island mid-3D, reveals the flat page, persists the choice (FR-009)
+- [x] T083 [US3] Add the re-enable affordance to the flat site footer (`src/components/Footer.astro`): clears the preference so 3D returns on the next visit — visible only when the preference is set
+- [x] T084 [US3] Validate US3 independently: quickstart.md §3 all scenarios on `/`, `/services/svc-agentic-netops/`, `/about/`; decline control persists across reload and is re-enableable; zero broken states
 
 **Checkpoint**: Fallback safety net complete.
 

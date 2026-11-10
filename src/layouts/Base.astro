@@ -108,6 +108,7 @@ const jsonLd = {
           <span>preparing screens</span>
         </p>
         <p class="boot-hint mono">3D experience loading — the full page stays available below</p>
+        <button type="button" class="boot-flat mono" data-use-flat>Use flat site</button>
       </div>
     </div>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -133,6 +134,8 @@ const jsonLd = {
     background: var(--bg);
     color: var(--fg);
   }
+  /* No JS → no island and no removal timer: never show the overlay. */
+  html:not(.js) #boot { display: none; }
   .boot-box { width: min(22rem, 80vw); text-align: center; }
   .boot-brand { color: var(--accent); font-size: var(--step-1); letter-spacing: 0.14em; margin: 0 0 var(--space-4); }
   .boot-bar {
@@ -164,6 +167,19 @@ const jsonLd = {
   }
   .boot-hint { margin: var(--space-3) 0 0; font-size: 0.75rem; color: var(--muted); }
   /* Removal: the island adds .done then removes the node (T010). */
+  .boot-flat {
+    margin-top: var(--space-3);
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.3rem 0.9rem;
+    font-size: 0.75rem;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .boot-flat:hover, .boot-flat:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
   #boot.done { opacity: 0; transition: opacity 0.45s ease; }
   @media (prefers-reduced-motion: reduce) {
     .boot-status span { animation: none; opacity: 1; position: static; }

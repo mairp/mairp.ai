@@ -5,9 +5,10 @@
  * AgX tone mapping (so the renderer's own tone mapping is disabled while the
  * composer is active, avoiding a double pass).
  *
- * Skipped entirely in lite mode (hardwareConcurrency ≤ 4) and under
- * prefers-reduced-motion (US3 behaviour): those paths render the raw scene
- * with the renderer's AgX tone mapping, which stays on.
+ * Lite mode (hardwareConcurrency ≤ 4): N8AO dropped, nothing else changes (the
+ * composer keeps AgX tone mapping; dpr is forced to 1 by Room3D). Under
+ * prefers-reduced-motion (T076) the composer is skipped entirely and the raw
+ * scene renders with the renderer's own AgX tone mapping.
  */
 import { useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
@@ -16,7 +17,7 @@ import { ToneMappingMode } from 'postprocessing';
 
 export function Effects({ lite, reducedMotion }: { lite: boolean; reducedMotion: boolean }) {
   const gl = useThree((s) => s.gl);
-  const skip = lite || reducedMotion;
+  const skip = reducedMotion;
 
   useEffect(() => {
     if (skip) return;
@@ -29,8 +30,8 @@ export function Effects({ lite, reducedMotion }: { lite: boolean; reducedMotion:
 
   if (skip) return null;
   return (
-    <EffectComposer key={skip ? 'off' : 'on'} multisampling={0} enableNormalPass={false}>
-      <N8AO halfRes quality="medium" />
+    <EffectComposer key={lite ? 'lite' : 'full'} multisampling={0} enableNormalPass={false}>
+      {!lite && <N8AO halfRes quality="medium" />}
       <ToneMapping mode={ToneMappingMode.AGX} />
     </EffectComposer>
   );

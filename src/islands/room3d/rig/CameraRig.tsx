@@ -97,6 +97,11 @@ export function CameraRig({ shots, activeKey, reducedMotion }: CameraRigProps) {
   // Per-frame damped transition: damp current pos/target toward the shot and
   // feed CameraControls; stops when converged (or cancelled by a newer run).
   useFrame((_, delta) => {
+    // Observable camera position for tests (T075 jump-cut measurement); only
+    // touches the DOM when the rounded value changes.
+    const p = camera.position;
+    const pos = `${p.x.toFixed(2)},${p.y.toFixed(2)},${p.z.toFixed(2)}`;
+    if (document.body.dataset.cameraPos !== pos) document.body.dataset.cameraPos = pos;
     const c = controls.current;
     if (!c || !shot || !flight.current.active) {
       if (c) clampTarget(c);

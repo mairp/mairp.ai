@@ -26,12 +26,31 @@ const year = new Date().getFullYear();
       <div class="legal">
         <p>Every claim on this site links to public evidence — a repo, a paper or a demo. No invented testimonials, no client logos.</p>
         <p class="muted">Confidential client work appears only as anonymized capability categories, never as names or details.</p>
+        <p class="muted" id="flat-reenable" hidden>
+          3D view is turned off on this device.
+          <button type="button" class="linklike" data-enable-3d>Re-enable 3D</button>
+        </p>
         <p class="muted">Privacy: no cookies, no trackers. Cookie-free, aggregate page counts by Cloudflare Web Analytics.</p>
         <p class="muted">© {year} {SITE.copyright}. Site <a href="https://github.com/mairp/mairp.ai">open source</a> under MIT.</p>
       </div>
     </div>
   </div>
 </footer>
+
+<script>
+  // Re-enable affordance: visible only while the "use flat site" preference is
+  // set (bundled external module, CSP-safe).
+  import { isFlatPreferred, clearFlatPreferred } from '../islands/room3d/flatPreference';
+  const box = document.getElementById('flat-reenable');
+  if (box && isFlatPreferred()) {
+    box.hidden = false;
+    box.querySelector('[data-enable-3d]')?.addEventListener('click', () => {
+      clearFlatPreferred();
+      box.textContent = '3D view will return on your next visit.';
+      box.setAttribute('role', 'status');
+    });
+  }
+</script>
 
 <style>
   .site-footer { border-top: 1px solid; border-image: linear-gradient(to right, var(--accent), var(--border) 45%, transparent) 1; padding: var(--space-7) 0 var(--space-6); font-size: var(--step--1); }
@@ -41,4 +60,5 @@ const year = new Date().getFullYear();
   ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-1); }
   ul a { display: inline-block; padding: var(--space-1) 0; }
   p { margin-bottom: var(--space-2); }
+  .linklike { background: none; border: 0; padding: var(--space-1) var(--space-2); min-height: 44px; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
 </style>

@@ -15,6 +15,8 @@ const SCENE_READY_FRAMES = 4;
 export interface RoomBoot {
   /** Report asset-loading progress, clamped to [0.04, 0.99]; 1 arrives via hide(). */
   setProgress(fraction: number): void;
+  /** Surface a boot failure on the overlay, then land on the flat page (T079). */
+  fail(): void;
   /** Fade the overlay out and remove it from the DOM. */
   hide(): void;
 }
@@ -32,7 +34,7 @@ function overlay(): HTMLElement | null {
 export function installRoomBoot(): RoomBoot {
   if (typeof window === 'undefined') {
     // SSR/prerender safety: return a no-op protocol object.
-    return { setProgress() {}, hide() {} };
+    return { setProgress() {}, hide() {}, fail() {} };
   }
   if (window.__roomBoot) return window.__roomBoot;
 
@@ -42,6 +44,16 @@ export function installRoomBoot(): RoomBoot {
       if (!node) return;
       const clamped = Math.min(0.99, Math.max(MIN_PROGRESS, fraction));
       node.style.setProperty('--p', String(clamped));
+    },
+    fail() {
+      const node = overlay();
+      if (!node) return;
+      node.classList.add('failed');
+      const hint = node.querySelector('.boot-hint');
+      if (hint) hint.textContent = '3D unavailable — showing the flat page';
+      node.style.setProperty('--p', '1');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.setTimeout(() => node.remove(), reduced ? 0 : 1200);
     },
     hide() {
       const node = overlay();

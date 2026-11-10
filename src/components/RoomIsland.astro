@@ -39,8 +39,23 @@ const { payload } = Astro.props;
       w.$RefreshSig$ ??= () => (t: unknown) => t;
       w.__vite_plugin_react_preamble_installed__ = true;
     }
-    const start = () =>
-      import('../islands/room3d/mount').then((m) => m.mountRoomIsland());
+    // Mount gate (T020/T081): a stored "use flat site" choice skips the island
+    // entirely (no 3D code is fetched) and clears the boot overlay. The tiny
+    // flatPreference module has no three/react imports.
+    import { isFlatPreferred, setFlatPreferred } from '../islands/room3d/flatPreference';
+    const dropBoot = () => document.getElementById('boot')?.remove();
+    // Boot-overlay "use flat site" control: persist, stand down, show flat page.
+    document.querySelector('[data-use-flat]')?.addEventListener('click', () => {
+      setFlatPreferred();
+      dropBoot();
+    });
+    const start = () => {
+      if (isFlatPreferred()) {
+        dropBoot();
+        return Promise.resolve();
+      }
+      return import('../islands/room3d/mount').then((m) => m.mountRoomIsland());
+    };
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(() => void start(), { timeout: 2000 });
     } else {

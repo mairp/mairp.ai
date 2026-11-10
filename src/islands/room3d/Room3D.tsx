@@ -16,7 +16,7 @@
  * - hardwareConcurrency ≤ 4 → lite mode (dpr 1, no N8AO);
  * - prefers-reduced-motion → jump-cut camera moves, no composer.
  */
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useProgress } from '@react-three/drei';
 import { AgXToneMapping, Color, PCFShadowMap } from 'three';
@@ -37,22 +37,13 @@ import { Css3dScreens, Css3dDriver } from './screens/Css3dScreens';
 import { KeyboardNav } from './screens/focus';
 import { shotForScreen, placementsForRoom, type ContentKey } from './rooms/screenPlacements';
 import { ShotControls } from './rooms/hotspots';
+import { FLAT_EVENT, isFlatPreferred, setFlatPreferred } from './flatPreference';
 import './screens/screens.css';
 
-/** Stored 3D preference (FR-009): 'flat' permanently declines the experience. */
-const PREF_KEY = 'room3d';
 /** Frames that must have rendered before the scene counts as usable (T010). */
 const GATE_FRAMES = 4;
 /** Minimum boot progress shown before any real progress arrives (T010). */
 const MIN_PROGRESS = 0.04;
-
-function readPref(): 'flat' | 'on' {
-  try {
-    return localStorage.getItem(PREF_KEY) === 'flat' ? 'flat' : 'on';
-  } catch {
-    return 'on';
-  }
-}
 
 function hasWebGL2(): boolean {
   if (typeof document === 'undefined') return false;
@@ -61,6 +52,23 @@ function hasWebGL2(): boolean {
     return canvas.getContext('webgl2') !== null;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Error boundary around the Canvas (T074): if WebGL context creation or the
+ * scene throws, drop the 3D layer, remove #boot and leave the flat page.
+ */
+class CanvasBoundary extends Component<{ onError: () => void; children: React.ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch() {
+    this.props.onError();
+  }
+  render() {
+    return this.state.failed ? null : this.props.children;
   }
 }
 
@@ -127,9 +135,10 @@ interface SessionProps {
   lite: boolean;
   reducedMotion: boolean;
   theme: ThemeBridge;
+  onFail: () => void;
 }
 
-function RoomSession({ payload, lite, reducedMotion, theme }: SessionProps) {
+function RoomSession({ payload, lite, reducedMotion, theme, onFail }: SessionProps) {
   const router = useRoomRoute(payload);
   const [roomPayload, setRoomPayload] = useState<RoomPayload>(payload);
   const [roomFetchState, setRoomFetchState] = useState<'idle' | 'loading' | 'ready' | 'error'>('ready');
@@ -246,11 +255,12 @@ function RoomSession({ payload, lite, reducedMotion, theme }: SessionProps) {
           shot-controls UI live outside it and stay screen-reader reachable. */}
       <div className="room3d-layer" data-room={router.route} data-lite={lite ? 'true' : undefined}>
         <div aria-hidden="true" className="room3d-canvas">
+          <CanvasBoundary onError={onFail}>
           <Canvas
             shadows={{ type: PCFShadowMap }}
             dpr={lite ? [1, 1] : [1, 1.5]}
             frameloop={hidden ? 'never' : 'always'}
-            gl={{ toneMapping: AgXToneMapping, antialias: !lite }}
+            gl={{ toneMapping: AgXToneMapping }}
             onCreated={({ gl }) => {
               gl.domElement.addEventListener(
                 'webglcontextlost',
@@ -275,11 +285,15 @@ function RoomSession({ payload, lite, reducedMotion, theme }: SessionProps) {
               <Effects lite={lite} reducedMotion={reducedMotion} />
             </Suspense>
           </Canvas>
+          </CanvasBoundary>
         </div>
         <Css3dScreens />
         <div className="room3d-ui">
           <ShotControls />
           <KeyboardNav />
+          <button type="button" className="room3d-flat-btn" onClick={() => setFlatPreferred()}>
+            Use flat site
+          </button>
         </div>
       </div>
     </Room3DContext.Provider>
@@ -301,6 +315,7 @@ export function RoomIsland() {
   const [payload, setPayload] = useState<RoomPayload | null>(null);
   const [bootFailed, setBootFailed] = useState(false);
   const [ctxLost, setCtxLost] = useState(false);
+  const [declined, setDeclined] = useState(false);
   // Document-lifetime singleton; the island is its only owner (no dispose:
   // StrictMode double-mount would leave a disposed observer disconnected).
   const [theme] = useState(() => new ThemeBridge());
@@ -313,15 +328,35 @@ export function RoomIsland() {
     };
   }, []);
 
+  // "Use flat site" (boot overlay or in-session control): stand down at once.
+  useEffect(() => {
+    const onFlat = () => {
+      setDeclined(true);
+      removeBoot();
+    };
+    window.addEventListener(FLAT_EVENT, onFlat);
+    return () => window.removeEventListener(FLAT_EVENT, onFlat);
+  }, []);
+
   // Detection + gating: runs once on mount (client-side island).
   useEffect(() => {
-    if (readPref() === 'flat' || !hasWebGL2()) {
+    if (isFlatPreferred() || !hasWebGL2()) {
       removeBoot();
       return;
     }
     setLite(typeof navigator !== 'undefined' && (navigator.hardwareConcurrency || 8) <= 4);
-    setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    const schedule = () => setActive(true);
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const onMotion = () => setReducedMotion(mq.matches);
+    mq.addEventListener?.('change', onMotion);
+    // Second detection immediately before the Canvas is created (T074).
+    const schedule = () => {
+      if (isFlatPreferred() || !hasWebGL2()) {
+        removeBoot();
+        return;
+      }
+      setActive(true);
+    };
     if ('requestIdleCallback' in window) {
       const handle = window.requestIdleCallback(schedule, { timeout: 2000 });
       cancelIdle.current = () => window.cancelIdleCallback(handle);
@@ -329,7 +364,10 @@ export function RoomIsland() {
       const t = setTimeout(schedule, 200);
       cancelIdle.current = () => clearTimeout(t);
     }
-    return () => cancelIdle.current?.();
+    return () => {
+      cancelIdle.current?.();
+      mq.removeEventListener?.('change', onMotion);
+    };
   }, []);
 
   // T066: fetch this route's Room Payload document at boot. Failure → boot
@@ -356,17 +394,26 @@ export function RoomIsland() {
       .catch(() => {
         if (!alive) return;
         setBootFailed(true);
-        removeBoot();
+        boot.fail();
       });
     return () => {
       alive = false;
     };
   }, [active, payload, bootFailed]);
 
-  if (!active || !payload || bootFailed || ctxLost) return null;
+  if (!active || !payload || bootFailed || ctxLost || declined) return null;
 
   return (
-    <RoomSession payload={payload} lite={lite} reducedMotion={reducedMotion} theme={theme} />
+    <RoomSession
+      payload={payload}
+      lite={lite}
+      reducedMotion={reducedMotion}
+      theme={theme}
+      onFail={() => {
+        installRoomBoot().fail();
+        setBootFailed(true);
+      }}
+    />
   );
 }
 
