@@ -11,19 +11,19 @@ const { text, label = 'Copy' } = Astro.props;
 
 <style>
   .copy {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 650;
+    color: var(--fg-strong);
     background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0.3rem 0.6rem;
+    border: 2px solid var(--fg-strong);
+    border-radius: 999px;
+    padding: 0.8rem 1.4rem;
     cursor: pointer;
-    min-height: 32px;
-    min-width: 44px;
+    min-height: 48px;
   }
-  .copy:hover { color: var(--fg-strong); border-color: var(--accent); }
-  .copy[data-done] { color: var(--ok); border-color: var(--ok); }
+  .copy:hover { background: var(--fg-strong); color: var(--bg); }
+  .copy[data-done] { background: var(--fg-strong); color: var(--bg); }
 </style>
 
 <script>

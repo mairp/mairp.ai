@@ -21,7 +21,7 @@ Append to `src/content/engagements.yaml`, `faq.yaml` or `proof.yaml`. FAQ answer
 `src/lib/site.ts` (SITE, NAV, VENDORS, CERTS, METHOD).
 
 ### Colours and type
-`src/styles/tokens.css` only. Both themes must stay WCAG AA (`scripts/a11y.mjs` checks).
+`src/styles/tokens.css` only. One theme; it must stay WCAG AA (`scripts/a11y.mjs` checks).
 
 ### The mark and social card
 `scripts/mark.mjs` (geometry) and `scripts/gen-og.mjs` (raster); `npm run build`
@@ -35,8 +35,8 @@ by hand. Categories and wording live in that pipeline's `overrides.json`.
 
 ```bash
 npx wrangler dev --port 8788                     # serve dist/ like production
-node scripts/screens.mjs http://127.0.0.1:8788   # screenshots, 390/768/1440, both themes
-node scripts/a11y.mjs http://127.0.0.1:8788      # axe-core on every page, both themes
+node scripts/screens.mjs http://127.0.0.1:8788   # screenshots, 390/768/1440
+node scripts/a11y.mjs http://127.0.0.1:8788      # axe-core on every page
 npx linkinator http://127.0.0.1:8788/ --recurse  # links
 npx lighthouse http://127.0.0.1:8788/            # mobile Lighthouse
 ```

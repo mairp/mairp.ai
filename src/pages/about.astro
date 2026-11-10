@@ -1,130 +1,114 @@
 ---
-// About: the person behind the practice — trajectory, certifications,
-// publications, languages, and the consultant profile (PDF).
+// About: the person. The story, the career route, certifications, the working
+// stack, publications and languages, plus the consultant profile (PDF).
 import Base from '../layouts/Base.astro';
+import Portrait from '../components/Portrait.astro';
 import CertBadges from '../components/CertBadges.astro';
 import CopyButton from '../components/CopyButton.astro';
-import { SITE, CERTS, VENDORS, TRAJECTORY_ABOUT, SKILLS } from '../lib/site';
-import { getCollection } from 'astro:content';
-import { buildRoomPayload } from '../lib/room-payload';
-import RoomIsland from '../components/RoomIsland.astro';
-
-const trajectory = TRAJECTORY_ABOUT;
-
-const skills = SKILLS;
-
-// Room Payload for the persistent 3D island (feature 001-whole-site-3d):
-// same collections as the flat pages (FR-007), passed as one prop.
-const svc = await getCollection('services');
-const proofC = await getCollection('proof');
-const engC = await getCollection('engagements');
-const reposC = await getCollection('repos');
-const faqC = await getCollection('faq');
-const payload = buildRoomPayload(
-  'about',
-  { services: svc, proof: proofC, engagements: engC, repos: reposC, faq: faqC },
-  SITE,
-  {
-    title: 'About',
-    description:
-      'Marlon Paz — the consultant behind the practice: trajectory, certifications, publications, languages. Independent network-automation and AI-infrastructure consulting from Abu Dhabi.',
-  },
-);
+import { SITE, VENDORS, TRAJECTORY_ABOUT, PAPERS, SKILLS } from '../lib/site';
 ---
-<Base title="About" description="Marlon Paz — the consultant behind the practice: trajectory, certifications, publications, languages. Independent network-automation and AI-infrastructure consulting from Abu Dhabi.">
+<Base title="About" description="Marlon Paz, network and AI infrastructure architect: the story, the career, certifications, publications and languages. Independent consulting from Abu Dhabi.">
   <div class="wrap page">
-    <p class="eyebrow mono">// about</p>
-    <h1>The consultant, not the CV.</h1>
-    <p class="lede">I solve the gap between what network and platform teams intend and what their fabric actually
-      runs. For a decade across telecom, banking and critical-infrastructure networking — and now in Gulf AI
-      data-center programs — I have built the automation that closes that gap: multivendor fabrics driven by
-      declarative intent, multi-agent systems that turn plain language into verified change, and closed loops that
-      repair drift instead of just reporting it. My operating rule is simple: nothing is reported done until it is
-      proven on the device.</p>
-    <p class="ctas">
-      <a class="btn btn-primary" href={SITE.cv}>Consultant profile — PDF <span class="arrow" aria-hidden="true">→</span></a>
-      <a class="btn" href={`mailto:${SITE.email}`}>{SITE.email}</a>
-      <CopyButton text={SITE.email} label="Copy address" />
-    </p>
+    <div class="about-head">
+      <div class="page-head">
+        <h1>The person behind the work.</h1>
+        <p class="lede">I close the gap between what network and platform teams intend and what their fabric actually runs.
+          For a decade across telecom, banking and critical-infrastructure networking, and now in Gulf AI data-centre
+          programmes, I have built the automation that closes it: multivendor fabrics driven by declarative intent,
+          multi-agent systems that turn plain language into verified change, and closed loops that repair drift instead of
+          only reporting it.</p>
+        <p>My operating rule is simple. Nothing is reported done until it is proven on the device.</p>
+        <p class="ctas">
+          <a class="btn btn-primary" href={SITE.cv}>Download the consultant profile (PDF)</a>
+          <a class="btn" href={`mailto:${SITE.email}`}>Email Marlon</a>
+          <CopyButton text={SITE.email} label="Copy the address" />
+        </p>
+      </div>
+      <Portrait />
+    </div>
 
-    <div class="bracket">
-      <p class="bracket-title mono">trajectory</p>
-      <div class="tl">
-        {trajectory.map((t, i) => (
-          <div class={`job ${i === 0 ? 'now' : ''}`}>
-            <div class="yr mono">{t.yr}</div>
-            <div class="ttl">{t.ttl}</div>
-            <div class="org muted">{t.org}</div>
-          </div>
+    <section class="block" aria-labelledby="b-career">
+      <h2 id="b-career">Career</h2>
+      <div>
+        <ol class="tl">
+          {TRAJECTORY_ABOUT.map((t, i) => (
+            <li class:list={[{ now: i === 0 }]}>
+              <span class="yr">{t.yr.replace(' — ', ' to ')}</span>
+              <span class="ttl">{t.ttl}</span>
+              <span class="org">{t.org.replaceAll(' · ', ', ').replace(' — ', ': ')}</span>
+            </li>
+          ))}
+        </ol>
+        <p class="muted">I currently work at Core42. The independent practice is separate and claims no company endorsement.</p>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="b-certs">
+      <h2 id="b-certs">Certifications</h2>
+      <div><CertBadges /></div>
+    </section>
+
+    <section class="block" aria-labelledby="b-stack">
+      <h2 id="b-stack">Working stack</h2>
+      <div>
+        <dl class="stack">
+          {Object.entries(SKILLS).map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+          <div><dt>Vendors</dt><dd>{VENDORS.join(', ')}. Deliberately vendor-independent.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="b-quantum">
+      <h2 id="b-quantum">Quantum-safe networking</h2>
+      <div class="prose">
+        <p>Hands-on, public and verifiable: <b>Nokia ANYsec</b>, post-quantum-resistant, line-rate encryption for
+          data-centre fabrics, plus <b>MACsec</b> and <b>Nokia Network Group Encryption</b>. The work runs in public
+          containerlab labs on Nokia SR OS FP5 vSIMs,
+          <a href="https://github.com/mairp/sros-anysec-lab" target="_blank" rel="noopener noreferrer">sros-anysec-lab</a> and
+          <a href="https://github.com/mairp/sros-anysec-macsec-lab" target="_blank" rel="noopener noreferrer">sros-anysec-macsec-lab</a>,
+          building on the <a href="https://github.com/srl-labs/sros-anysec-macsec-lab" target="_blank" rel="noopener noreferrer">srl-labs originals</a>.
+          I presented it as a quantum-safe ANYsec demonstration at MPLS SD &amp; AI Net World 2024
+          (<a href="https://www.youtube.com/watch?v=pAKnSQR694g" target="_blank" rel="noopener noreferrer">watch the demo</a>).</p>
+        <p class="muted">In depth: how post-quantum cryptography and keying change network design and operations, line-rate
+          encryption inside EVPN/VXLAN fabrics, performance and latency trade-offs, and staged multivendor migration. The
+          field is applied quantum-safe networking, not quantum-computing research.</p>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="b-papers">
+      <h2 id="b-papers">Publications</h2>
+      <div class="prose">
+        {PAPERS.map((p) => (
+          <p><a href={p.href} target="_blank" rel="noopener noreferrer"><b>{p.name}</b></a><br />
+            <span class="muted">{p.venue.replace(' · ', ', ')}. {p.note}</span></p>
         ))}
+        <p class="muted">Peer-reviewed, and co-authored as mentor to the master's students who carried out the research.</p>
       </div>
-    </div>
+    </section>
 
-    <div class="bracket">
-      <p class="bracket-title mono">certifications &amp; fluency</p>
-      <CertBadges />
-      <div class="grid grid-2">
-        <div class="card">
-          <h2 class="mono">certifications</h2>
-          <ul>{CERTS.map((c) => <li>{c}</li>)}</ul>
-          <p class="muted">Verified on <a href={SITE.credly}>Credly</a>.</p>
-        </div>
-        <div class="card">
-          <h2 class="mono">vendor fluency</h2>
-          <ul>{VENDORS.map((v) => <li>{v}</li>)}</ul>
-          <p class="muted">Deliberately vendor-independent — multivendor is the offer.</p>
-        </div>
+    <section class="block" aria-labelledby="b-langs">
+      <h2 id="b-langs">Languages and base</h2>
+      <div class="prose">
+        <p>Based in {SITE.location}. I work in English, Español and Português, which covers Gulf, Iberian and Latin
+          American engagements natively.</p>
       </div>
-      <div class="card skills">
-        <h2 class="mono">working stack</h2>
-        {Object.entries(skills).map(([k, v]) => <p><b>{k}:</b> {v}</p>)}
-      </div>
-    </div>
-
-    <div class="bracket">
-      <p class="bracket-title mono">quantum-safe networking</p>
-      <p>Hands-on, public and verifiable: <b>Nokia ANYsec</b> — post-quantum-resistant, line-rate encryption for
-        data-center fabrics — plus <b>MACsec</b> and <b>Nokia Network Group Encryption (NGE)</b>. The work runs in
-        public containerlab labs on Nokia SR OS FP5 vSIMs — <a href="https://github.com/mairp/sros-anysec-lab" target="_blank" rel="noopener noreferrer">sros-anysec-lab</a> and
-        <a href="https://github.com/mairp/sros-anysec-macsec-lab" target="_blank" rel="noopener noreferrer">sros-anysec-macsec-lab</a> — building on the
-        <a href="https://github.com/srl-labs/sros-anysec-macsec-lab" target="_blank" rel="noopener noreferrer">srl-labs originals</a>, and was presented as a quantum-safe ANYsec demonstration at
-        MPLS SD &amp; AI Net World 2024 (speaker) — <a href="https://www.youtube.com/watch?v=pAKnSQR694g" target="_blank" rel="noopener noreferrer">demo video</a>.</p>
-      <p class="muted">In depth: how post-quantum cryptography and keying change network design and operations · line-rate encryption inside EVPN/VXLAN fabrics · performance and latency trade-offs · staged, multi-vendor migration to quantum-safe controls.</p>
-      <p class="muted">The field is applied quantum-safe networking — making fabrics resistant to quantum adversaries — not quantum-computing research itself.</p>
-    </div>
-
-    <div class="bracket">
-      <p class="bracket-title mono">publications — co-authored, peer-reviewed</p>
-      <p><a href="https://ieeexplore.ieee.org/document/11080420/" target="_blank" rel="noopener noreferrer"><b>Decentralized &amp; Dynamic Zero-Touch Provisioning of Leaf-Spine EVPN Data Centers</b> (IEEE)</a></p>
-      <p class="muted">Autonomous agents provision AI infrastructure and networks with zero-touch — inferring roles from topology and self-healing across the fabric.</p>
-      <p><a href="https://link.springer.com/article/10.1186/s13677-025-00814-0" target="_blank" rel="noopener noreferrer"><b>Kubernetes-Aware Load Balancing for Leaf-Spine EVPN Data Centers</b> (Springer, Journal of Cloud Computing)</a></p>
-      <p class="muted">Distributed agents at leaf routers feed live Kubernetes pod data into the fabric, dynamically tuning ECMP weights via EVPN/BGP extended communities so routing aligns with pod placement.</p>
-      <p class="muted">Co-authored as mentor to the master's students who carried out the research.</p>
-    </div>
-
-    <div class="bracket">
-      <p class="bracket-title mono">languages &amp; base</p>
-      <p>Based in {SITE.location}. Working languages: English, Español, Português — covering GCC, Iberia and LATAM engagements natively.</p>
-      <p class="muted">Currently practicing at Core42; the independent practice is separate and makes no claim of company endorsement.</p>
-    </div>
+    </section>
   </div>
-
-  <RoomIsland payload={payload} />
 </Base>
 
 <style>
-  .eyebrow { color: var(--accent); font-size: var(--step--1); margin-bottom: var(--space-3); }
-  h1 { font-size: var(--step-4); }
-  .ctas { display: flex; gap: var(--space-3); flex-wrap: wrap; margin: var(--space-4) 0 var(--space-6); }
-  .tl { display: grid; gap: var(--space-4); max-width: 46rem; }
-  .job { border-left: 2px solid var(--border); padding-left: var(--space-4); position: relative; }
-  .job.now { border-left-color: var(--accent); }
-  .job::before { content: ''; position: absolute; left: -5px; top: 0.45rem; width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
-  .job.now::before { background: var(--accent); box-shadow: 0 0 12px 2px color-mix(in srgb, var(--accent) 60%, transparent); }
-  .job .yr { color: var(--accent); font-size: 0.75rem; }
-  .job .ttl { color: var(--fg-strong); font-weight: 600; }
-  .job .org { font-size: var(--step--1); }
-  .grid { margin-top: var(--space-4); }
-  .skills { margin-top: var(--space-4); }
-  .skills h2, .card h2 { font-size: var(--step--1); color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; }
+  .about-head { display: grid; gap: var(--space-6); align-items: start; padding-bottom: var(--space-7); }
+  .about-head .page-head { padding-bottom: 0; }
+  @media (min-width: 960px) { .about-head { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: var(--space-7); } }
+  .tl { list-style: none; margin: 0 0 var(--space-5); padding: 0; }
+  .tl li { position: relative; display: grid; gap: 2px; padding: 0 0 var(--space-5) var(--space-6); border-left: 2px solid var(--mist); }
+  .tl li:last-child { padding-bottom: 0; }
+  .tl li::before { content: ''; position: absolute; left: -8px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 2px solid var(--border-strong); }
+  .tl li.now::before { background: var(--yellow); border-color: var(--ink); }
+  .tl .yr { font-size: var(--step--1); color: var(--muted); }
+  .tl .ttl { font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); line-height: 1.2; letter-spacing: -0.015em; color: var(--fg-strong); }
+  .tl .org { font-size: var(--step--1); max-width: 40rem; }
+  .stack { margin: 0; display: grid; gap: var(--space-4); max-width: 46rem; }
+  .stack dt { font-weight: 650; color: var(--fg-strong); }
+  .stack dd { margin: 0; }
 </style>

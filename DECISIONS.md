@@ -46,22 +46,41 @@ No testimonials, no "trusted by" logos, no invented case-study metrics — anywh
 
 ## Design
 
-- **Accent: Signal Teal `#00B3A4` + cyan `#22D3EE`.** Rejected: NVIDIA green `#76B900`
-  (another company's trademark; ties a deliberately multivendor practice to one vendor;
-  reads as affiliation the practice cannot claim) and the template's pink `#f07cc0`
-  (fails enterprise credibility for GCC energy/government buyers). Teal keeps the
-  telemetry-on-dark energy of the previous identity, is WCAG-AA legible on near-black
-  in both themes (checked), and "signals instrumentation" — the verified-signal story.
-  Dark bg moved to a green-tinted near-black `#0f1512` to sit under the teal.
-- **The mark** (`scripts/mark.mjs`): a three-node fabric path whose final node carries
-  the verification check — intent in, evidence out, as geometry. OG image, touch icon,
-  favicon.ico and favicon.svg all regenerate from it.
-- **Micro-differentiators (research agent: experience):** dated-number badges (every
-  statistic renders with its source date in a mono chip), verification meters on proof
-  cards (pure-CSS fill on hover/focus), the print-to-pitch stylesheet (the page prints
-  as a one-page consulting brief — services, proof, contact; orbs/nav/chat removed).
-- Kept from the template: co3-style hero (orb + ring + dot grid), glow cards,
-  bracket groups, Poppins/Inter/JetBrains Mono (self-hosted), dark/light with AA.
+Redesigned 2026-11-10 (owner decisions the same day): the 3D experience is dropped, the
+site has one signature look with no light/dark toggle, and the page leads with Marlon,
+not with the practice. The brief that produced it is kept outside the repository.
+
+- **Palette, from fibre and patch-panel vernacular.** Paper `#F4F5FA` (ground), Ink
+  `#0B1230` (text, method band), Cobalt `#2742F5` (the signature colour: hero panel,
+  links, primary buttons), Signal yellow `#FFD12E` (single-mode jacket yellow: "verified"
+  marks and the contact band), Mist `#DDE1EE` (rules). The TIA-598 strand colours (blue,
+  orange, green, brown, slate) appear once, as information: they code the five
+  open-source categories. Rejected again: NVIDIA green (another company's trademark) and
+  the previous dark teal terminal look (read as a template, per the owner).
+- **Type.** Bricolage Grotesque (variable) for display, Hanken Grotesk (variable) for
+  text, both self-hosted through Fontsource. JetBrains Mono only for literal code, such
+  as the typed intent in the hero diagram. No all-caps eyebrows, no numbered section
+  labels, no middle-dot metadata strings.
+- **The one memorable thing** is the hero: the name set very large on a cobalt panel,
+  next to the reference fabric from `agentic-netops` (2 spines, 2 leaves, 4 clients)
+  drawn as an SVG that converges once on load and ends on "Verified on device". Its
+  resting state is the finished state, so reduced motion and print lose nothing
+  (`src/components/Fabric.astro`). Nothing else on the page animates by itself.
+- **Layout.** Three inset colour panels only (hero, method, contact). Everything else is
+  rows and rules on paper. Numbering appears only where the content is a sequence: the
+  three method steps and the career route.
+- **The mark** (`scripts/mark.mjs`): the three-node fabric path on a cobalt tile, the
+  last node yellow with the verification check. The social card, touch icon and favicons
+  regenerate from it; the card is set in static cuts of Bricolage Grotesque
+  (`scripts/assets`, OFL).
+- **Portrait.** `PORTRAIT` in `src/lib/site.ts`; a tight head-and-shoulders crop so no
+  event signage or employer badge is in frame. With it unset, the slot shows a
+  typographic place card.
+- **Kept:** sourced figures next to every number, the print stylesheet, the strict CSP
+  (no inline styles, one hashed inline script), and every URL and anchor.
+- **Removed:** the theme toggle and dark theme, the dot grid, orb and glow cards, scroll
+  reveals, and `content-visibility` on home sections (it made axe report phantom
+  overlaps; Lighthouse performance stays at 0.96 to 0.98 without it).
 
 ## Information architecture
 

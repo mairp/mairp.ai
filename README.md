@@ -1,7 +1,8 @@
 # mairp.ai
 
-The website of Marlon Paz's consulting practice — **Network & AI Systems Consulting**:
-multivendor network automation, agentic NetOps/CloudOps, and sovereign local inference.
+The personal site of Marlon Paz, network and AI infrastructure architect: who he is, the
+public work you can check, and his independent consulting (multivendor network
+automation, agentic NetOps/CloudOps, sovereign local inference).
 Live at **https://mairp.ai**.
 
 Built on the [specstride.ai](https://github.com/mairp/specstride.ai) site template (MIT).

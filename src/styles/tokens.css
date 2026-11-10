@@ -1,22 +1,20 @@
-/* Design tokens: the only place colours, type and spacing are defined. Dark
-   first; light follows prefers-color-scheme, and the toggle (data-theme on
-   <html>) overrides both ways. Accent system: Signal Teal (#00B3A4) with a
-   cyan gradient partner (#22D3EE) — vendor-neutral, telemetry-on-dark, AA in
-   both themes. See DECISIONS.md for why NVIDIA green and the template pink
-   were rejected. */
+/* Design tokens: the only place colours, type and spacing are defined.
+   One signature look, no theme branches. The palette comes from fibre and
+   patch-panel vernacular: a cool paper ground, ink text, cobalt as the voice,
+   single-mode jacket yellow for "verified". See DECISIONS.md → Design. */
 
 :root {
   /* type */
+  --font-display: 'Bricolage Grotesque Variable', 'Hanken Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Hanken Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --step--1: 0.8125rem;
-  --step-0: 1rem;
-  --step-1: 1.125rem;
-  --step-2: 1.375rem;
-  --font-display: 'Poppins', var(--font-sans);
-  --step-3: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
-  --step-4: clamp(1.75rem, 1.1rem + 2.6vw, 3rem);
-  --step-5: clamp(2.4rem, 1.2rem + 5.2vw, 5rem);
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.5rem;
+  --step-3: clamp(1.6rem, 1.3rem + 1.2vw, 2.1rem);
+  --step-4: clamp(2.1rem, 1.3rem + 3.2vw, 3.6rem);
+  --step-5: clamp(5rem, 20vw, 9.5rem);
   --leading: 1.6;
 
   /* spacing */
@@ -28,89 +26,71 @@
   --space-6: 2rem;
   --space-7: 3rem;
   --space-8: 4.5rem;
-  --space-9: 6.5rem;
+  --space-9: 7rem;
   --gutter: 16px;
-  --max: 72rem;
-  --radius: 8px;
+  --max: 78rem;
+  --radius: 14px;
+  --radius-panel: 28px;
 
-  /* colour: dark */
-  --bg: #0f1512;
-  --surface: #161d1a;
-  --surface-2: #1d2622;
-  --border: #2c3a35;
-  --fg: #d2ddd8;
-  --fg-strong: #ffffff;
-  --muted: #93a5a0;
-  --accent: #00b3a4;
-  --accent-2: #22d3ee;
-  --accent-ink: #04211d;
-  --ok: #4ade80;
-  --warn: #f5b342;
-  --err: #ff6b6b;
-  --info: #8b9cff;
-  --cyan: #22d3ee;
-  --focus: #22d3ee;
+  /* palette */
+  --paper: #f4f5fa;
+  --ink: #0b1230;
+  --cobalt: #2742f5;
+  --cobalt-deep: #1b31c9;
+  --yellow: #ffd12e;
+  --mist: #dde1ee;
 
-  /* canvas: card fill, the dot grid, and the accent used as light.
-     The dot grid is one 12×12 SVG tile (cheaper to paint than a live
-     radial-gradient tile; see DECISIONS.md). */
-  --card: #121917;
-  --dots-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Ccircle cx='6' cy='6' r='1' fill='rgb(220 255 250 / 0.09)'/%3E%3C/svg%3E");
-  --orb-core: #ffffff;
-  --orb-edge: #00b3a4;
-  --ring: rgb(180 235 228 / 0.3);
-
-  color-scheme: dark;
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) {
-    --bg: #fafaf7;
-    --surface: #ffffff;
-    --surface-2: #eef2f0;
-    --border: #d6ddd9;
-    --fg: #242b28;
-    --fg-strong: #000000;
-    --muted: #52605b;
-    --accent: #0a7d70;
-    --accent-2: #0e7490;
-    --accent-ink: #ffffff;
-    --ok: #0e6a2f;
-    --warn: #774700;
-    --err: #c42b2b;
-    --info: #3043c2;
-    --cyan: #0b7a86;
-    --focus: #0a7d70;
-    --card: #ffffff;
-    --dots-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Ccircle cx='6' cy='6' r='1' fill='rgb(0 60 50 / 0.13)'/%3E%3C/svg%3E");
-    --orb-core: #d8fbf5;
-    --orb-edge: #0fb5a6;
-    --ring: rgb(10 125 112 / 0.3);
-    color-scheme: light;
-  }
-}
-
-:root[data-theme='light'] {
-  --bg: #fafaf7;
+  /* roles (the twin widget and every component read these) */
+  --bg: var(--paper);
   --surface: #ffffff;
-  --surface-2: #eef2f0;
-  --border: #d6ddd9;
-  --fg: #242b28;
-  --fg-strong: #000000;
-  --muted: #52605b;
-  --accent: #0a7d70;
-  --accent-2: #0e7490;
+  --surface-2: #e9ecf6;
+  --border: var(--mist);
+  --border-strong: #8a93b2;
+  --fg: #1c2444;
+  --fg-strong: var(--ink);
+  --muted: #4e5878;
+  --accent: var(--cobalt);
   --accent-ink: #ffffff;
-  --ok: #0e6a2f;
-  --warn: #774700;
+  --ok: #0b7a3b;
+  --warn: #8a5200;
   --err: #c42b2b;
-  --info: #3043c2;
-  --cyan: #0b7a86;
-  --focus: #0a7d70;
-  --card: #ffffff;
-  --dot: rgb(0 60 50 / 0.13);
-  --orb-core: #d8fbf5;
-  --orb-edge: #0fb5a6;
-  --ring: rgb(10 125 112 / 0.3);
+  --focus: var(--cobalt);
+
+  /* TIA-598 strand colours: they code the five open-source categories. */
+  --strand-blue: #2742f5;
+  --strand-orange: #f26a1b;
+  --strand-green: #1e9e55;
+  --strand-brown: #8a5a33;
+  --strand-slate: #5c6784;
+
   color-scheme: light;
+}
+
+/* Local palettes: a section sets one class and every child reads the same roles. */
+.on-cobalt {
+  --bg: var(--cobalt);
+  --fg: #e6eaff;
+  --fg-strong: #ffffff;
+  --muted: #d3daff;
+  --accent: #ffffff;
+  --border: rgb(255 255 255 / 0.28);
+  --focus: var(--yellow);
+}
+.on-ink {
+  --bg: var(--ink);
+  --fg: #d5daee;
+  --fg-strong: #ffffff;
+  --muted: #aab3d4;
+  --accent: #a9b8ff;
+  --border: #2a3360;
+  --focus: var(--yellow);
+}
+.on-yellow {
+  --bg: var(--yellow);
+  --fg: #1c2444;
+  --fg-strong: var(--ink);
+  --muted: #3a3f55;
+  --accent: var(--ink);
+  --border: rgb(11 18 48 / 0.25);
+  --focus: var(--ink);
 }

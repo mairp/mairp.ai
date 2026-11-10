@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// axe-core over every page in both themes (Lighthouse only checks the light one).
+// axe-core over every page (the site has one theme).
 // Usage: node scripts/a11y.mjs [baseURL]
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -9,7 +9,7 @@ const base = process.argv[2] ?? 'http://localhost:4321';
 const pages = ['/', '/services/svc-agentic-netops/', '/services/svc-local-inference/', '/about/', '/nope/'];
 const browser = await chromium.launch();
 let bad = 0;
-for (const theme of ['dark', 'light']) {
+for (const theme of ['light']) {
   const page = await browser.newPage({ colorScheme: theme, reducedMotion: 'reduce', bypassCSP: true });
   for (const p of pages) {
     await page.goto(base + p);

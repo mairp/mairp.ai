@@ -3,7 +3,7 @@ export const SITE = {
   name: 'Marlon Paz',
   practice: 'Network & AI Systems Consulting',
   url: 'https://mairp.ai',
-  title: 'Marlon Paz — Infrastructure that verifies itself',
+  title: 'Marlon Paz, network and AI infrastructure architect',
   description:
     'Independent consulting by Marlon Paz: multivendor network automation, agentic NetOps/CloudOps (intent-to-fabric with verified-on-device change), and sovereign local inference on your own GPUs. Every claim on this site links to public evidence.',
   tagline: 'Infrastructure that verifies itself.',
@@ -19,10 +19,34 @@ export const SITE = {
 } as const;
 
 export const NAV = [
+  { href: '/#proof', label: 'Work' },
   { href: '/#services', label: 'Services' },
-  { href: '/#proof', label: 'Proof' },
   { href: '/#open-source', label: 'Open source' },
   { href: '/about/', label: 'About' },
+] as const;
+
+/**
+ * The portrait. Set `src` (4:5, 640 px wide) and `small` (400 px wide) to files under public/assets
+ * and the About band and the About page show it; while it is null they show the
+ * typographic place card instead.
+ */
+export const PORTRAIT: { src: string; small: string; width: number; height: number } | null = {
+  src: '/assets/portrait.webp',
+  small: '/assets/portrait-400.webp',
+  width: 640,
+  height: 800,
+};
+
+/** The one-sentence statement under the name. */
+export const STATEMENT = 'I build networks that prove their own changes, and AI that runs on your own GPUs.';
+
+/** Credentials named in the hero: each is verifiable from the badge wall or the papers. */
+export const HERO_CREDENTIALS = [
+  'CCIE Service Provider',
+  'Certified Kubernetes Administrator',
+  'NVIDIA-Certified Professional, Agentic AI',
+  'IEEE and Springer co-author',
+  'English, Español, Português',
 ] as const;
 
 /** Vendor fluency band: CV-backed, shown as text — never as logo soup. */

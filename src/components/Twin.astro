@@ -4,18 +4,18 @@
 // grounded in the public work (repos, papers, labs). See DECISIONS.md.
 // Markup only; behaviour is the bundled external script below (CSP-safe).
 ---
-<button id="twin-launch" data-twin-open type="button" aria-label="Open the lab twin chat">
+<button id="twin-launch" data-twin-open type="button" aria-label="Open the digital twin chat">
   <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
     <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
   </svg>
-  Ask the lab twin
+  Ask my digital twin
 </button>
-<div id="twin-panel" role="dialog" aria-label="Marlon's lab twin — technical Q&A" aria-modal="false">
+<div id="twin-panel" role="dialog" aria-label="Marlon's digital twin, technical Q&A" aria-modal="false">
   <div class="twin-head">
     <span class="dot" aria-hidden="true"></span>
     <div>
-      <div class="twin-title">Marlon's lab twin</div>
-      <div class="twin-sub mono">TECHNICAL Q&amp;A · SHOWS ITS SOURCES</div>
+      <div class="twin-title">Marlon's digital twin</div>
+      <div class="twin-sub">Technical Q&amp;A that shows its sources</div>
     </div>
     <button class="twin-x" id="twin-close" type="button" aria-label="Close chat">&times;</button>
   </div>
@@ -35,27 +35,28 @@
   #twin-launch {
     position: fixed; right: max(var(--gutter), 16px); bottom: 20px; z-index: 80;
     display: inline-flex; align-items: center; gap: var(--space-2);
-    background: var(--surface); color: var(--fg-strong);
-    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
-    border-radius: 999px; padding: 0.6rem 1.1rem; cursor: pointer;
-    font-family: var(--font-sans); font-size: 0.9rem; font-weight: 500;
-    box-shadow: 0 10px 40px -12px color-mix(in srgb, var(--accent) 45%, transparent);
-    min-height: 44px;
+    background: var(--ink); color: #fff;
+    border: 0;
+    border-radius: 999px; padding: 0.75rem 1.2rem; cursor: pointer;
+    font-family: var(--font-sans); font-size: 0.9375rem; font-weight: 650;
+    box-shadow: 0 12px 30px -10px rgb(11 18 48 / 0.5);
+    min-height: 48px;
   }
-  #twin-launch:hover { background: var(--accent); color: var(--accent-ink); }
+  #twin-launch:hover { background: var(--cobalt); }
+  #twin-launch.tucked { visibility: hidden; }
   #twin-panel {
     position: fixed; right: max(var(--gutter), 16px); bottom: 20px; z-index: 90;
     width: min(420px, calc(100vw - 32px));
     display: none; flex-direction: column;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.55);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    box-shadow: 0 30px 80px -20px rgb(11 18 48 / 0.45);
     max-height: min(600px, calc(100vh - 40px)); overflow: hidden;
   }
   #twin-panel.open { display: flex; }
   .twin-head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); background: var(--surface-2); }
-  .twin-head .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 10px 1px var(--ok); flex: none; }
+  .twin-head .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ok); flex: none; }
   .twin-title { font-weight: 600; color: var(--fg-strong); line-height: 1.2; }
-  .twin-sub { font-size: 0.68rem; letter-spacing: 0.08em; color: var(--muted); }
+  .twin-sub { font-size: 0.8125rem; color: var(--muted); }
   .twin-x { margin-left: auto; background: none; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; min-width: 44px; min-height: 44px; }
   .twin-x:hover { color: var(--fg-strong); }
   .twin-log { overflow-y: auto; padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); min-height: 160px; }
@@ -67,11 +68,11 @@
      the twin's answers in a bordered surface bubble on the left, each with a
      mono sender label. */
   .twin-msg { font-size: 0.9rem; line-height: 1.5; max-width: 92%; border-radius: 12px; padding: var(--space-2) var(--space-3); overflow-wrap: anywhere; }
-  .twin-msg .who { display: block; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2px; }
+  .twin-msg .who { display: block; font-size: 0.75rem; font-weight: 650; margin-bottom: 2px; }
   .twin-msg.bot { align-self: flex-start; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px 12px 12px 2px; color: var(--fg); }
   .twin-msg.bot .who { color: var(--accent); }
   .twin-msg.user { align-self: flex-end; background: var(--accent); color: var(--accent-ink); border-radius: 12px 12px 2px 12px; }
-  .twin-msg.user .who { color: color-mix(in srgb, var(--accent-ink) 75%, transparent); }
+  .twin-msg.user .who { color: var(--accent-ink); }
   .twin-msg.user a { color: var(--accent-ink); font-weight: 600; }
   .twin-msg.err { align-self: center; color: var(--warn); font-size: 0.8rem; background: color-mix(in srgb, var(--warn) 10%, transparent); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); }
   .twin-msg a { overflow-wrap: anywhere; }
@@ -83,15 +84,15 @@
   .twin-foot { display: flex; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border); background: var(--surface-2); }
   #twin-input {
     flex: 1; resize: none; font-family: var(--font-sans); font-size: 0.9rem;
-    background: var(--bg); color: var(--fg); border: 1px solid var(--border);
-    border-radius: 8px; padding: var(--space-2); max-height: 90px;
+    background: var(--surface); color: var(--fg); border: 1px solid var(--border-strong);
+    border-radius: 12px; padding: var(--space-2); max-height: 90px;
   }
   #twin-input:focus-visible { outline: 2px solid var(--focus); outline-offset: 0; }
   .twin-send {
-    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 8px;
-    padding: 0 var(--space-4); font-weight: 600; cursor: pointer; min-height: 44px;
+    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 999px;
+    padding: 0 var(--space-5); font-weight: 650; cursor: pointer; min-height: 44px;
   }
-  .twin-send:disabled { opacity: 0.45; cursor: not-allowed; }
+  .twin-send:disabled { background: var(--surface); color: var(--muted); box-shadow: inset 0 0 0 1px var(--border-strong); cursor: not-allowed; }
   @media print { #twin-launch, #twin-panel { display: none !important; } }
 </style>
 
@@ -136,8 +137,8 @@
     // Sender label first: "you" vs "twin" is never ambiguous, in either theme.
     if (kind === 'user' || kind === 'bot') {
       const who = document.createElement('span');
-      who.className = 'who mono';
-      who.textContent = kind === 'user' ? 'you' : 'twin';
+      who.className = 'who';
+      who.textContent = kind === 'user' ? 'You' : 'Twin';
       el.appendChild(who);
     }
     // Linkify http(s) URLs. XSS-safe: model output never touches innerHTML;
@@ -202,7 +203,7 @@
     ensureTurnstile().catch(() => {});
     if (!greeted) {
       greeted = true;
-      addMsg('bot', "Hi — I'm the lab twin of Marlon Paz, grounded in his public work. Ask me how intent-to-fabric verification, gNMI closed loops or local GPU serving actually work; I'll point back to the repo or paper.");
+      addMsg('bot', "Hi, I'm Marlon's digital twin, grounded in his public work. Ask me how intent-to-fabric verification, gNMI closed loops or local GPU serving work, and I'll point back to the repository or paper.");
     }
     input?.focus();
   }
@@ -266,6 +267,11 @@
     }
   }
 
+  // The hero has its own twin button, so the floating one waits until the hero is gone.
+  const hero = document.getElementById('top');
+  if (hero && launch && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => launch.classList.toggle('tucked', e.isIntersecting), { threshold: 0.15 }).observe(hero);
+  }
   launch?.addEventListener('click', openPanel);
   document.getElementById('twin-close')?.addEventListener('click', closePanel);
   send?.addEventListener('click', submit);
@@ -273,6 +279,11 @@
   input?.addEventListener('input', () => { if (!input) return; input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 90)}px`; });
   // Any element marked data-twin-open (e.g. the home-page band button) opens the twin.
   for (const el of document.querySelectorAll<HTMLElement>('[data-twin-open]')) {
-    if (el !== launch) el.addEventListener('click', openPanel);
+    if (el === launch) continue;
+    el.addEventListener('click', () => {
+      openPanel();
+      // A sample question fills the box; the visitor still presses Send.
+      if (el.dataset.twinQ && input) { input.value = el.dataset.twinQ; input.dispatchEvent(new Event('input')); }
+    });
   }
 </script>
