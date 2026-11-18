@@ -1,8 +1,10 @@
 ---
 // The portrait slot. With PORTRAIT set in src/lib/site.ts it shows the photo;
 // until then it shows a typographic place card, so the page is finished either way.
+// The photo is a cut-out on a cobalt panel that is part of the image, with the head
+// rising above the panel on transparency, so the img gets no background, radius or crop.
 import { PORTRAIT, SITE } from '../lib/site';
-const places = ['San Salvador', 'Lisboa', 'Abu Dhabi'];
+const places = ['Lisboa', 'Abu Dhabi'];
 ---
 {PORTRAIT ? (
   <figure class="portrait">
@@ -11,7 +13,7 @@ const places = ['San Salvador', 'Lisboa', 'Abu Dhabi'];
   </figure>
 ) : (
   <div class="places">
-    <p class="visually-hidden">Based in Abu Dhabi, after San Salvador and Lisbon. Works in English, Spanish and Portuguese.</p>
+    <p class="visually-hidden">Based in Abu Dhabi, after Lisbon. Works in English, Spanish and Portuguese.</p>
     <ol aria-hidden="true">
       {places.map((p) => <li>{p}</li>)}
     </ol>
@@ -22,7 +24,7 @@ const places = ['San Salvador', 'Lisboa', 'Abu Dhabi'];
 <style>
   .portrait { margin: 0; max-width: 12rem; }
   @media (min-width: 900px) { .portrait { max-width: 20rem; } }
-  .portrait img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius-panel); background: var(--mist); }
+  .portrait img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; }
   .portrait figcaption { margin-top: var(--space-3); font-size: var(--step--1); color: var(--muted); }
 
   .places { background: var(--mist); border-radius: var(--radius-panel); padding: var(--space-6); display: grid; gap: var(--space-6); align-content: space-between; min-height: 18rem; }

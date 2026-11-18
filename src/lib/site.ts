@@ -28,11 +28,13 @@ export const NAV = [
 /**
  * The portrait. Set `src` (4:5, 640 px wide) and `small` (400 px wide) to files under public/assets
  * and the About band and the About page show it; while it is null they show the
- * typographic place card instead.
+ * typographic place card instead. The image carries its own cobalt panel and is
+ * transparent around it (see DECISIONS.md, Design). /assets is cached for a day, so a
+ * new photo gets a new file name.
  */
 export const PORTRAIT: { src: string; small: string; width: number; height: number } | null = {
-  src: '/assets/portrait.webp',
-  small: '/assets/portrait-400.webp',
+  src: '/assets/portrait-2026.webp',
+  small: '/assets/portrait-2026-400.webp',
   width: 640,
   height: 800,
 };
