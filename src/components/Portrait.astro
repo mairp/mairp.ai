@@ -4,7 +4,7 @@
 // The photo is a cut-out on a cobalt panel that is part of the image, with the head
 // rising above the panel on transparency, so the img gets no background, radius or crop.
 import { PORTRAIT, SITE } from '../lib/site';
-const places = ['San Salvador', 'Lisboa', 'Abu Dhabi'];
+const places = ['Lisboa', 'Abu Dhabi'];
 ---
 {PORTRAIT ? (
   <figure class="portrait">
@@ -13,7 +13,7 @@ const places = ['San Salvador', 'Lisboa', 'Abu Dhabi'];
   </figure>
 ) : (
   <div class="places">
-    <p class="visually-hidden">Based in Abu Dhabi, after San Salvador and Lisbon. Works in English, Spanish and Portuguese.</p>
+    <p class="visually-hidden">Based in Abu Dhabi, after Lisbon. Works in English, Spanish and Portuguese.</p>
     <ol aria-hidden="true">
       {places.map((p) => <li>{p}</li>)}
     </ol>
