@@ -38,9 +38,9 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
   <rect width="1200" height="630" fill="${COBALT}" />
   <text x="70" y="250" font-family="${BOLD}" font-size="190" letter-spacing="-8" fill="#fff">Marlon</text>
   <text x="70" y="410" font-family="${BOLD}" font-size="190" letter-spacing="-8" fill="#fff">Paz</text>
-  <text x="76" y="492" font-family="${MEDIUM}" font-size="31" fill="#fff">I build networks that prove their own changes,</text>
-  <text x="76" y="534" font-family="${MEDIUM}" font-size="31" fill="#fff">and AI that runs on your own GPUs.</text>
-  <text x="76" y="590" font-family="${MEDIUM}" font-size="24" fill="#d3daff">Network and AI infrastructure architect, Abu Dhabi</text>
+  <text x="76" y="492" font-family="${MEDIUM}" font-size="31" fill="#fff">I build network, cloud and AI infrastructure</text>
+  <text x="76" y="534" font-family="${MEDIUM}" font-size="31" fill="#fff">that proves its own changes.</text>
+  <text x="76" y="590" font-family="${MEDIUM}" font-size="24" fill="#d3daff">Network, cloud and AI infrastructure architect, Abu Dhabi</text>
   <text x="1130" y="590" font-family="${BOLD}" font-size="28" fill="${YELLOW}" text-anchor="end">mairp.ai</text>
   ${fabric}
 </svg>`;

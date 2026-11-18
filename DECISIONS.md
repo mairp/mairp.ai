@@ -27,6 +27,13 @@ until the device proves it.* The moat is not "AI" — every boutique says AI —
 as the hub. Owner sign-off 2026-10-07 (naming, tagline variant "on your own GPUs",
 accent, curated+grouped grid, Core42 as credential line only).
 
+**Broadened 2026-11-18 (owner).** The statement under the name read "I build networks
+that prove their own changes, and AI that runs on your own GPUs.", which framed the work as
+networks only. It now reads "I build network, cloud and AI infrastructure that proves its own
+changes.", and the role line is "network, cloud and AI infrastructure architect" (title, meta
+description, footer, social card). Sovereign inference on your own GPUs stays in the meta
+description and the services. The jobTitle in the JSON-LD and the practice name are unchanged.
+
 ## Claim → evidence map (the honesty rule)
 
 | Claim on the site | Evidence |
