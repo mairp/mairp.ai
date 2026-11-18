@@ -73,9 +73,18 @@ not with the practice. The brief that produced it is kept outside the repository
   last node yellow with the verification check. The social card, touch icon and favicons
   regenerate from it; the card is set in static cuts of Bricolage Grotesque
   (`scripts/assets`, OFL).
-- **Portrait.** `PORTRAIT` in `src/lib/site.ts`; a tight head-and-shoulders crop so no
-  event signage or employer badge is in frame. With it unset, the slot shows a
-  typographic place card.
+- **Portrait.** `PORTRAIT` in `src/lib/site.ts`. Since 2026-11-18 it is the studio
+  photo, cut out of its grey backdrop and set on a flat cobalt panel with the head
+  rising above the panel's top edge. The suit is already ink and the shirt paper, so
+  only the backdrop had to change for the photo to belong to the page; the red tie is
+  left as the one warm note. The panel and its rounded corners are part of the image
+  (transparent WebP), so it prints and needs no extra CSS. This is a fourth cobalt
+  surface next to the three panels, accepted because it is a photograph, not a band.
+  Tried and dropped: the fabric motif behind him (its lines met the head at ear and
+  jaw height and turned to noise at 192 px), an ink ground (the suit disappears into
+  it) and a mist ground (reads as an ID photo). Nothing about the person is retouched.
+  The source photo, the cut-out and the render script stay outside the repository.
+  With `PORTRAIT` unset, the slot shows a typographic place card.
 - **Kept:** sourced figures next to every number, the print stylesheet, the strict CSP
   (no inline styles, one hashed inline script), and every URL and anchor.
 - **Cost of the hero diagram.** Its first version animated SVG geometry (stroke
@@ -187,6 +196,9 @@ sheer card count on the ledger band — trim `.reveal` and halos further there.
   `www.mairp.ai` → `mairp.github.io` (both unproxied). GitHub Pages serves the
   old site within minutes; its repo is untouched and its grid was last synced
   2026-10-07.
+- 2026-11-18: studio portrait. The images ship as `portrait-2026.webp` and
+  `portrait-2026-400.webp`; the previous `portrait.webp` and `portrait-400.webp`
+  are removed, so those two URLs now return 404.
 
 ## Addendum (2026-10-07): vendor band updates
 
