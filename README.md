@@ -1,6 +1,6 @@
 # mairp.ai
 
-The personal site of Marlon Paz, network and AI infrastructure architect: who he is, the
+The personal site of Marlon Paz, network, cloud and AI infrastructure architect: who he is, the
 public work you can check, and his independent consulting (multivendor network
 automation, agentic NetOps/CloudOps, sovereign local inference).
 Live at **https://mairp.ai**.

@@ -3,9 +3,9 @@ export const SITE = {
   name: 'Marlon Paz',
   practice: 'Network & AI Systems Consulting',
   url: 'https://mairp.ai',
-  title: 'Marlon Paz, network and AI infrastructure architect',
+  title: 'Marlon Paz: network, cloud and AI infrastructure architect',
   description:
-    'Independent consulting by Marlon Paz: multivendor network automation, agentic NetOps/CloudOps (intent-to-fabric with verified-on-device change), and sovereign local inference on your own GPUs. Every claim on this site links to public evidence.',
+    'Marlon Paz designs and automates network, cloud and AI infrastructure: multivendor fabrics, Kubernetes platforms, agentic NetOps/CloudOps with verified-on-device change, and sovereign inference on your own GPUs. Every claim on this site links to public evidence.',
   tagline: 'Infrastructure that verifies itself.',
   caption: 'AI you can run on your own GPUs.',
   email: 'marlon.paz@ieee.org',
@@ -40,7 +40,7 @@ export const PORTRAIT: { src: string; small: string; width: number; height: numb
 };
 
 /** The one-sentence statement under the name. */
-export const STATEMENT = 'I build networks that prove their own changes, and AI that runs on your own GPUs.';
+export const STATEMENT = 'I build network, cloud and AI infrastructure that proves its own changes.';
 
 /** Credentials named in the hero: each is verifiable from the badge wall or the papers. */
 export const HERO_CREDENTIALS = [
